@@ -885,7 +885,23 @@ function parseTabela(csv){
   });
   const metaPct = metaLbls.map(k=>metaPctMap[k]||0);
 
-  // Pace items
+  // Data de última atualização manual — col L (label) e M (valor) linha 24
+  let dataAtualizacao = null;
+  lines.forEach(line=>{
+    const cols = splitLine(line);
+    // Procura linha com label "ultima" ou "atualiz" em qualquer coluna
+    const hasLabel = cols.some(c=>c.toLowerCase().includes('ultima') || c.toLowerCase().includes('atualiz'));
+    if(hasLabel){
+      // Pega a próxima célula não vazia após o label
+      const idx = cols.findIndex(c=>c.toLowerCase().includes('ultima') || c.toLowerCase().includes('atualiz'));
+      for(let i=idx+1;i<cols.length;i++){
+        if(cols[i] && cols[i].trim()){
+          dataAtualizacao = cols[i].trim();
+          break;
+        }
+      }
+    }
+  });
   const paceItems = lineMeta && lineReal ? [
     {lbl:'Receita×Dias',meta:gp(lineMeta,4), real:gp(lineReal,4), fmt:v=>fmtR(v)},
     {lbl:'Receita/dia', meta:gp(lineMeta,5), real:gp(lineReal,5), fmt:v=>fmtR(v)},
@@ -894,7 +910,7 @@ function parseTabela(csv){
     {lbl:'Vendas/dia',  meta:gp(lineMeta,8), real:gp(lineReal,8), fmt:v=>fmtN(v)},
   ].map(p=>({...p,pct:p.meta&&p.real?p.real/p.meta:1})) : defaults.pace.items;
 
-  return {receita,ticket,vendas,vendasDia,hidrat,custo,
+  return {receita,ticket,vendas,vendasDia,hidrat,custo,dataAtualizacao,
     pace:{diasUteis,diasTrabalhados,diasFaltantes,items:paceItems},
     metaPct:metaPct.length>=5?metaPct.slice(0,7):defaults.metaPct,
     planos:defaults.planos, ads:defaults.ads, semanal:defaults.semanal};
@@ -1380,17 +1396,14 @@ async function loadData(noCache=false){
     let d = parseTabela(csvTab);
     d = parsePlanos(csvPlan, d);
     d = parseAds(csvAds, d);
-    console.table({receita:d.receita, ticket:d.ticket, vendas:d.vendas, vendasDia:d.vendasDia, hidrat:d.hidrat});
-    console.log('pace:', d.pace.items.map(p=>({lbl:p.lbl,meta:p.meta,real:p.real,pct:(p.pct*100).toFixed(1)+'%'})));
     renderAll(d);
-    const now = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    setStatus('✅ Sheets · ' + now, 'var(--green)');
-    console.log('✅ Dados carregados do Google Sheets', {receita:d.receita, ticket:d.ticket, vendas:d.vendas, hidrat:d.hidrat, planos:d.planos});
+    const dataLabel = d.dataAtualizacao
+      || new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+    setStatus('✅ Atualizado até ' + dataLabel, 'var(--green)');
   } catch(e){
-    const now = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    setStatus('⚠️ Dados locais · ' + now, 'var(--red)');
+    const hoje = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+    setStatus('⚠️ Dados locais · ' + hoje, 'var(--amber)');
     console.warn('⚠️ Erro ao carregar Sheets:', e.message);
-    // Mesmo com erro, renderiza com dados estáticos
     renderAll(defaults);
   } finally {
     spinIcon(false);
