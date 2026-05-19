@@ -942,20 +942,31 @@ function parsePlanos(csv, d){
 }
 
 function parseAds(csv, d){
-  const rows = parseCSV(csv);
+  // Estrutura da aba GOOGLE ADS:
+  // col0=campanha, col1=mês, col2=clientes, col3=investimento, col4=CAC, col5=faturamento, col6=ticket, col7=ROAS
   const mesesKey=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
-  const dr = rows.filter(r=>mesesKey.includes((r[1]||r[0]||'').toLowerCase().trim()) && parseBR(r[3])>0);
-  if(!dr.length) return d;
+  const lines = csv.trim().split('\n');
   const meses=[],invest=[],fat=[],cac=[],roas=[],clientes=[];
-  dr.forEach(r=>{
-    const col = mesesKey.includes((r[0]||'').toLowerCase())?0:1;
-    meses.push(r[col+1]||r[col]);
-    clientes.push(parseBR(r[col+1+1])||0);
-    invest.push(parseBR(r[col+1+2])||0);
-    cac.push(parseBR(r[col+1+3])||0);
-    fat.push(parseBR(r[col+1+4])||0);
-    roas.push(parseBR(r[col+1+6])||0);
+
+  lines.forEach(line=>{
+    const cols = splitLine(line);
+    // Acha o mês em qualquer posição
+    const mesIdx = cols.findIndex(c=>mesesKey.includes(c.toLowerCase().trim()));
+    if(mesIdx === -1) return;
+    const mes = cols[mesIdx].toLowerCase().trim();
+    // Offsets relativos ao mês: +1=clientes, +2=invest, +3=CAC, +4=fat, +5=ticket, +6=ROAS
+    const inv = parseBR(cols[mesIdx+2]);
+    const ft  = parseBR(cols[mesIdx+4]);
+    if(!inv || inv <= 0) return; // ignora linhas sem investimento
+    meses.push(mes.charAt(0).toUpperCase()+mes.slice(1));
+    clientes.push(parseBR(cols[mesIdx+1])||0);
+    invest.push(inv);
+    cac.push(parseBR(cols[mesIdx+3])||0);
+    fat.push(ft||0);
+    roas.push(parseBR(cols[mesIdx+6])||0);
   });
+
+  if(!meses.length) return d;
   return {...d, ads:{meses,invest,fat,cac,roas,clientes}};
 }
 
