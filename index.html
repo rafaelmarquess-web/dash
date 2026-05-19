@@ -748,8 +748,8 @@ function parseBR(s){
 }
 function parseCSV(txt){
   const _lines = txt.trim().split('\n');
-  const sep = (lines[0].split(';').length > lines[0].split(',').length) ? ';' : ',';
-  return lines.map(l=>l.split(sep).map(c=>c.replace(/^"|"$/g,'').trim()));
+  const sep = (_lines[0].split(';').length > _lines[0].split(',').length) ? ';' : ',';
+  return _lines.map(l=>l.split(sep).map(c=>c.replace(/^"|"$/g,'').trim()));
 }
 
 // Parser CSV que respeita vírgulas dentro de aspas
