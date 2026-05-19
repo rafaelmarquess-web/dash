@@ -1310,7 +1310,7 @@ function switchTab(name,btn){
 // ── fetch e inicialização ────────────────────────────────
 // OPCIONAL: cole aqui a URL do Google Apps Script para iOS
 // Veja instruções em: script.google.com → novo projeto → cole o código abaixo → publicar como web app
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxYqs6sdipqz25uUpUJtbg7E1HJD1atT4UNffLxcS16_KZXcYn-KtsFAMKJ37l-hj0DUA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuS-aVKOUryyviMaXq5p1WhnnNTUZblK_2ClUdW7376b25yt95-EmX5h75HOELGiMJDg/exec';
 
 function bustCache(url){ return url + '&t=' + Date.now(); }
 
@@ -1320,9 +1320,13 @@ async function fetchCSV(url, noCache=false){
   // Apps Script (melhor para iOS — funciona sempre)
   if(APPS_SCRIPT_URL){
     try {
-      const r = await fetch(APPS_SCRIPT_URL + '?url=' + encodeURIComponent(url), {cache:'no-store'});
+      const r = await fetch(APPS_SCRIPT_URL + '?url=' + encodeURIComponent(url), {
+        cache:'no-store',
+        mode:'cors'
+      });
       if(r.ok){ const t=await r.text(); if(t.length>100) return t; }
-    } catch(e){}
+      console.warn('Apps Script retornou status:', r.status);
+    } catch(e){ console.warn('Apps Script erro:', e.message); }
   }
 
   // Direto
