@@ -711,7 +711,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 const BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSGb4fpK871TkpyPynaHKan90Ls_TWX8eMXiyY4cKTGGtyuFAxQHLK7ZKGQdtIDGal3cFs27ztQNZ8h/pub';
 const SHEET_TABELA  = BASE + '?gid=0&single=true&output=csv';
 const SHEET_PLANOS  = BASE + '?gid=2146534632&single=true&output=csv';
-const SHEET_ADS     = BASE + '?gid=1118867912&single=true&output=csv';
+const SHEET_ADS     = BASE + '?gid=136933923&single=true&output=csv';
 const SHEET_SEMANAL = BASE + '?gid=622872267&single=true&output=csv';
 
 // Fallback com dados estáticos (usado se o fetch falhar)
@@ -942,28 +942,24 @@ function parsePlanos(csv, d){
 }
 
 function parseAds(csv, d){
-  // Estrutura da aba GOOGLE ADS:
-  // col0=campanha, col1=mês, col2=clientes, col3=investimento, col4=CAC, col5=faturamento, col6=ticket, col7=ROAS
+  // Estrutura: col0=campanha, col1=mês, col2=clientes, col3=investimento, col4=CAC, col5=faturamento, col6=ticket, col7=ROAS
   const mesesKey=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
   const lines = csv.trim().split('\n');
   const meses=[],invest=[],fat=[],cac=[],roas=[],clientes=[];
 
   lines.forEach(line=>{
     const cols = splitLine(line);
-    // Acha o mês em qualquer posição
-    const mesIdx = cols.findIndex(c=>mesesKey.includes(c.toLowerCase().trim()));
-    if(mesIdx === -1) return;
-    const mes = cols[mesIdx].toLowerCase().trim();
-    // Offsets relativos ao mês: +1=clientes, +2=invest, +3=CAC, +4=fat, +5=ticket, +6=ROAS
-    const inv = parseBR(cols[mesIdx+2]);
-    const ft  = parseBR(cols[mesIdx+4]);
-    if(!inv || inv <= 0) return; // ignora linhas sem investimento
+    // mês está sempre na col1 (índice 1)
+    const mes = (cols[1]||'').toLowerCase().trim();
+    if(!mesesKey.includes(mes)) return;
+    const inv = parseBR(cols[3]);
+    if(!inv || inv <= 0) return; // ignora meses sem dados
     meses.push(mes.charAt(0).toUpperCase()+mes.slice(1));
-    clientes.push(parseBR(cols[mesIdx+1])||0);
+    clientes.push(parseBR(cols[2])||0);
     invest.push(inv);
-    cac.push(parseBR(cols[mesIdx+3])||0);
-    fat.push(ft||0);
-    roas.push(parseBR(cols[mesIdx+6])||0);
+    cac.push(parseBR(cols[4])||0);
+    fat.push(parseBR(cols[5])||0);
+    roas.push(parseBR(cols[7])||0);
   });
 
   if(!meses.length) return d;
