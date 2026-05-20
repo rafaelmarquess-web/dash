@@ -657,44 +657,82 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 <!-- ===== ABA SEMANAL ===== -->
 <div id="tab-semanal" class="tab-content">
 
-  <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr)">
-    <div class="kpi" style="--acc:var(--green)"><div class="kpi-label">Jan — total</div><div class="kpi-val">R$ 48,5K</div><div class="kpi-footer"><span>480 atend.</span></div><div class="kpi-accent"></div></div>
-    <div class="kpi" style="--acc:var(--blue)"><div class="kpi-label">Fev — total</div><div class="kpi-val">R$ 53,9K</div><div class="kpi-footer"><span>492 atend.</span></div><div class="kpi-accent"></div></div>
-    <div class="kpi" style="--acc:var(--pink)"><div class="kpi-label">Mar — total</div><div class="kpi-val">R$ 55,6K</div><div class="kpi-footer"><span>510 atend.</span></div><div class="kpi-accent"></div></div>
-    <div class="kpi" style="--acc:var(--amber)"><div class="kpi-label">Abr — total</div><div class="kpi-val">R$ 63,6K</div><div class="kpi-footer"><span>576 atend.</span></div><div class="kpi-accent"></div></div>
-    <div class="kpi" style="--acc:#a78bfa"><div class="kpi-label">Mai — total</div><div class="kpi-val">R$ 40,3K</div><div class="kpi-footer"><span>450 atend.</span></div><div class="kpi-accent" style="background:#a78bfa"></div></div>
+  <!-- 5 KPIs do mês atual -->
+  <div class="kpi-grid">
+    <div class="kpi" style="--acc:var(--green)">
+      <div class="kpi-label">Faturamento mês</div>
+      <div class="kpi-val" id="sem-fat">—</div>
+      <div class="kpi-footer" id="sem-fat-sub">—</div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--blue)">
+      <div class="kpi-label">Serviços</div>
+      <div class="kpi-val" id="sem-srv">—</div>
+      <div class="kpi-footer" id="sem-srv-sub">—</div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--pink)">
+      <div class="kpi-label">Ticket médio</div>
+      <div class="kpi-val" id="sem-ticket">—</div>
+      <div class="kpi-footer" id="sem-ticket-sub">—</div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--amber)">
+      <div class="kpi-label">Projeção fechamento</div>
+      <div class="kpi-val" id="sem-proj">—</div>
+      <div class="kpi-footer" id="sem-proj-sub">—</div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#a78bfa">
+      <div class="kpi-label">Semana atual</div>
+      <div class="kpi-val" id="sem-atual">—</div>
+      <div class="kpi-footer" id="sem-atual-sub">—</div>
+      <div class="kpi-accent" style="background:#a78bfa"></div>
+    </div>
   </div>
 
+  <!-- Gráfico principal: Faturamento semanal por mês -->
   <div class="card" style="margin-bottom:14px">
     <div class="card-head">
-      <div><div class="card-title">Faturamento por semana</div><div class="card-sub">Cada coluna = um mês, cada linha = uma semana</div></div>
+      <div>
+        <div class="card-title">Faturamento semanal</div>
+        <div class="card-sub">Cada linha = um mês — identifique semanas historicamente fortes</div>
+      </div>
       <span class="badge badge-green">SEMANAL</span>
     </div>
     <div class="chart-h220"><canvas id="semanalChart"></canvas></div>
   </div>
 
+  <!-- Gráficos 2 e 3 -->
   <div class="row2b">
     <div class="card">
-      <div class="card-head"><div><div class="card-title">Serviços por semana</div><div class="card-sub">Atendimentos realizados</div></div></div>
+      <div class="card-head">
+        <div><div class="card-title">Serviços por semana</div><div class="card-sub">Volume de atendimentos</div></div>
+      </div>
       <div class="chart-h180"><canvas id="servicosChart"></canvas></div>
     </div>
     <div class="card">
-      <div class="card-head"><div><div class="card-title">Ticket médio por semana</div><div class="card-sub">R$ médio por atendimento</div></div></div>
+      <div class="card-head">
+        <div><div class="card-title">Ticket médio por semana</div><div class="card-sub">R$ médio por atendimento</div></div>
+      </div>
       <div class="chart-h180"><canvas id="ticketSemChart"></canvas></div>
     </div>
   </div>
 
+  <!-- Tabela -->
   <div class="card">
-    <div class="card-head"><div><div class="card-title">Detalhamento semanal completo</div><div class="card-sub">Faturamento por semana × mês</div></div></div>
+    <div class="card-head">
+      <div><div class="card-title">Detalhamento semanal</div><div class="card-sub">Faturamento por semana × mês</div></div>
+    </div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>Semana</th><th>Janeiro</th><th>Fevereiro</th><th>Março</th><th>Abril</th><th>Maio</th></tr></thead>
+        <thead><tr><th>Semana</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th></tr></thead>
         <tbody>
-          <tr><td class="td-month">Sem 1</td><td class="td-green">R$ 5,7K</td><td class="td-green">R$ 14,1K</td><td class="td-green">R$ 13,1K</td><td class="td-green">R$ 9,1K</td><td class="td-amber">R$ 3,9K</td></tr>
-          <tr><td class="td-month">Sem 2</td><td class="td-green">R$ 11,3K</td><td class="td-green">R$ 14,6K</td><td class="td-green">R$ 13,9K</td><td class="td-green">R$ 15,9K</td><td class="td-green">R$ 20,2K</td></tr>
-          <tr><td class="td-month">Sem 3</td><td class="td-green">R$ 10,8K</td><td class="td-green">R$ 10,5K</td><td class="td-green">R$ 12,7K</td><td class="td-green">R$ 12,5K</td><td class="td-green">R$ 13,3K</td></tr>
-          <tr><td class="td-month">Sem 4</td><td class="td-green">R$ 11,6K</td><td class="td-green">R$ 14,9K</td><td class="td-green">R$ 11,7K</td><td class="td-green">R$ 16,9K</td><td class="td-num">—</td></tr>
-          <tr><td class="td-month">Sem 5</td><td class="td-green">R$ 9,3K</td><td class="td-num">—</td><td class="td-green">R$ 4,9K</td><td class="td-num">—</td><td class="td-num">—</td></tr>
+          <tr><td class="td-month">S1</td><td class="td-green">R$ 5,7K</td><td class="td-green">R$ 14,1K</td><td class="td-green">R$ 13,1K</td><td class="td-green">R$ 9,1K</td><td class="td-amber">R$ 3,9K</td></tr>
+          <tr><td class="td-month">S2</td><td class="td-green">R$ 11,3K</td><td class="td-green">R$ 14,6K</td><td class="td-green">R$ 13,9K</td><td class="td-green">R$ 15,9K</td><td class="td-green">R$ 20,2K</td></tr>
+          <tr><td class="td-month">S3</td><td class="td-green">R$ 10,8K</td><td class="td-green">R$ 10,5K</td><td class="td-green">R$ 12,7K</td><td class="td-green">R$ 12,5K</td><td class="td-green">R$ 13,3K</td></tr>
+          <tr><td class="td-month">S4</td><td class="td-green">R$ 11,6K</td><td class="td-green">R$ 14,9K</td><td class="td-green">R$ 11,7K</td><td class="td-green">R$ 16,9K</td><td class="td-num">—</td></tr>
+          <tr><td class="td-month">S5</td><td class="td-green">R$ 9,3K</td><td class="td-num">—</td><td class="td-green">R$ 4,9K</td><td class="td-num">—</td><td class="td-num">—</td></tr>
         </tbody>
       </table>
     </div>
@@ -928,6 +966,52 @@ function parsePlanos(csv, d){
 
   if(!meses.length) return d;
   return {...d, planos:{meses, qtd, rec}};
+}
+
+function parseSemanal(csv, d){
+  // Estrutura: blocos por semana, cada bloco tem 3 linhas: serviços, faturamento, ticket
+  // Colunas: B=label, C=Jan, D=Fev, E=Mar, F=Abr, G=Mai (índices 1,2,3,4,5,6)
+  const lines = csv.trim().split('\n');
+  const NUM_MESES = 5; // Jan a Mai
+  const NUM_SEMS  = 5;
+
+  // Inicializa arrays
+  const fat  = Array.from({length:NUM_MESES}, ()=>Array(NUM_SEMS).fill(0));
+  const srv  = Array.from({length:NUM_MESES}, ()=>Array(NUM_SEMS).fill(0));
+  const tick = Array.from({length:NUM_MESES}, ()=>Array(NUM_SEMS).fill(0));
+
+  let semIdx = -1;
+  lines.forEach(line=>{
+    const cols = splitLine(line);
+    const label = (cols[1]||'').toLowerCase().trim();
+    // Detecta início de nova semana
+    if(label === '' && cols.some(c=>(c||'').toLowerCase().includes('semana'))){
+      semIdx++;
+      return;
+    }
+    if(semIdx < 0 || semIdx >= NUM_SEMS) return;
+    if(label.includes('faturamento')){
+      for(let m=0;m<NUM_MESES;m++){
+        const v = parseBR(cols[m+2]);
+        if(v && v > 0) fat[m][semIdx] = v;
+      }
+    } else if(label.includes('serviço') || label === 'serviços'){
+      for(let m=0;m<NUM_MESES;m++){
+        const v = parseBR(cols[m+2]);
+        if(v && v > 0) srv[m][semIdx] = v;
+      }
+    } else if(label.includes('ticket')){
+      for(let m=0;m<NUM_MESES;m++){
+        const v = parseBR(cols[m+2]);
+        if(v && v > 0) tick[m][semIdx] = v;
+      }
+    }
+  });
+
+  // Valida — se não encontrou dados usa fallback
+  const totalFat = fat.flat().reduce((a,b)=>a+b,0);
+  if(totalFat === 0) return d;
+  return {...d, semanal:{fat, srv, tick}};
 }
 
 function parseAds(csv, d){
@@ -1425,18 +1509,66 @@ function renderAll(d){
     }
   }
 
-  // semanal
-  const semLabels=['Sem 1','Sem 2','Sem 3','Sem 4','Sem 5'];
-  const semColors=['#3dffa0','#4da6ff','#ff6eb4','#ffb84d','#a78bfa'];
-  const semMeses=['Jan','Fev','Mar','Abr','Mai'];
-  mkBar('semanalChart',semLabels,
-    semMeses.map((m,i)=>({label:m,data:d.semanal.fat[i],backgroundColor:semColors[i]+'b0',borderRadius:4})),
+  // ── Semanal ───────────────────────────────────────────
+  const semLabels = ['S1','S2','S3','S4','S5'];
+  const semColors = ['#3dffa0','#4da6ff','#ff6eb4','#ffb84d','#a78bfa'];
+  const semMeses  = ['Jan','Fev','Mar','Abr','Mai'];
+
+  // KPIs — pega o último mês com dados
+  const idxMesAtual = d.receita.reduce((last,v,i)=>v>0?i:last,-1);
+  const nomeMesAtual = MESES[idxMesAtual] || 'Mai';
+  const fatMes  = d.receita[idxMesAtual] || 0;
+  const srvMes  = d.vendas[idxMesAtual]  || 0;
+  const tickMes = d.ticket[idxMesAtual]  || 0;
+
+  // Semana atual — soma das semanas com dados do mês atual (último índice do semanal fat)
+  const fatSemAtual = d.semanal.fat[idxMesAtual] || [];
+  const semAtualIdx = fatSemAtual.filter(v=>v>0).length; // quantas semanas têm dados
+  const semAtualFat = fatSemAtual[semAtualIdx-1] || 0;   // faturamento da última semana
+
+  // Projeção: média das semanas completas × 5 (ou dias proporcionais)
+  const mediaSem = fatSemAtual.filter(v=>v>0).reduce((a,b)=>a+b,0) / (semAtualIdx||1);
+  const projSem  = mediaSem * 5; // projeção para 5 semanas completas
+
+  // Preenche KPIs
+  const setKpi = (id, val, sub) => {
+    const el = document.getElementById(id); if(el) el.textContent = val;
+    const es = document.getElementById(id+'-sub'); if(es) es.innerHTML = sub;
+  };
+  setKpi('sem-fat',    fmtR(fatMes),   `<span style="color:var(--muted2)">${nomeMesAtual} acumulado</span>`);
+  setKpi('sem-srv',    fmtN(srvMes),   `<span style="color:var(--muted2)">${nomeMesAtual}</span>`);
+  setKpi('sem-ticket', fmtR(tickMes),  `<span style="color:var(--muted2)">média ${nomeMesAtual}</span>`);
+  setKpi('sem-proj',   fmtR(projSem),  `<span style="color:var(--muted2)">baseado em ${semAtualIdx} sem.</span>`);
+  setKpi('sem-atual',  `S${semAtualIdx}`, `<span style="color:var(--green)">${fmtR(semAtualFat)}</span><span style="color:var(--muted2)"> esta semana</span>`);
+
+  // Gráfico 1: Faturamento semanal — cada mês = uma linha
+  mkBar('semanalChart', semLabels,
+    semMeses.map((m,i)=>({
+      label: m,
+      data: d.semanal.fat[i].map(v=>v>0?v:null),
+      backgroundColor: semColors[i]+'b0',
+      borderRadius: 4
+    })),
     {yTick:{callback:v=>fmtR(v)}});
-  mkBar('servicosChart',semLabels,
-    semMeses.map((m,i)=>({label:m,data:d.semanal.srv[i],backgroundColor:semColors[i]+'b0',borderRadius:4})),
+
+  // Gráfico 2: Serviços semanais
+  mkBar('servicosChart', semLabels,
+    semMeses.map((m,i)=>({
+      label: m,
+      data: d.semanal.srv[i].map(v=>v>0?v:null),
+      backgroundColor: semColors[i]+'b0',
+      borderRadius: 4
+    })),
     {extra:{plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:10}}}}});
-  mkLine('ticketSemChart',semLabels,
-    semMeses.map((m,i)=>({label:m,data:d.semanal.tick[i].map(v=>v>0?v:null),borderColor:semColors[i],tension:.3,pointRadius:3,fill:false,spanGaps:false})),
+
+  // Gráfico 3: Ticket semanal
+  mkLine('ticketSemChart', semLabels,
+    semMeses.map((m,i)=>({
+      label: m,
+      data: d.semanal.tick[i].map(v=>v>0?v:null),
+      borderColor: semColors[i],
+      tension: .3, pointRadius: 3, fill: false, spanGaps: false
+    })),
     {yTick:{callback:v=>fmtR(v)}});
 
   // % meta bars
@@ -1550,21 +1682,17 @@ async function loadData(noCache=false){
   try {
     setStatus(noCache ? 'Buscando dados frescos...' : 'Carregando...', 'var(--amber)');
     spinIcon(true);
-    const [csvTab, csvPlan, csvAds] = await Promise.all([
-      fetchCSV(SHEET_TABELA, noCache),
-      fetchCSV(SHEET_PLANOS, noCache),
-      fetchCSV(SHEET_ADS,    noCache),
+    const [csvTab, csvPlan, csvAds, csvSem] = await Promise.all([
+      fetchCSV(SHEET_TABELA,  noCache),
+      fetchCSV(SHEET_PLANOS,  noCache),
+      fetchCSV(SHEET_ADS,     noCache),
+      fetchCSV(SHEET_SEMANAL, noCache),
     ]);
-
-    // DEBUG — mostra as 5 primeiras linhas do CSV da TABELA
-    const dbgLines = csvTab.trim().split('\n').slice(0,8);
-    console.log('=== CSV TABELA (primeiras 8 linhas) ===');
-    dbgLines.forEach((l,i)=>console.log(`L${i+1}:`, l));
-    console.log('Separador detectado:', (dbgLines[0].split(';').length > dbgLines[0].split(',').length) ? ';' : ',');
 
     let d = parseTabela(csvTab);
     d = parsePlanos(csvPlan, d);
     d = parseAds(csvAds, d);
+    d = parseSemanal(csvSem, d);
     renderAll(d);
     const dataLabel = d.dataAtualizacao
       || new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
