@@ -198,6 +198,19 @@ tbody td{padding:10px 10px;font-size:12px}
 @keyframes spin{to{transform:rotate(360deg)}}
 code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:11px}
 
+/* Tabela detalhamento — mobile vs desktop */
+@media(min-width:700px){.tbl-mobile{display:none!important}.tbl-desktop{display:block}}
+@media(max-width:699px){.tbl-mobile{display:block}.tbl-desktop{display:none!important}}
+.tbl-mobile .mes-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px}
+.tbl-mobile .mes-card:last-child{margin-bottom:0}
+.tbl-mobile .mes-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tbl-mobile .mes-nome{font-family:var(--mono);font-weight:700;font-size:14px;color:var(--txt)}
+.tbl-mobile .mes-margem{font-family:var(--mono);font-size:13px;font-weight:600}
+.tbl-mobile .mes-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.tbl-mobile .mes-item{text-align:center}
+.tbl-mobile .mes-item-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.tbl-mobile .mes-item-val{font-size:12px;font-family:var(--mono);font-weight:500}
+
 /* Pill de data - esconde texto no mobile muito pequeno */
 @media(max-width:480px){
   #sync-status { display:none !important; }
@@ -385,83 +398,14 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
         <div><div class="card-title">Detalhamento mensal</div><div class="card-sub">Todos os indicadores de operação</div></div>
       </div>
 
-      <!-- Versão mobile: cards empilhados -->
-      <div class="tbl-mobile">
-        <style>
-          .tbl-mobile .mes-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px}
-          .tbl-mobile .mes-card:last-child{margin-bottom:0}
-          .tbl-mobile .mes-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-          .tbl-mobile .mes-nome{font-family:var(--mono);font-weight:700;font-size:14px;color:var(--txt)}
-          .tbl-mobile .mes-margem{font-family:var(--mono);font-size:13px;font-weight:600}
-          .tbl-mobile .mes-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-          .tbl-mobile .mes-item{text-align:center}
-          .tbl-mobile .mes-item-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
-          .tbl-mobile .mes-item-val{font-size:12px;font-family:var(--mono);font-weight:500}
-          @media(min-width:700px){.tbl-mobile{display:none}.tbl-desktop{display:block}}
-          @media(max-width:699px){.tbl-mobile{display:block}.tbl-desktop{display:none}}
-        </style>
-        <div class="mes-card">
-          <div class="mes-header"><span class="mes-nome">dez/25</span><span class="mes-margem" style="color:var(--muted)">—</span></div>
-          <div class="mes-grid">
-            <div class="mes-item"><div class="mes-item-lbl">Receita</div><div class="mes-item-val" style="color:var(--green)">R$ 52,1K</div></div>
-            <div class="mes-item"><div class="mes-item-lbl">Serviços</div><div class="mes-item-val">524</div></div>
-            <div class="mes-item"><div class="mes-item-lbl">Ticket</div><div class="mes-item-val">R$ 99,35</div></div>
-          </div>
-        </div>
-        <div class="mes-card">
-          <div class="mes-header"><span class="mes-nome">Jan</span><span class="mes-margem" style="color:var(--red)">-3,4%</span></div>
-          <div class="mes-grid">
-            <div class="mes-item"><div class="mes-item-lbl">Receita</div><div class="mes-item-val" style="color:var(--green)">R$ 48,5K</div></div>
-            <div class="mes-item"><div class="mes-item-lbl">Serviços</div><div class="mes-item-val">480</div></div>
-            <div class="mes-item"><div class="mes-item-lbl">Ticket</div><div class="mes-item-val">R$ 100,98</div></div>
-          </div>
-        </div>
-        <div class="mes-card">
-          <div class="mes-header"><span class="mes-nome">Fev</span><span class="mes-margem" style="color:var(--green)">+2,7%</span></div>
-          <div class="mes-grid">
-            <div class="mes-item"><div class="mes-item-lbl">Receita</div><div class="mes-item-val" style="color:var(--green)">R$ 53,9K</div></div>
-            <div class="mes-item"><div class="mes-item-lbl">Serviços</div><div class="mes-item-val">492</div></div>
-            <div class="mes-item"><div class="mes-item-lbl">Ticket</div><div class="mes-item-val">R$ 109,58</div></div>
-          </div>
-        </div>
-        <div class="mes-card">
-          <div class="mes-header"><span class="mes-nome">Mar</span><span class="mes-margem" style="color:var(--red)">-2,9%</span></div>
-          <div class="mes-grid">
-            <div class="mes-item"><div class="mes-item-lbl">Receita</div><div class="mes-item-val" style="color:var(--green)">R$ 55,6K</div></div>
-            <div class="mes-item"><div class="mes-item-lbl">Serviços</div><div class="mes-item-val">510</div></div>
-            <div class="mes-item"><div class="mes-item-lbl">Ticket</div><div class="mes-item-val">R$ 109,00</div></div>
-          </div>
-        </div>
-        <div class="mes-card">
-          <div class="mes-header"><span class="mes-nome">Abr</span><span class="mes-margem" style="color:var(--green)">+8,7%</span></div>
-          <div class="mes-grid">
-            <div class="mes-item"><div class="mes-item-lbl">Receita</div><div class="mes-item-val" style="color:var(--green)">R$ 63,6K</div></div>
-            <div class="mes-item"><div class="mes-item-lbl">Serviços</div><div class="mes-item-val">576</div></div>
-            <div class="mes-item"><div class="mes-item-lbl">Ticket</div><div class="mes-item-val">R$ 110,29</div></div>
-          </div>
-        </div>
-        <div class="mes-card">
-          <div class="mes-header"><span class="mes-nome" style="color:var(--amber)">Mai ●</span><span class="mes-margem" style="color:var(--red)">-42,0%</span></div>
-          <div class="mes-grid">
-            <div class="mes-item"><div class="mes-item-lbl">Receita</div><div class="mes-item-val" style="color:var(--amber)">R$ 42,2K</div></div>
-            <div class="mes-item"><div class="mes-item-lbl">Serviços</div><div class="mes-item-val">464</div></div>
-            <div class="mes-item"><div class="mes-item-lbl">Ticket</div><div class="mes-item-val">R$ 91,05</div></div>
-          </div>
-        </div>
-      </div>
+      <!-- Versão mobile: cards dinâmicos -->
+      <div class="tbl-mobile" id="tbl-mobile-body"></div>
 
-      <!-- Versão desktop: tabela completa -->
+      <!-- Versão desktop: tabela dinâmica -->
       <div class="tbl-desktop tbl-wrap">
         <table>
           <thead><tr><th>Mês</th><th>Receita</th><th>Custo</th><th>Margem</th><th>Serviços</th><th>Ticket</th><th>Hidr.</th></tr></thead>
-          <tbody>
-            <tr><td class="td-month">dez/25</td><td class="td-green">R$ 52,1K</td><td class="td-num">—</td><td class="td-num">—</td><td class="td-num">524</td><td class="td-num">R$ 99,35</td><td class="td-num">28</td></tr>
-            <tr><td class="td-month">jan</td><td class="td-green">R$ 48,5K</td><td class="td-red">R$ 50,2K</td><td class="td-red">-3,4%</td><td class="td-num">480</td><td class="td-num">R$ 100,98</td><td class="td-num">30</td></tr>
-            <tr><td class="td-month">fev</td><td class="td-green">R$ 53,9K</td><td class="td-amber">R$ 52,5K</td><td class="td-green">+2,7%</td><td class="td-num">492</td><td class="td-num">R$ 109,58</td><td class="td-num">39</td></tr>
-            <tr><td class="td-month">mar</td><td class="td-green">R$ 55,6K</td><td class="td-red">R$ 57,2K</td><td class="td-red">-2,9%</td><td class="td-num">510</td><td class="td-num">R$ 109,00</td><td class="td-num">27</td></tr>
-            <tr><td class="td-month">abr</td><td class="td-green">R$ 63,6K</td><td class="td-amber">R$ 58,0K</td><td class="td-green">+8,7%</td><td class="td-num">576</td><td class="td-num">R$ 110,29</td><td class="td-num">31</td></tr>
-            <tr><td class="td-month" style="color:var(--amber)">mai ●</td><td class="td-amber">R$ 42,2K</td><td class="td-red">R$ 60,0K</td><td class="td-red">-42,0%</td><td class="td-num">464</td><td class="td-num">R$ 91,05</td><td class="td-num">21</td></tr>
-          </tbody>
+          <tbody id="tbl-desktop-body"></tbody>
         </table>
       </div>
     </div>
@@ -499,13 +443,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     <div class="card-head">
       <div><div class="card-title">Alerta: Receita vs Custo</div><div class="card-sub">Meses com margem negativa precisam de atenção</div></div>
     </div>
-    <div class="custo-row">
-      <div class="custo-item custo-bad"><span class="custo-mes" style="color:var(--red)">Jan</span><div class="custo-vals"><span style="color:var(--green)">R$ 48,5K</span><span style="color:var(--red)">custo R$ 50,2K</span><span style="color:var(--red)">▼ -R$ 1,7K</span></div></div>
-      <div class="custo-item custo-ok"><span class="custo-mes" style="color:var(--green)">Fev</span><div class="custo-vals"><span style="color:var(--green)">R$ 53,9K</span><span style="color:var(--muted2)">custo R$ 52,5K</span><span style="color:var(--green)">▲ +R$ 1,4K</span></div></div>
-      <div class="custo-item custo-bad"><span class="custo-mes" style="color:var(--red)">Mar</span><div class="custo-vals"><span style="color:var(--green)">R$ 55,6K</span><span style="color:var(--red)">custo R$ 57,2K</span><span style="color:var(--red)">▼ -R$ 1,7K</span></div></div>
-      <div class="custo-item custo-ok"><span class="custo-mes" style="color:var(--green)">Abr</span><div class="custo-vals"><span style="color:var(--green)">R$ 63,6K</span><span style="color:var(--muted2)">custo R$ 58,0K</span><span style="color:var(--green)">▲ +R$ 5,6K</span></div></div>
-      <div class="custo-item custo-bad"><span class="custo-mes" style="color:var(--red)">Mai</span><div class="custo-vals"><span style="color:var(--amber)">R$ 42,2K</span><span style="color:var(--red)">custo R$ 60,0K</span><span style="color:var(--red)">▼ -R$ 17,8K</span></div></div>
-    </div>
+    <div class="custo-row" id="alertBody"></div>
   </div>
 
   <!-- METAS -->
@@ -757,7 +695,7 @@ const SHEET_SEMANAL = BASE + '?gid=622872267&single=true&output=csv';
 // Fallback com dados estáticos (usado se o fetch falhar)
 const defaults = {
   receita:   [52061.79, 48471.60, 53914.98, 55588.16, 63526.50, 42244.95],
-  custo:     [null, 50110, 52500, 57200, 58000, 60000],
+  custo:     [null, 50110, 52500, 57200, 58000, 61500],
   ticket:    [99.35, 100.98, 109.58, 109.00, 110.29, 91.05],
   vendas:    [524, 480, 492, 510, 576, 464],
   vendasDia: [20, 18, 23, 20, 24, 19],
@@ -856,16 +794,16 @@ function parseTabela(csv){
   const vendasDia = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+6]):null; });
   const hidrat    = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+7]):null; });
 
-  // Segunda tabela (receita × custo): mesIdx+0=mês, +1=receita, +2=custo
-  // Tem linhas duplicadas de mês — pega a que tem custo (col+2 > 0)
+  // Segunda tabela CUSTO X RECEITA: col B=mês, col C=receita, col D=custo
+  // No CSV: col0=vazio, col1=mês, col2=receita, col3=custo
   const custoMap = {};
   lines.forEach(line=>{
     const cols = splitLine(line);
-    const mesIdx = cols.findIndex(c=>mesesKey.slice(1).includes(c.toLowerCase()));
+    const mesIdx = cols.findIndex(c=>mesesKey.slice(1).includes((c||'').toLowerCase().trim()));
     if(mesIdx === -1) return;
-    const mes = cols[mesIdx].toLowerCase();
-    const custo = parseBR(cols[mesIdx+2]);
-    if(custo && custo > 0) custoMap[mes] = custo;
+    const mes   = cols[mesIdx].toLowerCase().trim();
+    const custo = parseBR(cols[mesIdx+2]); // col D = mesIdx+2
+    if(custo && custo > 1000) custoMap[mes] = custo; // ignora valores pequenos/zerados
   });
   const custo = [null, ...mesesKey.slice(1).map(m=>custoMap[m]||null)];
 
@@ -1333,7 +1271,73 @@ function renderAll(d){
       borderRadius:4}],
     {extra:{plugins:{legend:{display:false}}}});
 
-  // planos
+  // ── Detalhamento mensal dinâmico ──────────────────────
+  const mesesNomes = ['dez/25','Jan','Fev','Mar','Abr','Mai'];
+  const mesesNomesLong = ['dez/25','Janeiro','Fevereiro','Março','Abril','Maio'];
+
+  // Desktop tbody
+  const tblDesktop = document.getElementById('tbl-desktop-body');
+  if(tblDesktop) tblDesktop.innerHTML = d.receita.map((rec,i)=>{
+    const c   = d.custo[i];
+    const margem = c ? ((rec-c)/c*100) : null;
+    const isParcial = i === idxParcial;
+    const recCor = isParcial ? 'td-amber' : 'td-green';
+    const custoCor = c ? (margem >= 0 ? 'td-amber' : 'td-red') : 'td-num';
+    const margemTxt = margem !== null ? (margem>=0?'+':'')+margem.toFixed(1)+'%' : '—';
+    const margemCor = margem !== null ? (margem>=0?'td-green':'td-red') : 'td-num';
+    const mesNome = mesesNomes[i] + (isParcial?' ●':'');
+    return `<tr>
+      <td class="td-month" style="${isParcial?'color:var(--amber)':''}">${mesNome}</td>
+      <td class="${recCor}">${fmtR(rec)}</td>
+      <td class="${custoCor}">${c?fmtR(c):'—'}</td>
+      <td class="${margemCor}">${margemTxt}</td>
+      <td class="td-num">${fmtN(d.vendas[i])||'—'}</td>
+      <td class="td-num">${d.ticket[i]?fmtR(d.ticket[i]):'—'}</td>
+      <td class="td-num">${d.hidrat[i]||'—'}</td>
+    </tr>`;
+  }).join('');
+
+  // Mobile cards
+  const tblMobile = document.getElementById('tbl-mobile-body');
+  if(tblMobile) tblMobile.innerHTML = d.receita.map((rec,i)=>{
+    const c = d.custo[i];
+    const margem = c ? ((rec-c)/c*100) : null;
+    const isParcial = i === idxParcial;
+    const margemTxt = margem !== null ? (margem>=0?'+':'')+margem.toFixed(1)+'%' : '—';
+    const margemCor = margem !== null ? (margem>=0?'var(--green)':'var(--red)') : 'var(--muted)';
+    return `<div class="mes-card">
+      <div class="mes-header">
+        <span class="mes-nome" style="${isParcial?'color:var(--amber)':''}">${mesesNomes[i]}${isParcial?' ●':''}</span>
+        <span class="mes-margem" style="color:${margemCor}">${margemTxt}</span>
+      </div>
+      <div class="mes-grid">
+        <div class="mes-item"><div class="mes-item-lbl">Receita</div><div class="mes-item-val" style="color:${isParcial?'var(--amber)':'var(--green)'}">${fmtR(rec)}</div></div>
+        <div class="mes-item"><div class="mes-item-lbl">Serviços</div><div class="mes-item-val">${fmtN(d.vendas[i])||'—'}</div></div>
+        <div class="mes-item"><div class="mes-item-lbl">Ticket</div><div class="mes-item-val">${d.ticket[i]?fmtR(d.ticket[i]):'—'}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Alerta Receita vs Custo
+  const alertBody = document.getElementById('alertBody');
+  if(alertBody) alertBody.innerHTML = d.receita.map((rec,i)=>{
+    const c = d.custo[i]; if(!c) return '';
+    const diff = rec - c;
+    const ok = diff >= 0;
+    const isParcial = i === idxParcial;
+    const cls = ok ? 'custo-ok' : 'custo-bad';
+    const cor = ok ? 'var(--green)' : 'var(--red)';
+    const seta = ok ? '▲' : '▼';
+    const recCor = isParcial ? 'var(--amber)' : 'var(--green)';
+    return `<div class="custo-item ${cls}">
+      <span class="custo-mes" style="color:${cor}">${mesesNomes[i]}${isParcial?' ●':''}</span>
+      <div class="custo-vals">
+        <span style="color:${recCor}">${fmtR(rec)}</span>
+        <span style="color:var(--muted2)">custo ${fmtR(c)}</span>
+        <span style="color:${cor}">${seta} ${diff>=0?'+':''}${fmtR(diff)}</span>
+      </div>
+    </div>`;
+  }).join('');
   const maxP=Math.max(...d.planos.qtd);
   document.getElementById('planosBars').innerHTML=d.planos.meses.map((m,i)=>`
     <div class="plano-row">
