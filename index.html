@@ -1529,16 +1529,18 @@ function renderAll(d){
   const srvMes  = d.vendas[idxMesAtual]  || 0;
   const tickMes = d.ticket[idxMesAtual]  || 0;
 
-  // Semana atual — usa índice correto no semanal
-  const fatSemAtual  = d.semanal.fat[idxSemAtual] || [];
-  const srvSemAtual  = d.semanal.srv[idxSemAtual] || [];
+  // Dados semanais do mês atual
+  const fatSemAtual  = d.semanal.fat[idxSemAtual]  || [];
+  const srvSemAtual  = d.semanal.srv[idxSemAtual]  || [];
+  const tickSemAtual = d.semanal.tick[idxSemAtual] || [];
   const semAtualIdx  = fatSemAtual.filter(v=>v>0).length;
-  const semAtualFat  = fatSemAtual[semAtualIdx-1] || 0;
+  const semAtualFat  = fatSemAtual[semAtualIdx-1]  || 0;
 
-  // Projeção: média das semanas com dados × 5
-  const semsComDados = fatSemAtual.filter(v=>v>0);
-  const mediaSem = semsComDados.length > 0 ? semsComDados.reduce((a,b)=>a+b,0) / semsComDados.length : 0;
-  const projSem  = mediaSem * 5;
+  // Acumulados das semanas preenchidas
+  const fatAcum  = fatSemAtual.filter(v=>v>0).reduce((a,b)=>a+b,0);
+  const srvAcum  = srvSemAtual.filter(v=>v>0).reduce((a,b)=>a+b,0);
+  const tickVals = tickSemAtual.filter(v=>v>0);
+  const tickMedio = tickVals.length > 0 ? tickVals.reduce((a,b)=>a+b,0) / tickVals.length : tickMes;
 
   // Preenche KPIs
   const setKpi = (id, val, sub) => {
@@ -1547,9 +1549,9 @@ function renderAll(d){
   };
 
   // Faturamento, Serviços, Ticket
-  setKpi('sem-fat',    fmtR(fatMes),   `<span style="color:var(--muted2)">${nomeMesAtual} acumulado</span>`);
-  setKpi('sem-srv',    fmtN(srvMes),   `<span style="color:var(--muted2)">${nomeMesAtual}</span>`);
-  setKpi('sem-ticket', fmtR(tickMes),  `<span style="color:var(--muted2)">média ${nomeMesAtual}</span>`);
+  setKpi('sem-fat',    fmtR(fatAcum),     `<span style="color:var(--muted2)">${nomeMesAtual} · S1–S${semAtualIdx}</span>`);
+  setKpi('sem-srv',    fmtN(srvAcum),     `<span style="color:var(--muted2)">${nomeMesAtual} · S1–S${semAtualIdx}</span>`);
+  setKpi('sem-ticket', fmtR(tickMedio),   `<span style="color:var(--muted2)">média S1–S${semAtualIdx}</span>`);
 
   // Semana vs Anterior
   const semAnterFat   = semAtualIdx > 1 ? (fatSemAtual[semAtualIdx-2] || 0) : 0;
@@ -1563,24 +1565,25 @@ function renderAll(d){
     `<span style="color:${semVsAntCor}">${semVsAntSeta} ${Math.abs(semVsAntDelta).toFixed(1)}% vs S${semAtualIdx-1}</span>`+
     `<span style="color:var(--muted2)"> · S${semAtualIdx}</span>`;
 
-  // Badge de semana atual — mostra última semana com dados
+  // Badge de semana atual
   const semStatus = document.getElementById('sem-status');
   if(semStatus && semAtualIdx > 0){
     semStatus.style.display = 'block';
     semStatus.textContent = `⚠️ Dados até S${semAtualIdx} de ${nomeMesAtual} — atualizar ao fechar S${semAtualIdx+1}`;
   }
 
-  // Ritmo do mês: acumulado ÷ dias trabalhados × dias úteis
-  const diasTrab = d.pace.diasTrabalhados || 1;
-  const diasUteis = d.pace.diasUteis || 25;
-  const ritmoProj = (fatMes / diasTrab) * diasUteis;
-  const ritmoPct  = (ritmoProj / 68500 * 100).toFixed(1); // vs meta mensal
-  const ritmoCor  = ritmoProj >= 68500 ? 'var(--green)' : 'var(--amber)';
+  // Ritmo do mês — usa receita da TABELA (mesma fonte da Operação)
+  const recAtualSem  = d.receita[idxMesAtual] || fatAcum;
+  const diasTrabSem  = d.pace.diasTrabalhados || 1;
+  const diasUteisSem = d.pace.diasUteis || 25;
+  const ritmoProj    = (recAtualSem / diasTrabSem) * diasUteisSem;
+  const ritmoPct     = (ritmoProj / 68500 * 100).toFixed(1);
+  const ritmoCor     = ritmoProj >= 68500 ? 'var(--green)' : 'var(--amber)';
   const elRitmo = document.getElementById('sem-ritmo');
   if(elRitmo){ elRitmo.textContent = fmtR(ritmoProj); elRitmo.style.color = ritmoCor; }
   setKpi('sem-ritmo', fmtR(ritmoProj),
     `<span style="color:${ritmoCor}">${ritmoPct}% da meta</span>`+
-    `<span style="color:var(--muted2)"> · ${diasTrab}/${diasUteis} dias</span>`);
+    `<span style="color:var(--muted2)"> · ${diasTrabSem}/${diasUteisSem} dias</span>`);
 
   // Gráfico 1: Faturamento semanal — cada mês = uma linha
   mkBar('semanalChart', semLabels,
