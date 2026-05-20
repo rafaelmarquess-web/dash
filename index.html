@@ -769,7 +769,7 @@ const defaults = {
     srv:[[41,105,106,120,108],[118,127,107,140,0],[116,119,115,119,40],[81,147,126,125,0],[42,149,137,0,0]],
     tick:[[137,107.3,101.6,95.9,85.3],[119.4,114.2,97.7,106.2,0],[112.6,116,109.9,98,123.2],[111.9,108.2,98.8,134.5,0],[93.8,135,96.6,0,0]]
   },
-  pace:{diasUteis:25,diasTrabalhados:15,diasFaltantes:10,items:[
+  pace:{diasUteis:25,diasTrabalhados:16,diasFaltantes:9,items:[
     {lbl:'Receita×Dias',meta:41100,  real:42244.95,pct:1.02786,fmt:v=>fmtR(v)},
     {lbl:'Receita/dia', meta:2740,   real:2816.33, pct:1.02786,fmt:v=>fmtR(v)},
     {lbl:'Ticket médio',meta:110.48, real:112.65,  pct:1.01965,fmt:v=>fmtR(v)},
@@ -889,17 +889,28 @@ function parseTabela(csv){
 
   const gp = (obj, off) => obj ? parseBR(obj.cols[obj.mi + off]) : null;
 
-  // Dias úteis/trabalhados/faltantes
+  // Dias úteis/trabalhados/faltantes — col L (label) e M (valor), linhas 19-21
   const findDias = (keyword) => {
-    const line = lines.find(l=>l.toLowerCase().includes(keyword));
-    if(!line) return null;
-    const cols = splitLine(line);
-    const idx = cols.findIndex(c=>c.toLowerCase().includes(keyword));
-    return parseInt(cols[idx+1])||null;
+    for(const line of lines){
+      const cols = splitLine(line);
+      // Coluna L = índice 11, coluna M = índice 12
+      const labelL = (cols[11]||'').toLowerCase();
+      if(labelL.includes(keyword)){
+        const v = parseInt(cols[12]);
+        if(!isNaN(v)) return v;
+      }
+      // Fallback: busca em qualquer coluna
+      const idx = cols.findIndex(c=>(c||'').toLowerCase().includes(keyword));
+      if(idx >= 0){
+        const v = parseInt(cols[idx+1]);
+        if(!isNaN(v)) return v;
+      }
+    }
+    return null;
   };
   const diasUteis       = findDias('úteis')       || 25;
-  const diasTrabalhados = findDias('trabalhados')  || 15;
-  const diasFaltantes   = findDias('faltantes')    || 10;
+  const diasTrabalhados = findDias('trabalhados')  || 16;
+  const diasFaltantes   = findDias('faltantes')    || 9;
 
   // % da meta — coluna M (índice 12 no Excel = última coluna com %)
   // Busca linhas que têm % na última coluna não vazia
