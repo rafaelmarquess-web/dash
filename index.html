@@ -574,82 +574,79 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 <!-- ===== ABA MARKETING ===== -->
 <div id="tab-marketing" class="tab-content">
 
+  <!-- KPIs -->
   <div class="kpi-grid">
     <div class="kpi" style="--acc:var(--amber)">
-      <div class="kpi-label">Invest. Google Ads</div>
-      <div class="kpi-val">R$ 5,1K</div>
-      <div class="kpi-footer"><span class="delta">Jan–Abr acumulado</span></div>
+      <div class="kpi-label">Investimento mês</div>
+      <div class="kpi-val" id="mkt-invest">—</div>
+      <div class="kpi-footer" id="mkt-invest-sub"><span class="delta">—</span></div>
       <div class="kpi-accent"></div>
     </div>
     <div class="kpi" style="--acc:var(--green)">
       <div class="kpi-label">Faturamento Ads</div>
-      <div class="kpi-val">R$ 15,2K</div>
-      <div class="kpi-footer"><span class="delta up">ROAS médio 2,97x</span></div>
+      <div class="kpi-val" id="mkt-fat">—</div>
+      <div class="kpi-footer" id="mkt-fat-sub"><span class="delta">—</span></div>
       <div class="kpi-accent"></div>
     </div>
     <div class="kpi" style="--acc:var(--blue)">
-      <div class="kpi-label">Clientes via Ads</div>
-      <div class="kpi-val">94</div>
-      <div class="kpi-footer"><span class="delta">Jan–Abr</span></div>
+      <div class="kpi-label">ROAS atual vs anterior</div>
+      <div class="kpi-val" id="mkt-roas">—</div>
+      <div class="kpi-footer" id="mkt-roas-sub"><span class="delta">—</span></div>
       <div class="kpi-accent"></div>
     </div>
     <div class="kpi" style="--acc:var(--pink)">
-      <div class="kpi-label">CAC médio</div>
-      <div class="kpi-val">R$ 56,00</div>
-      <div class="kpi-footer"><span class="delta down">↑ Jan R$ 36,00 → Abr R$ 64,52</span></div>
+      <div class="kpi-label">CAC atual · meta &lt;R$55</div>
+      <div class="kpi-val" id="mkt-cac">—</div>
+      <div class="kpi-footer" id="mkt-cac-sub"><span class="delta">—</span></div>
       <div class="kpi-accent"></div>
     </div>
-    <div class="kpi" style="--acc:var(--amber)">
-      <div class="kpi-label">Melhor ROAS</div>
-      <div class="kpi-val">3.94x</div>
-      <div class="kpi-footer"><span class="delta up">Janeiro (GMB)</span></div>
-      <div class="kpi-accent"></div>
+    <div class="kpi" style="--acc:#a78bfa">
+      <div class="kpi-label">Clientes captados · meta 35</div>
+      <div class="kpi-val" id="mkt-cli">—</div>
+      <div class="kpi-footer" id="mkt-cli-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent" style="background:#a78bfa"></div>
     </div>
   </div>
 
-  <div class="row2">
+  <!-- Badge de decisão -->
+  <div id="mkt-badge-wrap" style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div id="mkt-badge" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:700;font-family:var(--mono)">—</div>
+      <div id="mkt-badge-desc" style="font-size:12px;color:var(--muted2)">carregando...</div>
+    </div>
+    <div id="mkt-ads-status" style="display:none;font-size:11px;font-family:var(--mono);padding:5px 12px;border-radius:6px;background:rgba(255,184,77,.1);border:1px solid rgba(255,184,77,.3);color:#ffb84d"></div>
+  </div>
+
+  <!-- Gráfico 1: ROAS + CAC -->
+  <div class="row2" style="margin-bottom:14px">
     <div class="card">
       <div class="card-head">
-        <div><div class="card-title">Faturamento vs Investimento — Google Ads</div><div class="card-sub">Retorno sobre investimento por mês</div></div>
+        <div><div class="card-title">ROAS + CAC por mês</div><div class="card-sub">Retorno e custo de aquisição — eixos independentes</div></div>
         <span class="badge badge-amber">GOOGLE ADS</span>
       </div>
-      <div class="chart-h220"><canvas id="adsChart"></canvas></div>
+      <div class="chart-h220"><canvas id="roasCacChart"></canvas></div>
     </div>
     <div class="card">
       <div class="card-head">
-        <div><div class="card-title">ROAS por mês</div><div class="card-sub">Retorno por real investido</div></div>
+        <div><div class="card-title">Clientes captados × Investimento</div><div class="card-sub">Volume vs gasto por mês</div></div>
       </div>
-      <div class="chart-h220"><canvas id="roasChart"></canvas></div>
+      <div class="chart-h220"><canvas id="cliInvestChart"></canvas></div>
     </div>
   </div>
 
-  <div class="row2b">
-    <div class="card">
-      <div class="card-head">
-        <div><div class="card-title">CAC — Custo de Aquisição</div><div class="card-sub">R$ por novo cliente captado via Ads</div></div>
-      </div>
-      <div class="chart-h180"><canvas id="cacChart"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-head">
-        <div><div class="card-title">Clientes captados por mês</div><div class="card-sub">Volume de novos clientes via Google Ads</div></div>
-      </div>
-      <div class="chart-h180"><canvas id="clientesAdsChart"></canvas></div>
-    </div>
-  </div>
-
+  <!-- Tabela enxugada -->
   <div class="card">
     <div class="card-head">
-      <div><div class="card-title">Detalhamento Google Ads</div><div class="card-sub">Dados completos por mês e tipo de campanha</div></div>
+      <div><div class="card-title">Histórico Google Ads</div><div class="card-sub">Mês · Campanha · Investimento · Clientes · CAC · ROAS</div></div>
     </div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>Mês</th><th>Campanha</th><th>Investimento</th><th>Clientes</th><th>CAC</th><th>Faturamento</th><th>Ticket</th><th>ROAS</th></tr></thead>
-        <tbody>
-          <tr><td class="td-month">Jan</td><td class="td-num">GMB</td><td class="td-amber">R$ 900,00</td><td class="td-num">25</td><td class="td-green">R$ 36,00</td><td class="td-green">R$ 3,6K</td><td class="td-num">R$ 141,76</td><td class="td-green">3.94x</td></tr>
-          <tr><td class="td-month">Fev</td><td class="td-num">GMB+Clínica</td><td class="td-amber">R$ 1,0K</td><td class="td-num">23</td><td class="td-amber">R$ 43,48</td><td class="td-green">R$ 3,5K</td><td class="td-num">R$ 149,03</td><td class="td-green">3.43x</td></tr>
-          <tr><td class="td-month">Mar</td><td class="td-num">GMB</td><td class="td-amber">R$ 1,2K</td><td class="td-num">15</td><td class="td-red">R$ 80,00</td><td class="td-amber">R$ 2,5K</td><td class="td-num">R$ 161,40</td><td class="td-amber">2.02x</td></tr>
-          <tr><td class="td-month">Abr</td><td class="td-num">GMB+Search</td><td class="td-amber">R$ 2,0K</td><td class="td-num">31</td><td class="td-red">R$ 64,52</td><td class="td-green">R$ 5,8K</td><td class="td-num">R$ 185,42</td><td class="td-amber">2.87x</td></tr>
+        <thead><tr><th>Mês</th><th>Campanha</th><th>Investimento</th><th>Clientes</th><th>CAC</th><th>ROAS</th><th>Status</th></tr></thead>
+        <tbody id="mkt-tabela-body">
+          <tr><td class="td-month">Jan</td><td class="td-num">GMB</td><td class="td-amber">R$ 900,00</td><td class="td-num">25</td><td class="td-green">R$ 36,00</td><td class="td-green">3.94x</td><td>🟢 Escalar</td></tr>
+          <tr><td class="td-month">Fev</td><td class="td-num">GMB+Clínica</td><td class="td-amber">R$ 1,0K</td><td class="td-num">23</td><td class="td-green">R$ 43,48</td><td class="td-green">3.43x</td><td>🟢 Escalar</td></tr>
+          <tr><td class="td-month">Mar</td><td class="td-num">GMB</td><td class="td-amber">R$ 1,2K</td><td class="td-num">15</td><td class="td-red">R$ 80,00</td><td class="td-amber">2.02x</td><td>🔴 Revisar</td></tr>
+          <tr><td class="td-month">Abr</td><td class="td-num">GMB+Search</td><td class="td-amber">R$ 2,0K</td><td class="td-num">31</td><td class="td-red">R$ 64,52</td><td class="td-amber">2.87x</td><td>🟡 Manter</td></tr>
         </tbody>
       </table>
     </div>
@@ -1245,23 +1242,188 @@ function renderAll(d){
       <span class="plano-count">${d.planos.qtd[i]}</span>
     </div>`).join('');
 
-  // ads
-  mkBar('adsChart',d.ads.meses,
-    [{label:'Faturamento',data:d.ads.fat,backgroundColor:'rgba(61,255,160,.7)',borderRadius:4},
-     {label:'Investimento',data:d.ads.invest,backgroundColor:'rgba(255,184,77,.7)',borderRadius:4}],
-    {yTick:{callback:v=>fmtR(v)}});
+  // ── Marketing ─────────────────────────────────────────
+  const META_CAC = 55;
+  const META_CLI = 35;
+  const ads = d.ads;
+  const n = ads.meses.length;
+  if(n > 0){
+    const ultimo   = n - 1;
+    const anterior = n > 1 ? n - 2 : 0;
 
-  mkLine('roasChart',d.ads.meses,
-    [{label:'ROAS',data:d.ads.roas,borderColor:'#ffb84d',backgroundColor:'rgba(255,184,77,.07)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:'#ffb84d'}],
-    {extra:{plugins:{legend:{display:false}}}});
+    // KPI Investimento mês atual
+    const inv = ads.invest[ultimo];
+    const invAnterior = ads.invest[anterior];
+    const invDelta = anterior !== ultimo ? ((inv - invAnterior)/invAnterior*100).toFixed(1) : null;
+    const elMktInvest = document.getElementById('mkt-invest');
+    if(elMktInvest) elMktInvest.textContent = fmtR(inv);
+    const elMktInvestSub = document.getElementById('mkt-invest-sub');
+    if(elMktInvestSub) elMktInvestSub.innerHTML = `<span style="color:var(--muted2)">${ads.meses[ultimo]}</span>` + (invDelta ? ` <span style="color:${invDelta>0?'var(--red)':'var(--green)'}">${invDelta>0?'↑':'↓'} ${Math.abs(invDelta)}% vs ${ads.meses[anterior]}</span>` : '');
 
-  mkBar('cacChart',d.ads.meses,
-    [{label:'CAC (R$)',data:d.ads.cac,backgroundColor:d.ads.cac.map(v=>v>60?'rgba(255,95,95,.7)':v>40?'rgba(255,184,77,.7)':'rgba(61,255,160,.7)'),borderRadius:4}],
-    {yTick:{callback:v=>fmtR(v)},extra:{plugins:{legend:{display:false}}}});
+    // KPI Faturamento
+    const fat = ads.fat[ultimo];
+    const elMktFat = document.getElementById('mkt-fat');
+    if(elMktFat) elMktFat.textContent = fmtR(fat);
+    const roas = ads.roas[ultimo];
+    const elMktFatSub = document.getElementById('mkt-fat-sub');
+    if(elMktFatSub) elMktFatSub.innerHTML = `<span style="color:${roas>=3?'var(--green)':'var(--amber)'}">ROAS ${roas.toFixed(2)}x</span>`;
 
-  mkBar('clientesAdsChart',d.ads.meses,
-    [{label:'Clientes',data:d.ads.clientes,backgroundColor:'rgba(77,166,255,.7)',borderRadius:4}],
-    {extra:{plugins:{legend:{display:false}}}});
+    // KPI ROAS atual vs anterior
+    const roasAnterior = ads.roas[anterior];
+    const roasDelta = anterior !== ultimo ? (roas - roasAnterior).toFixed(2) : null;
+    const elMktRoas = document.getElementById('mkt-roas');
+    if(elMktRoas){ elMktRoas.textContent = roas.toFixed(2)+'x'; elMktRoas.style.color = roas>=3?'var(--green)':roas>=2.5?'var(--amber)':'var(--red)'; }
+    const elMktRoasSub = document.getElementById('mkt-roas-sub');
+    if(elMktRoasSub && roasDelta) elMktRoasSub.innerHTML = `<span style="color:${roasDelta>=0?'var(--green)':'var(--red)'}">${roasDelta>=0?'↑':'↓'} ${Math.abs(roasDelta)} vs ${ads.meses[anterior]}</span>`;
+
+    // KPI CAC
+    const cac = ads.cac[ultimo];
+    const cacOk = cac <= META_CAC;
+    const cacDelta = ((cac - META_CAC) / META_CAC * 100).toFixed(0);
+    const cacSinal = cac > META_CAC ? `+${cacDelta}% acima` : `${cacDelta}% abaixo`;
+    const elMktCac = document.getElementById('mkt-cac');
+    if(elMktCac){ elMktCac.textContent = fmtR(cac); elMktCac.style.color = cacOk?'var(--green)':'var(--red)'; }
+    const elMktCacSub = document.getElementById('mkt-cac-sub');
+    if(elMktCacSub) elMktCacSub.innerHTML =
+      `<span style="color:${cacOk?'var(--green)':'var(--red)'}">${cacOk?'🟢':'🔴'}</span>`+
+      `<span style="color:var(--muted2)"> Meta R$${META_CAC} · </span>`+
+      `<span style="color:${cacOk?'var(--green)':'var(--red)'}">${cacSinal}</span>`;
+
+    // KPI Clientes
+    const cli = ads.clientes[ultimo];
+    const cliPct = Math.round(cli / META_CLI * 100);
+    const cliOk = cli >= META_CLI;
+    const elMktCli = document.getElementById('mkt-cli');
+    if(elMktCli){ elMktCli.textContent = `${cli} / ${META_CLI}`; elMktCli.style.color = cliOk?'var(--green)':'var(--amber)'; }
+    const elMktCliSub = document.getElementById('mkt-cli-sub');
+    if(elMktCliSub) elMktCliSub.innerHTML =
+      `<span style="color:${cliOk?'var(--green)':'var(--amber)'}; font-weight:600; font-family:var(--mono)">${cliPct}%</span>`+
+      `<span style="color:var(--muted2)"> da meta</span>`;
+
+    // Badge de decisão — algoritmo decide sozinho, mostra os 3 com destaque
+    const badge = document.getElementById('mkt-badge');
+    const desc  = document.getElementById('mkt-badge-desc');
+    if(badge && desc){
+      let decisao, bg, cor;
+      if(roas > 3 && cac < META_CAC){ decisao='escalar'; bg='rgba(61,255,160,.12)'; cor='#3dffa0'; }
+      else if(roas >= 2.5)           { decisao='manter';  bg='rgba(255,184,77,.12)'; cor='#ffb84d'; }
+      else                           { decisao='revisar'; bg='rgba(255,95,95,.12)';  cor='#ff5f5f'; }
+
+      badge.style.background = 'transparent';
+      badge.style.border = 'none';
+      badge.style.padding = '0';
+      badge.innerHTML =
+        `<span style="opacity:${decisao==='escalar'?1:.25};font-size:13px;font-family:var(--font)">🟢 Escalar</span>`+
+        `<span style="margin:0 12px;color:var(--border)">·</span>`+
+        `<span style="opacity:${decisao==='manter'?1:.25};font-size:13px;font-family:var(--font)">🟡 Manter</span>`+
+        `<span style="margin:0 12px;color:var(--border)">·</span>`+
+        `<span style="opacity:${decisao==='revisar'?1:.25};font-size:13px;font-family:var(--font)">🔴 Revisar</span>`;
+      desc.textContent = decisao==='escalar'
+        ? `ROAS ${roas.toFixed(2)}x e CAC ${fmtR(cac)} — ótimo retorno, hora de escalar`
+        : decisao==='manter'
+        ? `ROAS ${roas.toFixed(2)}x — performance estável, monitorar`
+        : `ROAS ${roas.toFixed(2)}x — retorno baixo, revisar criativos`;
+    }
+
+    // Gráfico 1: ROAS + CAC eixos duplos
+    const ctxRC = document.getElementById('roasCacChart')?.getContext('2d');
+    if(ctxRC){
+      if(_charts['roasCacChart']) _charts['roasCacChart'].destroy();
+      _charts['roasCacChart'] = new Chart(ctxRC, {
+        type:'bar',
+        data:{
+          labels: ads.meses,
+          datasets:[
+            {
+              label:'ROAS',
+              data: ads.roas,
+              backgroundColor: ads.roas.map(v=>v>=3?'rgba(61,255,160,.7)':v>=2.5?'rgba(255,184,77,.7)':'rgba(255,95,95,.7)'),
+              borderRadius:4, yAxisID:'y'
+            },
+            {
+              type:'line',
+              label:'CAC (R$)',
+              data: ads.cac,
+              borderColor:'#ff6eb4',
+              backgroundColor:'transparent',
+              tension:.3, pointRadius:5,
+              pointBackgroundColor: ads.cac.map(v=>v<=META_CAC?'#3dffa0':'#ff5f5f'),
+              yAxisID:'y2'
+            }
+          ]
+        },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}}},
+          scales:{
+            y:{ position:'left', grid:{color:'#1e2130'}, ticks:{color:'#5a6080',callback:v=>v+'x'}, title:{display:true,text:'ROAS',color:'#5a6080'} },
+            y2:{ position:'right', grid:{drawOnChartArea:false}, ticks:{color:'#ff6eb4',callback:v=>'R$'+v}, title:{display:true,text:'CAC',color:'#ff6eb4'} },
+            x:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080'} }
+          }
+        }
+      });
+    }
+
+    // Gráfico 2: Clientes x Investimento
+    const ctxCI = document.getElementById('cliInvestChart')?.getContext('2d');
+    if(ctxCI){
+      if(_charts['cliInvestChart']) _charts['cliInvestChart'].destroy();
+      _charts['cliInvestChart'] = new Chart(ctxCI, {
+        type:'bar',
+        data:{
+          labels: ads.meses,
+          datasets:[
+            {label:'Clientes', data:ads.clientes, backgroundColor:'rgba(77,166,255,.7)', borderRadius:4, yAxisID:'y'},
+            {type:'line', label:'Investimento', data:ads.invest, borderColor:'#ffb84d', backgroundColor:'transparent', tension:.3, pointRadius:4, pointBackgroundColor:'#ffb84d', yAxisID:'y2'}
+          ]
+        },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}}},
+          scales:{
+            y:{ position:'left', grid:{color:'#1e2130'}, ticks:{color:'#5a6080'}, title:{display:true,text:'Clientes',color:'#5a6080'} },
+            y2:{ position:'right', grid:{drawOnChartArea:false}, ticks:{color:'#ffb84d',callback:v=>fmtR(v)}, title:{display:true,text:'Invest.',color:'#ffb84d'} },
+            x:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080'} }
+          }
+        }
+      });
+    }
+
+    // Badge de desatualização — compara último mês com dados vs mês atual
+    const mesesOrdem = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+    const mesAtualIdx = new Date().getMonth(); // 0=jan, 1=fev...
+    const ultimoMesAds = ads.meses[n-1]?.toLowerCase().trim();
+    const ultimoMesIdx = mesesOrdem.indexOf(ultimoMesAds);
+    const adsStatus = document.getElementById('mkt-ads-status');
+    if(adsStatus){
+      if(ultimoMesIdx < mesAtualIdx){
+        const nomeMes = ads.meses[n-1];
+        adsStatus.style.display = 'block';
+        adsStatus.textContent = `⚠️ Dados de ${nomeMes} — atualizar quando fechar ${mesesOrdem[mesAtualIdx].charAt(0).toUpperCase()+mesesOrdem[mesAtualIdx].slice(1)}`;
+      } else {
+        adsStatus.style.display = 'none';
+      }
+    }
+    const tbody = document.getElementById('mkt-tabela-body');
+    if(tbody){
+      const campanhas = ['GMB','GMB+Clínica','GMB','GMB+Search'];
+      tbody.innerHTML = ads.meses.map((m,i)=>{
+        const r = ads.roas[i]; const c = ads.cac[i];
+        const badgeTxt = r>3 && c<META_CAC ? '🟢 Escalar' : r>=2.5 ? '🟡 Manter' : '🔴 Revisar';
+        const cacCor = c<=META_CAC ? 'td-green' : 'td-red';
+        const roasCor = r>=3 ? 'td-green' : r>=2.5 ? 'td-amber' : 'td-red';
+        return `<tr>
+          <td class="td-month">${m}</td>
+          <td class="td-num">${campanhas[i]||'—'}</td>
+          <td class="td-amber">${fmtR(ads.invest[i])}</td>
+          <td class="td-num">${ads.clientes[i]}</td>
+          <td class="${cacCor}">${fmtR(c)}</td>
+          <td class="${roasCor}">${r.toFixed(2)}x</td>
+          <td style="font-size:12px">${badgeTxt}</td>
+        </tr>`;
+      }).join('');
+    }
+  }
 
   // semanal
   const semLabels=['Sem 1','Sem 2','Sem 3','Sem 4','Sem 5'];
@@ -1290,6 +1452,18 @@ function renderAll(d){
   // pace card
   const {diasUteis:_dU,items}=d.pace;
   const pctDias=Math.round(d.pace.diasTrabalhados/d.pace.diasUteis*100);
+
+  // Atualiza textos de dias no card de metas e PACE
+  const elDU   = document.getElementById('meta-dias-uteis');
+  const elDT   = document.getElementById('meta-dias-trab');
+  const elDF   = document.getElementById('meta-dias-falt');
+  const elML   = document.getElementById('meta-dias-label');
+  const elPS   = document.getElementById('pace-sub');
+  if(elDU) elDU.textContent = d.pace.diasUteis;
+  if(elDT) elDT.textContent = d.pace.diasTrabalhados;
+  if(elDF) elDF.textContent = d.pace.diasFaltantes;
+  if(elML) elML.textContent = `% da meta atingido — parcial Mai (${d.pace.diasTrabalhados} de ${d.pace.diasUteis} dias)`;
+  if(elPS) elPS.textContent = `Comparativo entre o acumulado real e a meta esperada para ${d.pace.diasTrabalhados} de ${d.pace.diasUteis} dias trabalhados`;
   document.getElementById('diasBar').style.width=pctDias+'%';
   document.getElementById('diasLabel').innerHTML=`${d.pace.diasTrabalhados} de ${d.pace.diasUteis} dias úteis <span style="color:var(--muted)">· ${d.pace.diasFaltantes} faltantes</span>`;
   document.getElementById('diasPct').textContent='← hoje ('+pctDias+'%)';
