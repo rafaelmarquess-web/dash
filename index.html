@@ -657,7 +657,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 <!-- ===== ABA SEMANAL ===== -->
 <div id="tab-semanal" class="tab-content">
 
-  <!-- 5 KPIs do mês atual -->
+  <!-- 5 KPIs -->
   <div class="kpi-grid">
     <div class="kpi" style="--acc:var(--green)">
       <div class="kpi-label">Faturamento mês</div>
@@ -678,17 +678,22 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <div class="kpi-accent"></div>
     </div>
     <div class="kpi" style="--acc:var(--amber)">
-      <div class="kpi-label">Projeção fechamento</div>
-      <div class="kpi-val" id="sem-proj">—</div>
-      <div class="kpi-footer" id="sem-proj-sub">—</div>
+      <div class="kpi-label">Semana vs anterior</div>
+      <div class="kpi-val" id="sem-vsant">—</div>
+      <div class="kpi-footer" id="sem-vsant-sub">—</div>
       <div class="kpi-accent"></div>
     </div>
     <div class="kpi" style="--acc:#a78bfa">
-      <div class="kpi-label">Semana atual</div>
-      <div class="kpi-val" id="sem-atual">—</div>
-      <div class="kpi-footer" id="sem-atual-sub">—</div>
+      <div class="kpi-label">Ritmo do mês</div>
+      <div class="kpi-val" id="sem-ritmo">—</div>
+      <div class="kpi-footer" id="sem-ritmo-sub">—</div>
       <div class="kpi-accent" style="background:#a78bfa"></div>
     </div>
+  </div>
+
+  <!-- Badge semana atual -->
+  <div style="margin-bottom:14px">
+    <div id="sem-status" style="display:none;font-size:11px;font-family:var(--mono);padding:5px 12px;border-radius:6px;background:rgba(255,184,77,.1);border:1px solid rgba(255,184,77,.3);color:#ffb84d"></div>
   </div>
 
   <!-- Gráfico principal: Faturamento semanal por mês -->
@@ -1515,31 +1520,67 @@ function renderAll(d){
   const semMeses  = ['Jan','Fev','Mar','Abr','Mai'];
 
   // KPIs — pega o último mês com dados
-  const idxMesAtual = d.receita.reduce((last,v,i)=>v>0?i:last,-1);
+  // d.receita: [dez/25, jan, fev, mar, abr, mai] → índice 5 = mai
+  // d.semanal: [jan, fev, mar, abr, mai] → índice 4 = mai (sem dez/25)
+  const idxMesAtual  = d.receita.reduce((last,v,i)=>v>0?i:last,-1);
+  const idxSemAtual  = Math.max(0, idxMesAtual - 1); // desconta dez/25
   const nomeMesAtual = MESES[idxMesAtual] || 'Mai';
   const fatMes  = d.receita[idxMesAtual] || 0;
   const srvMes  = d.vendas[idxMesAtual]  || 0;
   const tickMes = d.ticket[idxMesAtual]  || 0;
 
-  // Semana atual — soma das semanas com dados do mês atual (último índice do semanal fat)
-  const fatSemAtual = d.semanal.fat[idxMesAtual] || [];
-  const semAtualIdx = fatSemAtual.filter(v=>v>0).length; // quantas semanas têm dados
-  const semAtualFat = fatSemAtual[semAtualIdx-1] || 0;   // faturamento da última semana
+  // Semana atual — usa índice correto no semanal
+  const fatSemAtual  = d.semanal.fat[idxSemAtual] || [];
+  const srvSemAtual  = d.semanal.srv[idxSemAtual] || [];
+  const semAtualIdx  = fatSemAtual.filter(v=>v>0).length;
+  const semAtualFat  = fatSemAtual[semAtualIdx-1] || 0;
 
-  // Projeção: média das semanas completas × 5 (ou dias proporcionais)
-  const mediaSem = fatSemAtual.filter(v=>v>0).reduce((a,b)=>a+b,0) / (semAtualIdx||1);
-  const projSem  = mediaSem * 5; // projeção para 5 semanas completas
+  // Projeção: média das semanas com dados × 5
+  const semsComDados = fatSemAtual.filter(v=>v>0);
+  const mediaSem = semsComDados.length > 0 ? semsComDados.reduce((a,b)=>a+b,0) / semsComDados.length : 0;
+  const projSem  = mediaSem * 5;
 
   // Preenche KPIs
   const setKpi = (id, val, sub) => {
     const el = document.getElementById(id); if(el) el.textContent = val;
     const es = document.getElementById(id+'-sub'); if(es) es.innerHTML = sub;
   };
+
+  // Faturamento, Serviços, Ticket
   setKpi('sem-fat',    fmtR(fatMes),   `<span style="color:var(--muted2)">${nomeMesAtual} acumulado</span>`);
   setKpi('sem-srv',    fmtN(srvMes),   `<span style="color:var(--muted2)">${nomeMesAtual}</span>`);
   setKpi('sem-ticket', fmtR(tickMes),  `<span style="color:var(--muted2)">média ${nomeMesAtual}</span>`);
-  setKpi('sem-proj',   fmtR(projSem),  `<span style="color:var(--muted2)">baseado em ${semAtualIdx} sem.</span>`);
-  setKpi('sem-atual',  `S${semAtualIdx}`, `<span style="color:var(--green)">${fmtR(semAtualFat)}</span><span style="color:var(--muted2)"> esta semana</span>`);
+
+  // Semana vs Anterior
+  const semAnterFat   = semAtualIdx > 1 ? (fatSemAtual[semAtualIdx-2] || 0) : 0;
+  const semVsAntDelta = semAnterFat > 0 ? ((semAtualFat - semAnterFat) / semAnterFat * 100) : 0;
+  const semVsAntCor   = semVsAntDelta >= 0 ? 'var(--green)' : 'var(--red)';
+  const semVsAntSeta  = semVsAntDelta >= 0 ? '↑' : '↓';
+  const elVsAnt = document.getElementById('sem-vsant');
+  if(elVsAnt){ elVsAnt.textContent = fmtR(semAtualFat); elVsAnt.style.color = semVsAntCor; }
+  const esVsAnt = document.getElementById('sem-vsant-sub');
+  if(esVsAnt) esVsAnt.innerHTML =
+    `<span style="color:${semVsAntCor}">${semVsAntSeta} ${Math.abs(semVsAntDelta).toFixed(1)}% vs S${semAtualIdx-1}</span>`+
+    `<span style="color:var(--muted2)"> · S${semAtualIdx}</span>`;
+
+  // Badge de semana atual — mostra última semana com dados
+  const semStatus = document.getElementById('sem-status');
+  if(semStatus && semAtualIdx > 0){
+    semStatus.style.display = 'block';
+    semStatus.textContent = `⚠️ Dados até S${semAtualIdx} de ${nomeMesAtual} — atualizar ao fechar S${semAtualIdx+1}`;
+  }
+
+  // Ritmo do mês: acumulado ÷ dias trabalhados × dias úteis
+  const diasTrab = d.pace.diasTrabalhados || 1;
+  const diasUteis = d.pace.diasUteis || 25;
+  const ritmoProj = (fatMes / diasTrab) * diasUteis;
+  const ritmoPct  = (ritmoProj / 68500 * 100).toFixed(1); // vs meta mensal
+  const ritmoCor  = ritmoProj >= 68500 ? 'var(--green)' : 'var(--amber)';
+  const elRitmo = document.getElementById('sem-ritmo');
+  if(elRitmo){ elRitmo.textContent = fmtR(ritmoProj); elRitmo.style.color = ritmoCor; }
+  setKpi('sem-ritmo', fmtR(ritmoProj),
+    `<span style="color:${ritmoCor}">${ritmoPct}% da meta</span>`+
+    `<span style="color:var(--muted2)"> · ${diasTrab}/${diasUteis} dias</span>`);
 
   // Gráfico 1: Faturamento semanal — cada mês = uma linha
   mkBar('semanalChart', semLabels,
