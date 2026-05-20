@@ -858,32 +858,24 @@ function parseTabela(csv){
     return parseInt(cols[idx+1])||null;
   };
   const diasUteis       = findDias('úteis')       || 25;
-  const diasTrabalhados = findDias('trabalhados')  || 14;
-  const diasFaltantes   = findDias('faltantes')    || 11;
+  const diasTrabalhados = findDias('trabalhados')  || 15;
+  const diasFaltantes   = findDias('faltantes')    || 10;
 
-  // % da meta — vem da coluna M da planilha (próxima célula após labels RECEITA, RECEITA/DIA etc)
-  // No CSV são linhas com label na penúltima coluna e % na última
-  const metaLbls = ['receita','receita/dia','ticket m','vendas','vendas/dia','hidrata','loja'];
-  const metaPctMap = {};
+  // % da meta — coluna M (índice 12 no Excel = última coluna com %)
+  // Busca linhas que têm % na última coluna não vazia
+  const metaPct = [];
   lines.forEach(line=>{
     const cols = splitLine(line);
-    for(let i=0;i<cols.length-1;i++){
-      const c = cols[i].toLowerCase();
-      const matched = metaLbls.find(l=>c.startsWith(l));
-      if(!matched) continue;
-      // próxima célula não vazia
-      for(let j=i+1;j<cols.length;j++){
-        if(!cols[j]) continue;
-        const pctStr = cols[j].replace('%','').replace(',','.');
-        const pct = parseFloat(pctStr);
-        if(!isNaN(pct) && pct > 0 && pct < 200 && !metaPctMap[matched]){
-          metaPctMap[matched] = pct;
-        }
-        break;
-      }
-    }
+    // Procura célula com % que não seja #DIV/0!
+    const pctIdx = cols.map((c,i)=>({c,i}))
+      .filter(({c})=> c && c.includes('%') && !c.includes('#') && !c.includes('META'))
+      .map(({i})=>i);
+    if(!pctIdx.length) return;
+    // Pega o último % da linha (coluna M)
+    const pctStr = cols[pctIdx[pctIdx.length-1]].replace('%','').replace(',','.');
+    const pct = parseFloat(pctStr);
+    if(!isNaN(pct) && pct > 0 && pct <= 200) metaPct.push(pct);
   });
-  const metaPct = metaLbls.map(k=>metaPctMap[k]||0);
 
   // Data de última atualização manual — col L (label) e M (valor) linha 24
   let dataAtualizacao = null;
