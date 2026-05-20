@@ -1421,7 +1421,9 @@ async function forceRefresh(){
 }
 
 async function init(){
-  renderAll(defaults);
+  // Mostra loading sem renderizar dados estáticos
+  setStatus('Carregando...', 'var(--amber)');
+  spinIcon(true);
   await loadData(false);
 }
 
