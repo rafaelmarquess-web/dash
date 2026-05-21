@@ -1060,7 +1060,8 @@ function renderKPIs(d){
     if(elVal)   elVal.textContent = p.fmt(p.real);
     if(elDelta) elDelta.innerHTML =
       `<span style="color:${col};font-weight:600;font-size:12px">${seta} ${pct}%</span>`+
-      `<span style="color:var(--muted);font-size:11px"> vs meta</span>`;
+      `<span style="color:var(--muted);font-size:11px"> · </span>`+
+      `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${p.fmt(p.meta)}</span>`;
     const kpi = elVal?.closest('.kpi');
     if(kpi) kpi.style.setProperty('--acc', col);
   });
