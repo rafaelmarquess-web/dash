@@ -307,11 +307,16 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
           <div id="cap-livre" style="font-size:11px;color:var(--muted2);margin-top:2px">— serviços disponíveis</div>
         </div>
       </div>
-      <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden">
+      <div style="height:8px;background:var(--border);border-radius:4px;overflow:visible;position:relative;margin-top:4px">
         <div id="cap-bar" style="height:100%;border-radius:4px;background:var(--green);width:0%;transition:width 1s cubic-bezier(.4,0,.2,1)"></div>
+        <!-- Marcador de meta -->
+        <div id="cap-meta-marker" style="position:absolute;top:-4px;height:16px;width:2px;background:#4da6ff;border-radius:1px;transition:left 1s cubic-bezier(.4,0,.2,1)" title="Meta mensal"></div>
       </div>
-      <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--muted)">
-        <span>0</span><span id="cap-bar-lbl">—</span><span>850</span>
+      <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--muted);position:relative">
+        <span>0</span>
+        <span id="cap-bar-atual" style="color:var(--green);font-family:var(--mono);font-weight:600">—</span>
+        <span id="cap-bar-meta" style="color:#4da6ff;font-family:var(--mono);font-weight:600">— meta</span>
+        <span>850</span>
       </div>
     </div>
 
@@ -1064,12 +1069,14 @@ function renderKPIs(d){
 
   // ── Capacidade operacional ──────────────────────────────
   const CAP_MAX = 850;
+  const META_SRV = 620;
   const vendasMes = d.vendas.filter(v=>v>0);
   const vendasAtual = vendasMes[vendasMes.length-1] || 0;
   const capPct = Math.round(vendasAtual / CAP_MAX * 100);
   const capLivre = CAP_MAX - vendasAtual;
   const capCol = capPct >= 90 ? '#ff5f5f' : capPct >= 70 ? '#ffb84d' : '#3dffa0';
   const capLabel = capPct >= 90 ? 'Saturação — atenção máxima' : capPct >= 70 ? 'Atenção — próximo do limite' : 'Saudável';
+  const metaSrvPct = Math.round(META_SRV / CAP_MAX * 100);
 
   document.getElementById('cap-atual').textContent = fmtN(vendasAtual);
   document.getElementById('cap-pct').textContent = capPct + '%';
@@ -1077,14 +1084,21 @@ function renderKPIs(d){
   document.getElementById('cap-livre').textContent = fmtN(capLivre) + ' serviços disponíveis';
   document.getElementById('cap-bar').style.width = Math.min(capPct,100) + '%';
   document.getElementById('cap-bar').style.background = capCol;
-  document.getElementById('cap-bar-lbl').textContent = fmtN(vendasAtual) + ' serviços este mês';
   document.getElementById('cap-footer').innerHTML =
     `<span style="color:${capCol};font-weight:600">${capLabel}</span>`+
     `<span style="color:var(--muted)"> · máx. ${CAP_MAX} serviços</span>`;
 
-  // Atualiza cor do accent do card
+  // Marcador de meta
+  const marker = document.getElementById('cap-meta-marker');
+  if(marker) marker.style.left = metaSrvPct + '%';
+  const lblAtual = document.getElementById('cap-bar-atual');
+  if(lblAtual){ lblAtual.textContent = fmtN(vendasAtual); lblAtual.style.color = capCol; }
+  const lblMeta = document.getElementById('cap-bar-meta');
+  if(lblMeta) lblMeta.textContent = fmtN(META_SRV) + ' meta';
+
+  // Atualiza cor do accent
   const capCard = document.getElementById('cap-atual')?.closest('.kpi');
-  if(capCard){ capCard.style.setProperty('--acc', capCol); }
+  if(capCard) capCard.style.setProperty('--acc', capCol);
   document.getElementById('cap-bar').style.boxShadow = `0 0 8px ${capCol}40`;
 
   // ── Projeção de fechamento ──────────────────────────────
