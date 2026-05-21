@@ -286,7 +286,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     </div>
   </div>
 
-  <!-- CARDS ESTRATÉGICOS -->
+  <!-- CARDS ESTRATÉGICOS — nova ordem: Capacidade | Projeção | Meta | Ritmo -->
   <div class="row2b" style="margin-bottom:14px">
 
     <!-- Capacidade operacional -->
@@ -315,7 +315,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       </div>
     </div>
 
-    <!-- Projeção de fechamento -->
+    <!-- Projeção de fechamento + mínimo diário -->
     <div class="kpi" style="--acc:var(--green);border-radius:14px;padding:20px" id="proj-card">
       <div class="kpi-accent" id="proj-accent"></div>
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:8px">
@@ -330,7 +330,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
           <div id="proj-status" style="font-size:11px;margin-top:2px">—</div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:12px;border-top:1px solid var(--border)">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:12px;border-top:1px solid var(--border);margin-bottom:12px">
         <div style="text-align:center">
           <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Média diária</div>
           <div id="proj-ritmo" style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--txt)">—</div>
@@ -344,64 +344,85 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
           <div style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--muted2)">R$ 68,5K</div>
         </div>
       </div>
-    </div>
-
-  </div>
-
-  <!-- Receita + Serviços -->
-  <div class="row2">
-    <div class="card">
-      <div class="card-head">
-        <div><div class="card-title">Receita mensal</div><div class="card-sub">Evolução Jan–Mai 2026 + referência dez/25</div></div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <span id="badge-parcial" style="display:none;font-size:10px;padding:3px 8px;border-radius:4px;font-weight:600;letter-spacing:.3px;font-family:var(--mono);background:#2a1e08;color:#ffb84d;border:1px solid #ffb84d40">● MÊS EM ANDAMENTO</span>
-          <span class="badge badge-green">REAL</span>
+      <!-- Mini tabela mínimo diário aceitável -->
+      <div style="padding-top:10px;border-top:1px solid var(--border)">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Mín. diário aceitável</div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px" id="min-diario">
+          <!-- gerado pelo JS -->
         </div>
       </div>
-      <div class="chart-h220"><canvas id="receitaChart"></canvas></div>
     </div>
-    <div class="card">
-      <div class="card-head">
-        <div><div class="card-title">Receita vs Custo</div><div class="card-sub">Margem por mês</div></div>
-        <span class="badge badge-amber">JAN–MAI</span>
-      </div>
-      <div class="chart-h220"><canvas id="custoChart"></canvas></div>
-    </div>
+
   </div>
 
-  <!-- Ticket + Serviços/dia + Hidratação -->
-  <div class="row3">
-    <div class="card">
+  <!-- Meta + Ritmo do mês -->
+  <!-- Meta + Ritmo do mês — logo após Capacidade/Projeção -->
+  <div class="row2b" style="margin-bottom:14px">
+
+    <!-- METAS -->
+    <div class="card" id="card-meta">
       <div class="card-head">
-        <div><div class="card-title">Ticket médio</div><div class="card-sub">R$ por atendimento</div></div>
+        <div><div class="card-title">Metas — Fevereiro (referência +8%)</div><div class="card-sub">Parcial acumulado Jan–Mai vs metas definidas</div></div>
+        <span class="badge badge-blue">META</span>
       </div>
-      <div class="chart-h140"><canvas id="ticketChart"></canvas></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;font-weight:600">Valores-alvo</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="meta-row"><span class="meta-lbl">Receita</span><span class="meta-target">R$ 68,5K</span></div>
+            <div class="meta-row"><span class="meta-lbl">Receita / dia</span><span class="meta-target">R$ 2,74K</span></div>
+            <div class="meta-row"><span class="meta-lbl">Ticket médio</span><span class="meta-target">R$ 110,48</span></div>
+            <div class="meta-row"><span class="meta-lbl">Serviços</span><span class="meta-target">620</span></div>
+            <div class="meta-row"><span class="meta-lbl">Serviços / dia</span><span class="meta-target">24,8</span></div>
+            <div class="meta-row"><span class="meta-lbl">Hidratação</span><span class="meta-target">40</span></div>
+            <div class="meta-row"><span class="meta-lbl">Produtos / loja</span><span class="meta-target">R$ 4,0K</span></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;font-weight:600" id="meta-dias-label">% da meta atingido — parcial Mai</div>
+          <div style="display:flex;flex-direction:column;gap:10px" id="metaBars"></div>
+          <div style="margin-top:14px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:11px;color:var(--muted2);line-height:1.6">
+            <span style="color:var(--txt);font-weight:600">Dias úteis:</span> <span id="meta-dias-uteis">25</span> &nbsp;·&nbsp;
+            <span style="color:var(--amber);font-weight:600">Trabalhados:</span> <span id="meta-dias-trab">16</span> &nbsp;·&nbsp;
+            <span style="color:var(--muted2)">Faltantes:</span> <span id="meta-dias-falt">9</span>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="card">
+
+    <!-- RITMO DO MÊS -->
+    <div class="card" id="card-ritmo">
       <div class="card-head">
-        <div><div class="card-title">Serviços / dia</div><div class="card-sub">Média diária por mês</div></div>
+        <div>
+          <div class="card-title">Ritmo do mês — Real vs Meta proporcional ao dia</div>
+          <div class="card-sub" id="pace-sub">Comparativo entre o acumulado real e a meta esperada</div>
+        </div>
+        <span class="badge badge-green">PACE</span>
       </div>
-      <div class="chart-h140"><canvas id="vendasDiaChart"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-head">
-        <div><div class="card-title">Hidratação</div><div class="card-sub">Procedimentos / mês</div></div>
+      <div style="margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:11px;color:var(--muted2)">Progresso do mês</span>
+          <span style="font-size:11px;font-family:var(--mono);color:var(--amber)" id="diasLabel">16 de 25 dias úteis <span style="color:var(--muted)">· 9 faltantes</span></span>
+        </div>
+        <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;position:relative">
+          <div id="diasBar" style="width:64%;height:100%;background:linear-gradient(90deg,#ffb84d,#ff9020);border-radius:4px;transition:width 1s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted)">
+          <span>Início</span><span id="diasPct">← hoje (64%)</span><span>Fim do mês</span>
+        </div>
       </div>
-      <div class="chart-h140"><canvas id="hidratacaoChart"></canvas></div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px" id="paceGrid"></div>
     </div>
+
   </div>
 
-  <!-- Tabela mensal + Planos -->
-  <div class="row2b">
+  <!-- Detalhamento mensal + Planos -->
+  <div class="row2b" style="margin-bottom:14px">
     <div class="card">
       <div class="card-head">
         <div><div class="card-title">Detalhamento mensal</div><div class="card-sub">Todos os indicadores de operação</div></div>
       </div>
-
-      <!-- Versão mobile: cards dinâmicos -->
       <div class="tbl-mobile" id="tbl-mobile-body"></div>
-
-      <!-- Versão desktop: tabela dinâmica -->
       <div class="tbl-desktop tbl-wrap">
         <table>
           <thead><tr><th>Mês</th><th>Receita</th><th>Custo</th><th>Margem</th><th>Serviços</th><th>Ticket</th><th>Hidr.</th></tr></thead>
@@ -409,7 +430,6 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
         </table>
       </div>
     </div>
-
     <div class="card">
       <div class="card-head">
         <div><div class="card-title">Planos mensais</div><div class="card-sub">Quantidade de planos ativos por mês</div></div>
@@ -438,7 +458,32 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     </div>
   </div>
 
-  <!-- Custo alert -->
+  <!-- Ticket + Serviços/dia + Hidratação -->
+  <div class="row3" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Ticket médio</div><div class="card-sub">R$ por atendimento</div></div></div>
+      <div class="chart-h140"><canvas id="ticketChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Serviços / dia</div><div class="card-sub">Média diária por mês</div></div></div>
+      <div class="chart-h140"><canvas id="vendasDiaChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Hidratação</div><div class="card-sub">Procedimentos / mês</div></div></div>
+      <div class="chart-h140"><canvas id="hidratacaoChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Receita vs Custo (largura total) -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div><div class="card-title">Receita vs Custo</div><div class="card-sub">Margem por mês</div></div>
+      <span class="badge badge-amber">JAN–MAI</span>
+    </div>
+    <div class="chart-h220"><canvas id="custoChart"></canvas></div>
+  </div>
+
+  <!-- Alerta Receita vs Custo -->
   <div class="card" style="margin-bottom:14px">
     <div class="card-head">
       <div><div class="card-title">Alerta: Receita vs Custo</div><div class="card-sub">Meses com margem negativa precisam de atenção</div></div>
@@ -446,65 +491,16 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     <div class="custo-row" id="alertBody"></div>
   </div>
 
-  <!-- METAS -->
+  <!-- Receita mensal (largura total, por último) -->
   <div class="card" style="margin-bottom:14px">
     <div class="card-head">
-      <div><div class="card-title">Metas — Fevereiro (referência +8%)</div><div class="card-sub">Parcial acumulado Jan–Mai vs metas definidas</div></div>
-      <span class="badge badge-blue">META</span>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-      <!-- Coluna esquerda: metas absolutas -->
-      <div>
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;font-weight:600">Valores-alvo</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div class="meta-row"><span class="meta-lbl">Receita</span><span class="meta-target">R$ 68,5K</span></div>
-          <div class="meta-row"><span class="meta-lbl">Receita / dia</span><span class="meta-target">R$ 2,74K</span></div>
-          <div class="meta-row"><span class="meta-lbl">Ticket médio</span><span class="meta-target">R$ 110,48</span></div>
-          <div class="meta-row"><span class="meta-lbl">Serviços</span><span class="meta-target">620</span></div>
-          <div class="meta-row"><span class="meta-lbl">Serviços / dia</span><span class="meta-target">24,8</span></div>
-          <div class="meta-row"><span class="meta-lbl">Hidratação</span><span class="meta-target">40</span></div>
-          <div class="meta-row"><span class="meta-lbl">Produtos / loja</span><span class="meta-target">R$ 4,0K</span></div>
-        </div>
-      </div>
-      <!-- Coluna direita: % atingido (parcial mai, dias trabalhados = 13/25) -->
-      <div>
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;font-weight:600" id="meta-dias-label">% da meta atingido — parcial Mai</div>
-        <div style="display:flex;flex-direction:column;gap:10px" id="metaBars"></div>
-        <div style="margin-top:14px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:11px;color:var(--muted2);line-height:1.6">
-          <span style="color:var(--txt);font-weight:600">Dias úteis:</span> <span id="meta-dias-uteis">25</span> &nbsp;·&nbsp;
-          <span style="color:var(--amber);font-weight:600">Trabalhados:</span> <span id="meta-dias-trab">15</span> &nbsp;·&nbsp;
-          <span style="color:var(--muted2)">Faltantes:</span> <span id="meta-dias-falt">10</span>
-        </div>
+      <div><div class="card-title">Receita mensal</div><div class="card-sub">Evolução Jan–Mai 2026 + referência dez/25</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="badge-parcial" style="display:none;font-size:10px;padding:3px 8px;border-radius:4px;font-weight:600;letter-spacing:.3px;font-family:var(--mono);background:#2a1e08;color:#ffb84d;border:1px solid #ffb84d40">● MÊS EM ANDAMENTO</span>
+        <span class="badge badge-green">REAL</span>
       </div>
     </div>
-  </div>
-
-  <!-- PACE DO MÊS -->
-  <div class="card" style="margin-bottom:14px">
-    <div class="card-head">
-      <div>
-        <div class="card-title">Ritmo do mês — Real vs Meta proporcional ao dia</div>
-        <div class="card-sub" id="pace-sub">Comparativo entre o acumulado real e a meta esperada</div>
-      </div>
-      <span class="badge badge-green">PACE</span>
-    </div>
-
-    <!-- Barra de progresso dos dias -->
-    <div style="margin-bottom:20px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <span style="font-size:11px;color:var(--muted2)">Progresso do mês</span>
-        <span style="font-size:11px;font-family:var(--mono);color:var(--amber)" id="diasLabel">14 de 25 dias úteis <span style="color:var(--muted)">· 11 faltantes</span></span>
-      </div>
-      <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;position:relative">
-        <div id="diasBar" style="width:56%;height:100%;background:linear-gradient(90deg,#ffb84d,#ff9020);border-radius:4px;transition:width 1s"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted)">
-        <span>Início</span><span id="diasPct">← hoje (56%)</span><span>Fim do mês</span>
-      </div>
-    </div>
-
-    <!-- Grid de indicadores de pace -->
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px" id="paceGrid"></div>
+    <div class="chart-h220"><canvas id="receitaChart"></canvas></div>
   </div>
 
 </div>
@@ -1673,6 +1669,26 @@ function renderAll(d){
       </div>
     </div>`;
   }).join('');
+  // ── Mini tabela mínimo diário aceitável ──────────────
+  const minDiario = [
+    {dia:'Seg', min:25}, {dia:'Ter', min:20}, {dia:'Qua', min:20},
+    {dia:'Qui', min:25}, {dia:'Sex', min:30}, {dia:'Sáb', min:35}
+  ];
+  const hoje = new Date().getDay(); // 0=dom,1=seg...6=sab
+  const diaMap = [null,0,1,2,3,4,5]; // domingo não tem mínimo
+  const diaHoje = diaMap[hoje];
+  const elMinDiario = document.getElementById('min-diario');
+  if(elMinDiario) elMinDiario.innerHTML = minDiario.map((d,i)=>{
+    const isHoje = diaHoje === i;
+    const cor = isHoje ? '#ffb84d' : 'var(--muted2)';
+    const bg  = isHoje ? 'rgba(255,184,77,.12)' : 'var(--s2)';
+    const brd = isHoje ? '1px solid rgba(255,184,77,.4)' : '1px solid var(--border)';
+    return `<div style="text-align:center;padding:5px 2px;border-radius:6px;background:${bg};border:${brd}">
+      <div style="font-size:9px;color:${isHoje?'var(--amber)':'var(--muted)'};font-weight:${isHoje?700:400};margin-bottom:2px">${d.dia}</div>
+      <div style="font-size:12px;font-family:var(--mono);font-weight:700;color:${cor}">${d.min}</div>
+    </div>`;
+  }).join('');
+
   // Atualiza banner de dados
   updateDataBanner(d);
 }
