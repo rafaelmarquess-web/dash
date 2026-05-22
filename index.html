@@ -1290,7 +1290,7 @@ function renderAll(d){
   const tblDesktop = document.getElementById('tbl-desktop-body');
   if(tblDesktop) tblDesktop.innerHTML = d.receita.map((rec,i)=>{
     const c   = d.custo[i];
-    const margem = c ? ((rec-c)/c*100) : null;
+    const margem = c ? ((rec-c)/rec*100) : null;
     const isParcial = i === idxParcial;
     const recCor = isParcial ? 'td-amber' : 'td-green';
     const custoCor = c ? (margem >= 0 ? 'td-amber' : 'td-red') : 'td-num';
@@ -1312,7 +1312,7 @@ function renderAll(d){
   const tblMobile = document.getElementById('tbl-mobile-body');
   if(tblMobile) tblMobile.innerHTML = d.receita.map((rec,i)=>{
     const c = d.custo[i];
-    const margem = c ? ((rec-c)/c*100) : null;
+    const margem = c ? ((rec-c)/rec*100) : null;
     const isParcial = i === idxParcial;
     const margemTxt = margem !== null ? (margem>=0?'+':'')+margem.toFixed(1)+'%' : '—';
     const margemCor = margem !== null ? (margem>=0?'var(--green)':'var(--red)') : 'var(--muted)';
