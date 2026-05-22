@@ -1143,10 +1143,11 @@ function renderAll(d){
   // Linha sólida SÓ até o mês anterior ao parcial — evita queda visual
   // Mês parcial aparece APENAS como projeção pontilhada
   const dataCompletos = d.receita.map((v,i)=> i < idxParcial ? v : null);
-  const dataComProj   = MESES.map((m,i)=>{
-    if(i === idxParcial - 1) return d.receita[idxParcial - 1]; // conexão
-    if(i === idxParcial)     return recAtual;  // acumulado atual
-    if(i === idxParcial + 1) return recProj;   // projeção fechamento
+  // Dataset de projeção: conecta do último mês completo até o acumulado parcial
+  // e mostra a projeção de fechamento como ponto separado em Mai
+  const dataComProj = MESES.map((m,i)=>{
+    if(i === idxParcial - 1) return d.receita[idxParcial - 1]; // ponto de conexão (Abr)
+    if(i === idxParcial)     return recProj;  // projeção de fechamento
     return null;
   });
 
@@ -1194,8 +1195,11 @@ function renderAll(d){
                 const i = ctx.dataIndex;
                 const v = ctx.parsed.y;
                 if(!v) return null;
-                if(ctx.datasetIndex === 1) return ` Projeção: ${fmtR(v)}`;
-                if(i === idxParcial) return ` Acumulado (${diasTrabalhados}d): ${fmtR(v)}`;
+                if(ctx.datasetIndex === 1){
+                  if(i === idxParcial) return ` Projeção fechamento: ${fmtR(v)}`;
+                  return null;
+                }
+                if(i === idxParcial) return ` Acumulado (${diasTrabalhados}d): ${fmtR(recAtual)}`;
                 return ` ${fmtR(v)}`;
               }
             }
@@ -1218,22 +1222,37 @@ function renderAll(d){
      {label:'Custo',data:d.custo.slice(1),backgroundColor:'rgba(255,95,95,.6)',borderRadius:4}],
     {yTick:{callback:v=>fmtR(v)},extra:{barPercentage:.7}});
 
-  // Ticket e Serviços/dia — ponto parcial destacado
+  // Ticket e Serviços/dia — mesmo padrão do gráfico de receita
   const mkLinePartial = (id, data, color, bgColor) => {
     const ctx = document.getElementById(id)?.getContext('2d');
     if(!ctx) return;
     if(_charts[id]) _charts[id].destroy();
-    // Linha sólida só até o mês anterior — evita queda visual do mês parcial
+
+    const isTicket = id === 'ticketChart';
+    const fmt = v => isTicket ? fmtR(v) : fmtN(v);
+    const yFmt = v => isTicket ? fmtR(v) : v;
+
+    // Linha sólida até mês anterior ao parcial
     const dataSolid = data.map((v,i)=> i < idxParcial ? v : null);
-    // Pontilhado do último mês completo até o parcial
-    const dataDash  = data.map((v,i)=> i >= idxParcial-1 ? v : null);
+
+    // Projeção proporcional: valor atual ÷ dias trabalhados × dias úteis
+    const valorAtual = data[idxParcial] || 0;
+    const valorProj  = diasTrabalhados > 0 ? (valorAtual / diasTrabalhados) * diasUteis : valorAtual;
+
+    // Linha pontilhada: conecta do último mês completo até a projeção
+    const dataProj = data.map((v,i)=>{
+      if(i === idxParcial - 1) return data[idxParcial - 1];
+      if(i === idxParcial)     return valorProj;
+      return null;
+    });
+
     _charts[id] = new Chart(ctx, {
       type:'line',
       data:{
         labels: MESES_LBL,
         datasets:[
           {
-            label: id === 'ticketChart' ? 'Ticket' : 'Serviços/dia',
+            label: isTicket ? 'Ticket' : 'Serviços/dia',
             data: dataSolid,
             borderColor: color,
             backgroundColor: bgColor,
@@ -1244,12 +1263,12 @@ function renderAll(d){
           },
           {
             label: '(parcial)',
-            data: dataDash,
+            data: dataProj,
             borderColor: '#ffb84d',
             backgroundColor: 'transparent',
             borderDash: [6,4],
             fill: false, tension: .4,
-            pointRadius: data.map((_,i)=> i===idxParcial ? 7 : 0),
+            pointRadius: dataProj.map((_,i)=> i===idxParcial ? 7 : 0),
             pointBackgroundColor: '#ffb84d',
             spanGaps: false,
           }
@@ -1264,13 +1283,15 @@ function renderAll(d){
           tooltip:{callbacks:{label:(ctx)=>{
             const i=ctx.dataIndex; const v=ctx.parsed.y;
             if(!v) return null;
-            if(i===idxParcial) return ` Parcial (${diasTrabalhados}d): ${id==='ticketChart'?fmtR(v):fmtN(v)}`;
-            return ` ${id==='ticketChart'?fmtR(v):fmtN(v)}`;
+            if(ctx.datasetIndex === 1 && i === idxParcial)
+              return ` Projeção fechamento: ${fmt(v)}`;
+            if(ctx.datasetIndex === 1) return null;
+            return ` ${fmt(v)}`;
           }}}
         },
         scales:{
           x:{grid:{color:'#1e2130'},ticks:{color:'#5a6080'}},
-          y:{grid:{color:'#1e2130'},ticks:{color:'#5a6080',callback:v=>id==='ticketChart'?fmtR(v):v}}
+          y:{grid:{color:'#1e2130'},ticks:{color:'#5a6080',callback:yFmt}}
         }
       }
     });
