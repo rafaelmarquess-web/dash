@@ -1224,6 +1224,7 @@ function renderAll(d){
 
   // Ticket e Serviços/dia — mesmo padrão do gráfico de receita
   const mkLinePartial = (id, data, color, bgColor) => {
+    try {
     const ctx = document.getElementById(id)?.getContext('2d');
     if(!ctx) return;
     if(_charts[id]) _charts[id].destroy();
@@ -1237,7 +1238,9 @@ function renderAll(d){
 
     // Projeção proporcional: valor atual ÷ dias trabalhados × dias úteis
     const valorAtual = data[idxParcial] || 0;
-    const valorProj  = diasTrabalhados > 0 ? (valorAtual / diasTrabalhados) * diasUteis : valorAtual;
+    const _dt = d.pace.diasTrabalhados || 1;
+    const _du = d.pace.diasUteis || 25;
+    const valorProj  = _dt > 0 ? (valorAtual / _dt) * _du : valorAtual;
 
     // Linha pontilhada: conecta do último mês completo até a projeção
     const dataProj = data.map((v,i)=>{
@@ -1286,6 +1289,7 @@ function renderAll(d){
             if(ctx.datasetIndex === 1 && i === idxParcial)
               return ` Projeção fechamento: ${fmt(v)}`;
             if(ctx.datasetIndex === 1) return null;
+            if(i === idxParcial) return ` Parcial (${d.pace.diasTrabalhados}d): ${fmt(v)}`;
             return ` ${fmt(v)}`;
           }}}
         },
@@ -1295,10 +1299,11 @@ function renderAll(d){
         }
       }
     });
+    } catch(e){ console.warn('mkLinePartial erro:', id, e.message); }
   };
 
-  mkLinePartial('ticketChart',    d.ticket,    '#4da6ff', 'rgba(77,166,255,.05)');
-  mkLinePartial('vendasDiaChart', d.vendasDia, '#ff6eb4', 'rgba(255,110,180,.05)');
+  mkLinePartial('ticketChart',    d.ticket.map(v=>v||null),    '#4da6ff', 'rgba(77,166,255,.05)');
+  mkLinePartial('vendasDiaChart', d.vendasDia.map(v=>v||null), '#ff6eb4', 'rgba(255,110,180,.05)');
 
   mkBar('hidratacaoChart',MESES,
     [{label:'Hidratação',data:d.hidrat,
