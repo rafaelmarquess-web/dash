@@ -746,14 +746,17 @@ function splitLine(line){
 }
 
 // Formata moeda: sempre arredonda para cima, usa K para milhares
-function fmtR(v, decimals=2){
-  const c = Math.ceil(v * 100) / 100; // arredonda para cima 2 casas
-  if(c >= 1000){
-    const k = c / 1000;
+function fmtR(v){
+  if(v === null || v === undefined || isNaN(v)) return '—';
+  const neg = v < 0;
+  const abs = Math.abs(v);
+  const prefix = neg ? '-' : '';
+  if(abs >= 1000){
+    const k = abs / 1000;
     const kstr = k % 1 === 0 ? k.toFixed(0) : k.toFixed(1).replace('.',',');
-    return 'R$ ' + kstr + 'K';
+    return prefix + 'R$ ' + kstr + 'K';
   }
-  return 'R$ ' + c.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
+  return prefix + 'R$ ' + abs.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
 // Formata número absoluto: sempre arredonda para cima, sem casas decimais
@@ -1290,20 +1293,21 @@ function renderAll(d){
   const tblDesktop = document.getElementById('tbl-desktop-body');
   if(tblDesktop) tblDesktop.innerHTML = d.receita.map((rec,i)=>{
     const c   = d.custo[i];
-    const margem = c ? ((rec-c)/rec*100) : null;
     const isParcial = i === idxParcial;
+    const margem = (!isParcial && c) ? ((rec-c)/rec*100) : null;
     const recCor = isParcial ? 'td-amber' : 'td-green';
     const custoCor = c ? (margem >= 0 ? 'td-amber' : 'td-red') : 'td-num';
-    const margemTxt = margem !== null ? (margem>=0?'+':'')+margem.toFixed(1)+'%' : '—';
+    const margemTxt = isParcial ? '<span style="color:var(--muted);font-size:10px">parcial</span>' : margem !== null ? (margem>=0?'+':'')+margem.toFixed(1)+'%' : '—';
     const margemCor = margem !== null ? (margem>=0?'td-green':'td-red') : 'td-num';
     const mesNome = mesesNomes[i] + (isParcial?' ●':'');
+    const ticketFmt = d.ticket[i] ? 'R$ '+d.ticket[i].toFixed(2).replace('.',',') : '—';
     return `<tr>
       <td class="td-month" style="${isParcial?'color:var(--amber)':''}">${mesNome}</td>
       <td class="${recCor}">${fmtR(rec)}</td>
       <td class="${custoCor}">${c?fmtR(c):'—'}</td>
       <td class="${margemCor}">${margemTxt}</td>
       <td class="td-num">${fmtN(d.vendas[i])||'—'}</td>
-      <td class="td-num">${d.ticket[i]?fmtR(d.ticket[i]):'—'}</td>
+      <td class="td-num">${ticketFmt}</td>
       <td class="td-num">${d.hidrat[i]||'—'}</td>
     </tr>`;
   }).join('');
@@ -1312,10 +1316,11 @@ function renderAll(d){
   const tblMobile = document.getElementById('tbl-mobile-body');
   if(tblMobile) tblMobile.innerHTML = d.receita.map((rec,i)=>{
     const c = d.custo[i];
-    const margem = c ? ((rec-c)/rec*100) : null;
     const isParcial = i === idxParcial;
-    const margemTxt = margem !== null ? (margem>=0?'+':'')+margem.toFixed(1)+'%' : '—';
-    const margemCor = margem !== null ? (margem>=0?'var(--green)':'var(--red)') : 'var(--muted)';
+    const margem = (!isParcial && c) ? ((rec-c)/rec*100) : null;
+    const margemTxt = isParcial ? 'parcial' : margem !== null ? (margem>=0?'+':'')+margem.toFixed(1)+'%' : '—';
+    const margemCor = isParcial ? 'var(--amber)' : margem !== null ? (margem>=0?'var(--green)':'var(--red)') : 'var(--muted)';
+    const ticketFmt = d.ticket[i] ? 'R$ '+d.ticket[i].toFixed(2).replace('.',',') : '—';
     return `<div class="mes-card">
       <div class="mes-header">
         <span class="mes-nome" style="${isParcial?'color:var(--amber)':''}">${mesesNomes[i]}${isParcial?' ●':''}</span>
@@ -1324,7 +1329,7 @@ function renderAll(d){
       <div class="mes-grid">
         <div class="mes-item"><div class="mes-item-lbl">Receita</div><div class="mes-item-val" style="color:${isParcial?'var(--amber)':'var(--green)'}">${fmtR(rec)}</div></div>
         <div class="mes-item"><div class="mes-item-lbl">Serviços</div><div class="mes-item-val">${fmtN(d.vendas[i])||'—'}</div></div>
-        <div class="mes-item"><div class="mes-item-lbl">Ticket</div><div class="mes-item-val">${d.ticket[i]?fmtR(d.ticket[i]):'—'}</div></div>
+        <div class="mes-item"><div class="mes-item-lbl">Ticket</div><div class="mes-item-val">${ticketFmt}</div></div>
       </div>
     </div>`;
   }).join('');
@@ -1333,9 +1338,10 @@ function renderAll(d){
   const alertBody = document.getElementById('alertBody');
   if(alertBody) alertBody.innerHTML = d.receita.map((rec,i)=>{
     const c = d.custo[i]; if(!c) return '';
+    const isParcial = i === idxParcial;
+    if(isParcial) return '';
     const diff = rec - c;
     const ok = diff >= 0;
-    const isParcial = i === idxParcial;
     const cls = ok ? 'custo-ok' : 'custo-bad';
     const cor = ok ? 'var(--green)' : 'var(--red)';
     const seta = ok ? '▲' : '▼';
