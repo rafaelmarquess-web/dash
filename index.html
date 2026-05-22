@@ -1236,16 +1236,11 @@ function renderAll(d){
     // Linha sólida até mês anterior ao parcial
     const dataSolid = data.map((v,i)=> i < idxParcial ? v : null);
 
-    // Projeção proporcional: valor atual ÷ dias trabalhados × dias úteis
-    const valorAtual = data[idxParcial] || 0;
-    const _dt = d.pace.diasTrabalhados || 1;
-    const _du = d.pace.diasUteis || 25;
-    const valorProj  = _dt > 0 ? (valorAtual / _dt) * _du : valorAtual;
-
-    // Linha pontilhada: conecta do último mês completo até a projeção
+    // Sem projeção — ticket e serviços/dia são médias, não acumulados
+    // Mostra só o ponto parcial atual em âmbar
     const dataProj = data.map((v,i)=>{
-      if(i === idxParcial - 1) return data[idxParcial - 1];
-      if(i === idxParcial)     return valorProj;
+      if(i === idxParcial - 1) return data[idxParcial - 1]; // conexão
+      if(i === idxParcial)     return data[idxParcial];     // valor atual parcial
       return null;
     });
 
@@ -1287,9 +1282,8 @@ function renderAll(d){
             const i=ctx.dataIndex; const v=ctx.parsed.y;
             if(!v) return null;
             if(ctx.datasetIndex === 1 && i === idxParcial)
-              return ` Projeção fechamento: ${fmt(v)}`;
+              return ` Parcial (${d.pace.diasTrabalhados}d): ${fmt(v)}`;
             if(ctx.datasetIndex === 1) return null;
-            if(i === idxParcial) return ` Parcial (${d.pace.diasTrabalhados}d): ${fmt(v)}`;
             return ` ${fmt(v)}`;
           }}}
         },
