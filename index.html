@@ -902,22 +902,23 @@ function parseTabela(csv){
 }
 
 function parsePlanos(csv, d){
-  const mesesKey = ['dez/25','jan','fev','mar','abr','mai'];
+  // Estrutura: MÊS | RECEITA TOTAL | TICKET MÉDIO | TOTAL DE PLANOS
+  // Colunas P, Q, R, S — no CSV chegam como cols[0..3] ou com colunas vazias antes
+  const mesesKey = ['dez/25','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
   const lines = csv.trim().split('\n');
   const meses=[], qtd=[], rec=[];
 
   lines.forEach(line=>{
-    // remove aspas e divide
     const cols = splitLine(line);
-    // acha a célula que contém o mês
-    const mesIdx = cols.findIndex(c=>mesesKey.includes(c.toLowerCase()));
+    // Acha o mês em qualquer posição
+    const mesIdx = cols.findIndex(c=>mesesKey.includes((c||'').toLowerCase().trim()));
     if(mesIdx === -1) return;
-    const mes = cols[mesIdx];
-    // receita total está na próxima célula não vazia
-    const recStr = cols[mesIdx+1];
-    const qtdVal = parseInt(cols[cols.length-1]); // quantidade é sempre a última coluna
-    const recVal = parseBR(recStr);
-    if(recVal && qtdVal && !isNaN(qtdVal)){
+    const mes = cols[mesIdx].trim();
+    // RECEITA TOTAL = mesIdx+1, TICKET = mesIdx+2, TOTAL DE PLANOS = mesIdx+3
+    const recVal = parseBR(cols[mesIdx+1]);
+    const qtdStr = (cols[mesIdx+3]||'').replace(/[^\d]/g,'');
+    const qtdVal = parseInt(qtdStr);
+    if(recVal && recVal > 0 && qtdVal && !isNaN(qtdVal) && qtdVal > 0){
       meses.push(mes); rec.push(recVal); qtd.push(qtdVal);
     }
   });
