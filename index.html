@@ -445,18 +445,18 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
           <div>
             <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Maior mês</div>
-            <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--green)">52</div>
-            <div style="font-size:9px;color:var(--muted2);margin-top:2px;white-space:nowrap">Mai (R$ 17,6K)</div>
+            <div id="planos-maior-qtd" style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--green)">—</div>
+            <div id="planos-maior-sub" style="font-size:9px;color:var(--muted2);margin-top:2px;white-space:nowrap">—</div>
           </div>
           <div>
             <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Ticket plano</div>
-            <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--blue)">R$ 344</div>
-            <div style="font-size:9px;color:var(--muted2);margin-top:2px;white-space:nowrap">média Jan–Mai</div>
+            <div id="planos-ticket" style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--blue)">—</div>
+            <div id="planos-ticket-sub" style="font-size:9px;color:var(--muted2);margin-top:2px;white-space:nowrap">—</div>
           </div>
           <div>
             <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Crescimento</div>
-            <div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--amber)">+100%</div>
-            <div style="font-size:9px;color:var(--muted2);margin-top:2px;white-space:nowrap">dez/25→mai</div>
+            <div id="planos-cresc" style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--amber)">—</div>
+            <div id="planos-cresc-sub" style="font-size:9px;color:var(--muted2);margin-top:2px;white-space:nowrap">—</div>
           </div>
         </div>
       </div>
@@ -1383,6 +1383,29 @@ function renderAll(d){
       <div class="plano-track"><div class="plano-fill" style="width:${(d.planos.qtd[i]/maxP*100)}%"></div></div>
       <span class="plano-count">${d.planos.qtd[i]}</span>
     </div>`).join('');
+
+  // Estatísticas dinâmicas de planos
+  const planos = d.planos;
+  if(planos && planos.meses.length){
+    const maxIdx = planos.qtd.indexOf(Math.max(...planos.qtd));
+    const totalRec = planos.rec.reduce((a,b)=>a+b,0);
+    const totalQtd = planos.qtd.reduce((a,b)=>a+b,0);
+    const ticketMedio = totalQtd > 0 ? totalRec / totalQtd : 0;
+    const crescimento = planos.qtd.length > 1
+      ? ((planos.qtd[planos.qtd.length-1] - planos.qtd[0]) / planos.qtd[0] * 100).toFixed(0)
+      : 0;
+    const primeiroMes = planos.meses[0];
+    const ultimoMes = planos.meses[planos.meses.length-1];
+    const crescCor = crescimento >= 0 ? 'var(--amber)' : 'var(--red)';
+    const nomeMaior = planos.meses[maxIdx].charAt(0).toUpperCase()+planos.meses[maxIdx].slice(1);
+
+    const elMQ = document.getElementById('planos-maior-qtd'); if(elMQ) elMQ.textContent = planos.qtd[maxIdx];
+    const elMS = document.getElementById('planos-maior-sub'); if(elMS) elMS.textContent = `${nomeMaior} (${fmtR(planos.rec[maxIdx])})`;
+    const elTK = document.getElementById('planos-ticket'); if(elTK) elTK.textContent = fmtR(ticketMedio);
+    const elTS = document.getElementById('planos-ticket-sub'); if(elTS) elTS.textContent = `média ${primeiroMes}–${ultimoMes}`;
+    const elCR = document.getElementById('planos-cresc'); if(elCR){ elCR.textContent = (crescimento>=0?'+':'')+crescimento+'%'; elCR.style.color=crescCor; }
+    const elCS = document.getElementById('planos-cresc-sub'); if(elCS) elCS.textContent = `${primeiroMes}→${ultimoMes}`;
+  }
 
   // ── Marketing ─────────────────────────────────────────
   const META_CAC = 55;
