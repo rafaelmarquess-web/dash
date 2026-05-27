@@ -816,22 +816,19 @@ function parseTabela(csv){
   const taxiDog   = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+9]):null; });
   const escovacao = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+10]):null; });
 
-  // Meta de produtos — busca no quadro de metas absolutas
-  // O quadro tem: col N = label (RECEITA, RECEITA/DIA, etc), col O = valor absoluto
-  // A linha de LOJA tem valor >= 1000 (R$4.000)
+  // Meta de produtos — quadro de metas col N=14, O=15
   let metaProdutos = 4000;
   let emQuadroMeta = false;
   lines.forEach(line=>{
     const cols = splitLine(line);
-    const labelN = (cols[13]||'').toUpperCase().trim();
-    // Detecta início do quadro de metas pela linha RECEITA com valor >= 10000
+    const labelN = (cols[14]||'').toUpperCase().trim();
     if(labelN === 'RECEITA'){
-      const v = parseBR(cols[14]);
+      const v = parseBR(cols[15]);
       if(v && v >= 10000) emQuadroMeta = true;
     }
-    if(emQuadroMeta && (labelN === 'LOJA' || labelN === 'PRODUTO/LOJA' || labelN === 'PRODUTOS/LOJA')){
-      const v = parseBR(cols[14]);
-      if(v && v >= 100) { metaProdutos = v; emQuadroMeta = false; }
+    if(emQuadroMeta && labelN === 'LOJA'){
+      const v = parseBR(cols[15]);
+      if(v && v >= 100){ metaProdutos = v; emQuadroMeta = false; }
     }
   });
 
@@ -872,10 +869,10 @@ function parseTabela(csv){
   const findDias = (keyword) => {
     for(const line of lines){
       const cols = splitLine(line);
-      // Coluna N = índice 13, coluna O = índice 14
-      const labelN = (cols[13]||'').toLowerCase();
+      // Coluna N = índice 14, coluna O = índice 15 (col A vazia no CSV)
+      const labelN = (cols[14]||'').toLowerCase();
       if(labelN.includes(keyword)){
-        const v = parseInt(cols[14]);
+        const v = parseInt(cols[15]);
         if(!isNaN(v)) return v;
       }
       // Fallback: busca em qualquer coluna
