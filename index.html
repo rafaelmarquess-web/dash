@@ -451,7 +451,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <div class="chart-h180"><canvas id="produtosChart"></canvas></div>
       <div class="tbl-wrap" style="margin-top:12px">
         <table>
-          <thead><tr><th>Mês</th><th>Valor</th><th>vs Meta</th></tr></thead>
+          <thead><tr><th>Indicador</th><th>dez/25</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th></tr></thead>
           <tbody id="tbl-produtos"></tbody>
         </table>
       </div>
@@ -1466,18 +1466,14 @@ function renderAll(d){
 
   const tblProd = document.getElementById('tbl-produtos');
   if(tblProd){
-    const metaP = d.metaProdutos || 4000;
-    tblProd.innerHTML = mesesTab.map((m,i)=>{
-      const v = d.produtos[i] || 0;
-      const isParcial = i === idxParcial;
-      const cor = v >= metaP ? 'td-green' : v >= metaP*0.8 ? 'td-amber' : 'td-red';
-      const pctCell = isParcial ? `<td class="${cor}">${(v/metaP*100).toFixed(1)}%</td>` : `<td class="td-num">—</td>`;
-      return `<tr>
-        <td class="td-month" style="${isParcial?'color:var(--amber)':''}">${m}${isParcial?' ●':''}</td>
-        <td class="${isParcial?cor:'td-num'}">${fmtR(v)}</td>
-        ${pctCell}
-      </tr>`;
-    }).join('');
+    tblProd.innerHTML = `<tr>
+      <td class="td-month" style="color:var(--green)">Produtos</td>
+      ${mesesTab.map((m,i)=>{
+        const v = d.produtos[i] || 0;
+        const isParcial = i === idxParcial;
+        return `<td class="${isParcial?'td-amber':'td-num'}">${fmtR(v)}</td>`;
+      }).join('')}
+    </tr>`;
   }
 
   const mesesNomes = ['dez/25','Jan','Fev','Mar','Abr','Mai'];
