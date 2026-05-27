@@ -162,9 +162,9 @@ tbody td{padding:10px 10px;font-size:12px}
   .tab{padding:6px 16px;font-size:13px}
   .meta-pill{font-size:12px;padding:5px 14px}
   .wrap{padding:28px 32px}
-  .kpi-grid{grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:20px}
+  .kpi-grid{grid-template-columns:repeat(6,1fr);gap:16px;margin-bottom:20px}
   .kpi{padding:22px 20px}
-  .kpi-val{font-size:28px}
+  .kpi-val{font-size:26px}
   .kpi-label{font-size:11px}
   .row2{grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px}
   .row3{grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
@@ -284,11 +284,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <div class="kpi-footer" id="kp-venddia-delta"><span class="delta">carregando...</span></div>
       <div class="kpi-accent" style="background:#a78bfa"></div>
     </div>
-  </div>
-
-  <!-- KPI Produtos/loja — linha separada -->
-  <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px">
-    <div class="kpi" style="--acc:#3dffa0;max-width:320px">
+    <div class="kpi" style="--acc:var(--green)">
       <div class="kpi-label">Produtos / loja</div>
       <div class="kpi-val" id="kp-produtos-val">—</div>
       <div class="kpi-footer" id="kp-produtos-delta"><span class="delta">carregando...</span></div>
@@ -820,14 +816,14 @@ function parseTabela(csv){
   const taxiDog   = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+9]):null; });
   const escovacao = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+10]):null; });
 
-  // Meta de produtos — pega do quadro de metas (linha com "LOJA" ou "PRODUTO" na col N, valor na col O)
+  // Meta de produtos — quadro de metas: linha com "LOJA" na col N, valor absoluto na col O
   let metaProdutos = 4000;
   lines.forEach(line=>{
     const cols = splitLine(line);
-    const labelN = (cols[13]||'').toLowerCase();
-    if(labelN.includes('loja') || labelN.includes('produto')){
+    const labelN = (cols[13]||'').toUpperCase().trim();
+    if(labelN === 'LOJA' || labelN === 'PRODUTOS/LOJA' || labelN === 'PRODUTO'){
       const v = parseBR(cols[14]);
-      if(v && v > 0) metaProdutos = v;
+      if(v && v >= 100) metaProdutos = v; // ignora valores pequenos
     }
   });
 
@@ -1342,7 +1338,7 @@ function renderAll(d){
   const elProdDelta = document.getElementById('kp-produtos-delta');
   if(elProdVal){ elProdVal.textContent = fmtR(prodAtual); elProdVal.style.color = prodCor; }
   if(elProdDelta) elProdDelta.innerHTML =
-    `<span style="color:${prodCor};font-weight:600;font-size:12px">${prodPct}%</span>`+
+    `<span style="color:${prodCor};font-weight:600;font-size:12px">${prodPct>=100?'↑':'↓'} ${prodPct}%</span>`+
     `<span style="color:var(--muted);font-size:11px"> · </span>`+
     `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${fmtR(metaProd)}</span>`;
   const kpiProd = elProdVal?.closest('.kpi');
