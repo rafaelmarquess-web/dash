@@ -6,6 +6,7 @@
 <title>Operação & Marketing 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -1043,8 +1044,10 @@ function parseAds(csv, d){
 
 // ── charts ──────────────────────────────────────────────
 function chartDefaults(){
+  if(typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
   Chart.defaults.color='#5a6080';Chart.defaults.borderColor='#242736';
   Chart.defaults.font.family="'Syne', sans-serif";Chart.defaults.font.size=11;
+  if(Chart.defaults.plugins) Chart.defaults.plugins.datalabels = {display:false};
 }
 const _charts = {};
 function mkLine(id,labels,datasets,opts={}){
@@ -1369,14 +1372,21 @@ function renderAll(d){
       data: {
         labels: mesesVisiveis,
         datasets: [
-          { label:'Hidratação',      data:d.hidrat.slice(0,idxParcial+1),   backgroundColor:cores[0]+'b0', borderRadius:4 },
-          { label:'Táxi Dog',        data:d.taxiDog.slice(0,idxParcial+1),  backgroundColor:cores[2]+'b0', borderRadius:4 },
-          { label:'Escovação Dental',data:d.escovacao.slice(0,idxParcial+1),backgroundColor:cores[1]+'b0', borderRadius:4 },
+          { label:'Hidratação',      data:d.hidrat.slice(0,idxParcial+1),   backgroundColor:cores[0]+'b0', borderRadius:4,
+            datalabels:{display:true,color:'#e6e8f0',anchor:'end',align:'top',font:{size:10,weight:'600'}} },
+          { label:'Táxi Dog',        data:d.taxiDog.slice(0,idxParcial+1),  backgroundColor:cores[2]+'b0', borderRadius:4,
+            datalabels:{display:true,color:'#e6e8f0',anchor:'end',align:'top',font:{size:10,weight:'600'}} },
+          { label:'Escovação Dental',data:d.escovacao.slice(0,idxParcial+1),backgroundColor:cores[1]+'b0', borderRadius:4,
+            datalabels:{display:true,color:'#e6e8f0',anchor:'end',align:'top',font:{size:10,weight:'600'}} },
         ]
       },
       options:{
         responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}} },
+        layout:{ padding:{ top:20 } },
+        plugins:{
+          legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},
+          datalabels:{ display:true }
+        },
         scales:{
           x:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080'} },
           y:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080'}, title:{display:true,text:'Qtd.',color:'#5a6080'} }
@@ -1410,7 +1420,15 @@ function renderAll(d){
               i===idxParcial ? 'rgba(61,255,160,.6)' :
               v >= (d.metaProdutos||4000) ? 'rgba(61,255,160,.7)' : 'rgba(255,184,77,.7)'
             ),
-            borderRadius: 4
+            borderRadius: 4,
+            datalabels: {
+              display: true,
+              color: '#e6e8f0',
+              anchor: 'end',
+              align: 'top',
+              font: {family:'DM Mono, monospace', size:11, weight:'600'},
+              formatter: v => fmtR(v)
+            }
           },
           {
             type: 'line',
@@ -1420,13 +1438,18 @@ function renderAll(d){
             borderDash: [5,4],
             backgroundColor: 'transparent',
             pointRadius: 0,
-            tension: 0
+            tension: 0,
+            datalabels: { display: false }
           }
         ]
       },
       options:{
         responsive:true, maintainAspectRatio:false,
-        plugins:{ legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}} },
+        layout:{ padding:{ top:24 } },
+        plugins:{
+          legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},
+          datalabels: { display: true }
+        },
         scales:{
           x:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080'} },
           y:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080', callback:v=>fmtR(v)} }
