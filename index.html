@@ -816,14 +816,22 @@ function parseTabela(csv){
   const taxiDog   = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+9]):null; });
   const escovacao = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+10]):null; });
 
-  // Meta de produtos — quadro de metas: linha com "LOJA" na col N, valor absoluto na col O
+  // Meta de produtos — busca no quadro de metas absolutas
+  // O quadro tem: col N = label (RECEITA, RECEITA/DIA, etc), col O = valor absoluto
+  // A linha de LOJA tem valor >= 1000 (R$4.000)
   let metaProdutos = 4000;
+  let emQuadroMeta = false;
   lines.forEach(line=>{
     const cols = splitLine(line);
     const labelN = (cols[13]||'').toUpperCase().trim();
-    if(labelN === 'LOJA' || labelN === 'PRODUTOS/LOJA' || labelN === 'PRODUTO'){
+    // Detecta início do quadro de metas pela linha RECEITA com valor >= 10000
+    if(labelN === 'RECEITA'){
       const v = parseBR(cols[14]);
-      if(v && v >= 100) metaProdutos = v; // ignora valores pequenos
+      if(v && v >= 10000) emQuadroMeta = true;
+    }
+    if(emQuadroMeta && (labelN === 'LOJA' || labelN === 'PRODUTO/LOJA' || labelN === 'PRODUTOS/LOJA')){
+      const v = parseBR(cols[14]);
+      if(v && v >= 100) { metaProdutos = v; emQuadroMeta = false; }
     }
   });
 
