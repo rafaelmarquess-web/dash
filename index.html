@@ -1373,11 +1373,11 @@ function renderAll(d){
         labels: mesesVisiveis,
         datasets: [
           { label:'Hidratação',      data:d.hidrat.slice(0,idxParcial+1),   backgroundColor:cores[0]+'b0', borderRadius:4,
-            datalabels:{display:true,color:'#e6e8f0',anchor:'end',align:'top',font:{size:10,weight:'600'}} },
+            datalabels:{display:true,color:'#ffffff',anchor:'end',align:'top',font:{size:12,weight:'700',family:'DM Mono, monospace'}} },
           { label:'Táxi Dog',        data:d.taxiDog.slice(0,idxParcial+1),  backgroundColor:cores[2]+'b0', borderRadius:4,
-            datalabels:{display:true,color:'#e6e8f0',anchor:'end',align:'top',font:{size:10,weight:'600'}} },
+            datalabels:{display:true,color:'#ffffff',anchor:'end',align:'top',font:{size:12,weight:'700',family:'DM Mono, monospace'}} },
           { label:'Escovação Dental',data:d.escovacao.slice(0,idxParcial+1),backgroundColor:cores[1]+'b0', borderRadius:4,
-            datalabels:{display:true,color:'#e6e8f0',anchor:'end',align:'top',font:{size:10,weight:'600'}} },
+            datalabels:{display:true,color:'#ffffff',anchor:'end',align:'top',font:{size:12,weight:'700',family:'DM Mono, monospace'}} },
         ]
       },
       options:{
@@ -1423,10 +1423,10 @@ function renderAll(d){
             borderRadius: 4,
             datalabels: {
               display: true,
-              color: '#e6e8f0',
+              color: '#ffffff',
               anchor: 'end',
               align: 'top',
-              font: {family:'DM Mono, monospace', size:11, weight:'600'},
+              font: {family:'DM Mono, monospace', size:12, weight:'700'},
               formatter: v => fmtR(v)
             }
           },
