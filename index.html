@@ -435,14 +435,26 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
         <div><div class="card-title">Adicionais</div><div class="card-sub">Hidratação · Táxi Dog · Escovação Dental — mês a mês</div></div>
         <span class="badge badge-blue">VOLUME</span>
       </div>
-      <div class="chart-h220"><canvas id="servicosEvolChart"></canvas></div>
+      <div class="chart-h180"><canvas id="servicosEvolChart"></canvas></div>
+      <div class="tbl-wrap" style="margin-top:12px">
+        <table>
+          <thead><tr><th>Indicador</th><th>dez/25</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th></tr></thead>
+          <tbody id="tbl-adicionais"></tbody>
+        </table>
+      </div>
     </div>
     <div class="card">
       <div class="card-head">
         <div><div class="card-title">Produtos / loja</div><div class="card-sub">Evolução mensal — R$</div></div>
         <span class="badge badge-green">R$</span>
       </div>
-      <div class="chart-h220"><canvas id="produtosChart"></canvas></div>
+      <div class="chart-h180"><canvas id="produtosChart"></canvas></div>
+      <div class="tbl-wrap" style="margin-top:12px">
+        <table>
+          <thead><tr><th>Mês</th><th>Valor</th><th>vs Meta</th></tr></thead>
+          <tbody id="tbl-produtos"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -1372,17 +1384,14 @@ function renderAll(d){
       data: {
         labels: mesesVisiveis,
         datasets: [
-          { label:'Hidratação',      data:d.hidrat.slice(0,idxParcial+1),   backgroundColor:cores[0]+'b0', borderRadius:4,
-            datalabels:{display:true,color:'#ffffff',anchor:'end',align:'top',font:{size:12,weight:'700',family:'DM Mono, monospace'}} },
-          { label:'Táxi Dog',        data:d.taxiDog.slice(0,idxParcial+1),  backgroundColor:cores[2]+'b0', borderRadius:4,
-            datalabels:{display:true,color:'#ffffff',anchor:'end',align:'top',font:{size:12,weight:'700',family:'DM Mono, monospace'}} },
-          { label:'Escovação Dental',data:d.escovacao.slice(0,idxParcial+1),backgroundColor:cores[1]+'b0', borderRadius:4,
-            datalabels:{display:true,color:'#ffffff',anchor:'end',align:'top',font:{size:12,weight:'700',family:'DM Mono, monospace'}} },
+          { label:'Hidratação',      data:d.hidrat.slice(0,idxParcial+1),   backgroundColor:cores[0]+'b0', borderRadius:4, datalabels:{display:false} },
+          { label:'Táxi Dog',        data:d.taxiDog.slice(0,idxParcial+1),  backgroundColor:cores[2]+'b0', borderRadius:4, datalabels:{display:false} },
+          { label:'Escovação Dental',data:d.escovacao.slice(0,idxParcial+1),backgroundColor:cores[1]+'b0', borderRadius:4, datalabels:{display:false} },
         ]
       },
       options:{
         responsive:true, maintainAspectRatio:false,
-        layout:{ padding:{ top:20 } },
+        layout:{ padding:{ top:4 } },
         plugins:{
           legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},
           datalabels:{ display:true }
@@ -1421,31 +1430,13 @@ function renderAll(d){
               v >= (d.metaProdutos||4000) ? 'rgba(61,255,160,.7)' : 'rgba(255,184,77,.7)'
             ),
             borderRadius: 4,
-            datalabels: {
-              display: true,
-              color: '#ffffff',
-              anchor: 'end',
-              align: 'top',
-              font: {family:'DM Mono, monospace', size:12, weight:'700'},
-              formatter: v => fmtR(v)
-            }
-          },
-          {
-            type: 'line',
-            label: 'Meta',
-            data: metaLine,
-            borderColor: '#4da6ff',
-            borderDash: [5,4],
-            backgroundColor: 'transparent',
-            pointRadius: 0,
-            tension: 0,
             datalabels: { display: false }
           }
         ]
       },
       options:{
         responsive:true, maintainAspectRatio:false,
-        layout:{ padding:{ top:24 } },
+        layout:{ padding:{ top:4 } },
         plugins:{
           legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},
           datalabels: { display: true }
@@ -1457,6 +1448,38 @@ function renderAll(d){
       }
     });
   }
+
+  // ── Tabelas de adicionais e produtos ─────────────────
+  const mesesTab = MESES.slice(0, idxParcial+1);
+  const tblAdic = document.getElementById('tbl-adicionais');
+  if(tblAdic){
+    const rows = [
+      {label:'Hidratação', data:d.hidrat,   cor:'#ffb84d'},
+      {label:'Táxi Dog',   data:d.taxiDog,  cor:'#4da6ff'},
+      {label:'Escovação',  data:d.escovacao,cor:'#a78bfa'},
+    ];
+    tblAdic.innerHTML = rows.map(r=>`<tr>
+      <td class="td-month" style="color:${r.cor}">${r.label}</td>
+      ${mesesTab.map((m,i)=>`<td class="td-num">${r.data[i]||'—'}</td>`).join('')}
+    </tr>`).join('');
+  }
+
+  const tblProd = document.getElementById('tbl-produtos');
+  if(tblProd){
+    const metaP = d.metaProdutos || 4000;
+    tblProd.innerHTML = mesesTab.map((m,i)=>{
+      const v = d.produtos[i] || 0;
+      const isParcial = i === idxParcial;
+      const cor = v >= metaP ? 'td-green' : v >= metaP*0.8 ? 'td-amber' : 'td-red';
+      const pctCell = isParcial ? `<td class="${cor}">${(v/metaP*100).toFixed(1)}%</td>` : `<td class="td-num">—</td>`;
+      return `<tr>
+        <td class="td-month" style="${isParcial?'color:var(--amber)':''}">${m}${isParcial?' ●':''}</td>
+        <td class="${isParcial?cor:'td-num'}">${fmtR(v)}</td>
+        ${pctCell}
+      </tr>`;
+    }).join('');
+  }
+
   const mesesNomes = ['dez/25','Jan','Fev','Mar','Abr','Mai'];
   const mesesNomesLong = ['dez/25','Janeiro','Fevereiro','Março','Abril','Maio'];
 
