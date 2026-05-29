@@ -1410,7 +1410,8 @@ function renderAll(d){
         layout:{ padding:{ top:4 } },
         plugins:{
           legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},
-          datalabels:{ display:true }
+          datalabels:{ display:true },
+          tooltip:{callbacks:{label:(ctx)=>{const v=ctx.parsed.y;return v!=null?` ${ctx.dataset.label}: ${fmtN(v)}`:null;}}}
         },
         scales:{
           x:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080'} },
@@ -1455,7 +1456,8 @@ function renderAll(d){
         layout:{ padding:{ top:4 } },
         plugins:{
           legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},
-          datalabels: { display: true }
+          datalabels: { display: false },
+          tooltip:{callbacks:{label:(ctx)=>{const v=ctx.parsed.y;return v!=null?` ${fmtR(v)}`:null;}}}
         },
         scales:{
           x:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080'} },
@@ -1704,7 +1706,14 @@ function renderAll(d){
         },
         options:{
           responsive:true, maintainAspectRatio:false,
-          plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}}},
+          plugins:{
+            legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},
+            tooltip:{callbacks:{label:(ctx)=>{
+              const v=ctx.parsed.y;
+              if(v==null) return null;
+              return ctx.dataset.yAxisID==='y2' ? ` CAC: ${fmtR(v)}` : ` ROAS: ${v.toFixed(2)}x`;
+            }}}
+          },
           scales:{
             y:{ position:'left', grid:{color:'#1e2130'}, ticks:{color:'#5a6080',callback:v=>v+'x'}, title:{display:true,text:'ROAS',color:'#5a6080'} },
             y2:{ position:'right', grid:{drawOnChartArea:false}, ticks:{color:'#ff6eb4',callback:v=>fmtR(v)}, title:{display:true,text:'CAC',color:'#ff6eb4'} },
@@ -1729,7 +1738,14 @@ function renderAll(d){
         },
         options:{
           responsive:true, maintainAspectRatio:false,
-          plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}}},
+          plugins:{
+            legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},
+            tooltip:{callbacks:{label:(ctx)=>{
+              const v=ctx.parsed.y;
+              if(v==null) return null;
+              return ctx.dataset.yAxisID==='y2' ? ` Invest.: ${fmtR(v)}` : ` Clientes: ${fmtN(v)}`;
+            }}}
+          },
           scales:{
             y:{ position:'left', grid:{color:'#1e2130'}, ticks:{color:'#5a6080'}, title:{display:true,text:'Clientes',color:'#5a6080'} },
             y2:{ position:'right', grid:{drawOnChartArea:false}, ticks:{color:'#ffb84d',callback:v=>fmtR(v)}, title:{display:true,text:'Invest.',color:'#ffb84d'} },
