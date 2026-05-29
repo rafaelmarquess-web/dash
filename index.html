@@ -1079,12 +1079,14 @@ const _charts = {};
 function mkLine(id,labels,datasets,opts={}){
   const ctx=document.getElementById(id)?.getContext('2d');if(!ctx)return;
   if(_charts[id]) _charts[id].destroy();
-  _charts[id]=new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}}},scales:{x:{grid:{color:'#1e2130'},ticks:{color:'#5a6080'}},y:{grid:{color:'#1e2130'},ticks:{color:'#5a6080',...(opts.yTick||{})}}}, ...opts.extra}});
+  const tooltipFmt = opts.yTick?.callback ? (v=>opts.yTick.callback(v)) : (v=>v);
+  _charts[id]=new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},tooltip:{callbacks:{label:(ctx)=>{const v=ctx.parsed.y;return v!=null?` ${tooltipFmt(v)}`:null;}}}},scales:{x:{grid:{color:'#1e2130'},ticks:{color:'#5a6080'}},y:{grid:{color:'#1e2130'},ticks:{color:'#5a6080',...(opts.yTick||{})}}}, ...opts.extra}});
 }
 function mkBar(id,labels,datasets,opts={}){
   const ctx=document.getElementById(id)?.getContext('2d');if(!ctx)return;
   if(_charts[id]) _charts[id].destroy();
-  _charts[id]=new Chart(ctx,{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}}},scales:{x:{grid:{color:'#1e2130'},ticks:{color:'#5a6080'}},y:{grid:{color:'#1e2130'},ticks:{color:'#5a6080',...(opts.yTick||{})}}}, ...opts.extra}});
+  const tooltipFmt = opts.yTick?.callback ? (v=>opts.yTick.callback(v)) : (v=>v);
+  _charts[id]=new Chart(ctx,{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},tooltip:{callbacks:{label:(ctx)=>{const v=ctx.parsed.y;return v!=null?` ${tooltipFmt(v)}`:null;}}}},scales:{x:{grid:{color:'#1e2130'},ticks:{color:'#5a6080'}},y:{grid:{color:'#1e2130'},ticks:{color:'#5a6080',...(opts.yTick||{})}}}, ...opts.extra}});
 }
 
 // ── render ───────────────────────────────────────────────
@@ -1705,7 +1707,7 @@ function renderAll(d){
           plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}}},
           scales:{
             y:{ position:'left', grid:{color:'#1e2130'}, ticks:{color:'#5a6080',callback:v=>v+'x'}, title:{display:true,text:'ROAS',color:'#5a6080'} },
-            y2:{ position:'right', grid:{drawOnChartArea:false}, ticks:{color:'#ff6eb4',callback:v=>'R$'+v}, title:{display:true,text:'CAC',color:'#ff6eb4'} },
+            y2:{ position:'right', grid:{drawOnChartArea:false}, ticks:{color:'#ff6eb4',callback:v=>fmtR(v)}, title:{display:true,text:'CAC',color:'#ff6eb4'} },
             x:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080'} }
           }
         }
