@@ -704,13 +704,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     <div class="tbl-wrap">
       <table>
         <thead><tr><th>Semana</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th></tr></thead>
-        <tbody>
-          <tr><td class="td-month">S1</td><td class="td-green">R$ 5,7K</td><td class="td-green">R$ 14,1K</td><td class="td-green">R$ 13,1K</td><td class="td-green">R$ 9,1K</td><td class="td-amber">R$ 3,9K</td></tr>
-          <tr><td class="td-month">S2</td><td class="td-green">R$ 11,3K</td><td class="td-green">R$ 14,6K</td><td class="td-green">R$ 13,9K</td><td class="td-green">R$ 15,9K</td><td class="td-green">R$ 20,2K</td></tr>
-          <tr><td class="td-month">S3</td><td class="td-green">R$ 10,8K</td><td class="td-green">R$ 10,5K</td><td class="td-green">R$ 12,7K</td><td class="td-green">R$ 12,5K</td><td class="td-green">R$ 13,3K</td></tr>
-          <tr><td class="td-month">S4</td><td class="td-green">R$ 11,6K</td><td class="td-green">R$ 14,9K</td><td class="td-green">R$ 11,7K</td><td class="td-green">R$ 16,9K</td><td class="td-num">—</td></tr>
-          <tr><td class="td-month">S5</td><td class="td-green">R$ 9,3K</td><td class="td-num">—</td><td class="td-green">R$ 4,9K</td><td class="td-num">—</td><td class="td-num">—</td></tr>
-        </tbody>
+        <tbody id="tbl-semanal-body"></tbody>
       </table>
     </div>
   </div>
@@ -741,9 +735,27 @@ const defaults = {
   planos:    {meses:['dez/25','jan','fev','mar','abr','mai'],qtd:[26,36,30,38,49,50],rec:[8748.30,12412.00,10679.40,12604.60,16764.69,16925.40]},
   ads:{meses:['Jan','Fev','Mar','Abr'],invest:[900,1000,1200,2000],fat:[3543.9,3427.74,2421,5748],cac:[36,43.48,80,64.52],roas:[3.94,3.43,2.02,2.87],clientes:[25,23,15,31]},
   semanal:{
-    fat:[[5617.75,11269.36,10771.23,11507.06,9214.48],[14091.92,14506.62,10454.66,14864.48,0],[13060.44,13802.95,12636.76,11656.31,4928.12],[9062.29,15907.14,12454.14,16807.78,0],[3941.45,20115.76,13229.5,0,0]],
-    srv:[[41,105,106,120,108],[118,127,107,140,0],[116,119,115,119,40],[81,147,126,125,0],[42,149,137,0,0]],
-    tick:[[137,107.3,101.6,95.9,85.3],[119.4,114.2,97.7,106.2,0],[112.6,116,109.9,98,123.2],[111.9,108.2,98.8,134.5,0],[93.8,135,96.6,0,0]]
+    fat:[
+      [5617.75,  11269.36, 10771.23, 11507.06, 9214.48],  // jan
+      [14091.92, 14506.62, 10454.66, 14864.48, 0],         // fev
+      [13060.44, 13802.95, 12636.76, 11656.31, 4928.12],   // mar
+      [9062.29,  15907.14, 12454.14, 16807.78, 0],         // abr
+      [3941.45,  20115.76, 13229.50, 13766.15, 0]          // mai — S4 correto
+    ],
+    srv:[
+      [41,  105, 106, 120, 108],
+      [118, 127, 107, 140, 0],
+      [116, 119, 115, 119, 40],
+      [81,  147, 126, 125, 0],
+      [42,  149, 137, 133, 0]   // mai — S4 correto
+    ],
+    tick:[
+      [137.02, 107.33, 101.62, 95.89,  85.32],
+      [119.42, 114.23, 115.99, 106.17, 0],
+      [112.59, 97.71,  109.88, 97.95,  123.20],
+      [111.88, 108.21, 98.84,  134.46, 0],
+      [93.84,  135.01, 96.57,  103.50, 0]   // mai — S4 correto
+    ]
   },
   pace:{diasUteis:25,diasTrabalhados:21,diasFaltantes:4,items:[
     {lbl:'Receita×Dias',meta:57540,  real:56004.49,pct:0.9733,fmt:v=>fmtR(v)},
@@ -984,46 +996,48 @@ function parsePlanos(csv, d){
 }
 
 function parseSemanal(csv, d){
-  // Estrutura: blocos por semana, cada bloco tem 3 linhas: serviços, faturamento, ticket
-  // Colunas: B=label, C=Jan, D=Fev, E=Mar, F=Abr, G=Mai (índices 1,2,3,4,5,6)
+  // Estrutura: blocos por semana, 3 linhas cada: serviços / faturamento / ticket médio
+  // Col A=vazio, Col B=label, Col C=Jan, D=Fev, E=Mar, F=Abr, G=Mai...
+  // Índices no CSV: 0=vazio, 1=label, 2=Jan, 3=Fev, 4=Mar, 5=Abr, 6=Mai
   const lines = csv.trim().split('\n');
-  const NUM_MESES = 5; // Jan a Mai
+  const NUM_MESES = 5;
   const NUM_SEMS  = 5;
 
-  // Inicializa arrays
   const fat  = Array.from({length:NUM_MESES}, ()=>Array(NUM_SEMS).fill(0));
   const srv  = Array.from({length:NUM_MESES}, ()=>Array(NUM_SEMS).fill(0));
   const tick = Array.from({length:NUM_MESES}, ()=>Array(NUM_SEMS).fill(0));
 
   let semIdx = -1;
+
   lines.forEach(line=>{
     const cols = splitLine(line);
     const label = (cols[1]||'').toLowerCase().trim();
-    // Detecta início de nova semana
-    if(label === '' && cols.some(c=>(c||'').toLowerCase().includes('semana'))){
+
+    // Detecta início de novo bloco de semana pelo cabeçalho "semana X"
+    if((cols[2]||'').toLowerCase().includes('semana')){
       semIdx++;
       return;
     }
     if(semIdx < 0 || semIdx >= NUM_SEMS) return;
-    if(label.includes('faturamento')){
-      for(let m=0;m<NUM_MESES;m++){
+
+    if(label.includes('faturamento') || label.includes('receita')){
+      for(let m=0; m<NUM_MESES; m++){
         const v = parseBR(cols[m+2]);
         if(v && v > 0) fat[m][semIdx] = v;
       }
-    } else if(label.includes('serviço') || label === 'serviços'){
-      for(let m=0;m<NUM_MESES;m++){
-        const v = parseBR(cols[m+2]);
-        if(v && v > 0) srv[m][semIdx] = v;
+    } else if(label === 'serviços' || label === 'servicos' || label.includes('servi')){
+      for(let m=0; m<NUM_MESES; m++){
+        const v = parseFloat((cols[m+2]||'').replace(',','.'));
+        if(!isNaN(v) && v > 0) srv[m][semIdx] = v;
       }
     } else if(label.includes('ticket')){
-      for(let m=0;m<NUM_MESES;m++){
+      for(let m=0; m<NUM_MESES; m++){
         const v = parseBR(cols[m+2]);
         if(v && v > 0) tick[m][semIdx] = v;
       }
     }
   });
 
-  // Valida — se não encontrou dados usa fallback
   const totalFat = fat.flat().reduce((a,b)=>a+b,0);
   if(totalFat === 0) return d;
   return {...d, semanal:{fat, srv, tick}};
@@ -1830,7 +1844,22 @@ function renderAll(d){
     `<span style="color:${ritmoCor}">${ritmoPct}% da meta</span>`+
     `<span style="color:var(--muted2)"> · ${diasTrabSem}/${diasUteisSem} dias</span>`);
 
-  // Gráfico 1: Faturamento semanal — cada mês = uma linha
+  // ── Tabela semanal dinâmica ───────────────────────────
+  const tblSem = document.getElementById('tbl-semanal-body');
+  if(tblSem){
+    // d.semanal.fat: [jan[s1..s5], fev[s1..s5], mar[s1..s5], abr[s1..s5], mai[s1..s5]]
+    const semNames = ['S1','S2','S3','S4','S5'];
+    const nMeses = d.semanal.fat.length; // quantos meses têm dados
+    tblSem.innerHTML = semNames.map((s,si)=>`<tr>
+      <td class="td-month">${s}</td>
+      ${d.semanal.fat.map((mesFat,mi)=>{
+        const v = mesFat[si];
+        const isAtual = mi === idxSemAtual;
+        const cor = v > 0 ? (isAtual ? 'td-amber' : 'td-green') : 'td-num';
+        return `<td class="${cor}">${v > 0 ? fmtR(v) : '—'}</td>`;
+      }).join('')}
+    </tr>`).join('');
+  }
   mkBar('semanalChart', semLabels,
     semMeses.map((m,i)=>({
       label: m,
