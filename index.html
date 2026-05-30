@@ -500,7 +500,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     </div>
   </div>
 
-  <!-- Detalhamento mensal + Receita vs Custo -->
+  <!-- Detalhamento mensal + Alerta Receita vs Custo -->
   <div class="row2b" style="margin-bottom:14px">
     <div class="card">
       <div class="card-head">
@@ -516,19 +516,19 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     </div>
     <div class="card">
       <div class="card-head">
-        <div><div class="card-title">Receita vs Custo</div><div class="card-sub">Margem por mês</div></div>
-        <span class="badge badge-amber">JAN–MAI</span>
+        <div><div class="card-title">Alerta: Receita vs Custo</div><div class="card-sub">Meses com margem negativa precisam de atenção</div></div>
       </div>
-      <div class="chart-h220"><canvas id="custoChart"></canvas></div>
+      <div class="custo-row" id="alertBody"></div>
     </div>
   </div>
 
-  <!-- Alerta Receita vs Custo -->
+  <!-- Receita vs Custo (largura total) -->
   <div class="card" style="margin-bottom:14px">
     <div class="card-head">
-      <div><div class="card-title">Alerta: Receita vs Custo</div><div class="card-sub">Meses com margem negativa precisam de atenção</div></div>
+      <div><div class="card-title">Receita vs Custo</div><div class="card-sub">Margem por mês</div></div>
+      <span class="badge badge-amber">JAN–MAI</span>
     </div>
-    <div class="custo-row" id="alertBody"></div>
+    <div class="chart-h220"><canvas id="custoChart"></canvas></div>
   </div>
 
   <!-- Receita mensal (largura total, por último) -->
