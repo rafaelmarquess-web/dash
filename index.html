@@ -722,15 +722,15 @@ const SHEET_SEMANAL = BASE + '?gid=622872267&single=true&output=csv';
 
 // Fallback com dados estáticos (usado se o fetch falhar)
 const defaults = {
-  receita:   [52061.79, 48471.60, 53914.98, 55588.16, 63526.50, 56004.49],
+  receita:   [52061.79, 48471.60, 53914.98, 55588.16, 63526.50, 67485.14],
   custo:     [null, 50110, 52500, 57200, 58000, 61500],
-  ticket:    [99.35, 100.98, 109.58, 109.00, 110.29, 102.57],
-  vendas:    [524, 480, 492, 510, 576, 546],
-  vendasDia: [20, 18, 23, 20, 24, 22],
-  hidrat:    [28, 30, 39, 27, 31, 26],
-  produtos:  [2572.46, 1486.32, 3174.90, 3723.26, 2870.13, 5669.32],
-  taxiDog:   [51, 56, 50, 65, 67, 51],
-  escovacao: [121, 184, 170, 163, 223, 182],
+  ticket:    [99.35, 100.98, 109.58, 109.00, 110.29, 109.55],
+  vendas:    [524, 480, 492, 510, 576, 616],
+  vendasDia: [20, 18, 23, 20, 24, 25],
+  hidrat:    [28, 30, 39, 27, 31, 69],
+  produtos:  [2572.46, 1486.32, 3174.90, 3723.26, 2870.13, 6481.32],
+  taxiDog:   [51, 56, 50, 65, 67, 57],
+  escovacao: [121, 184, 170, 163, 223, 231],
   metaProdutos: 4000,
   planos:    {meses:['dez/25','jan','fev','mar','abr','mai'],qtd:[26,36,30,38,49,50],rec:[8748.30,12412.00,10679.40,12604.60,16764.69,16925.40]},
   ads:{meses:['Jan','Fev','Mar','Abr'],invest:[900,1000,1200,2000],fat:[3543.9,3427.74,2421,5748],cac:[36,43.48,80,64.52],roas:[3.94,3.43,2.02,2.87],clientes:[25,23,15,31]},
@@ -757,14 +757,14 @@ const defaults = {
       [93.84,  135.01, 96.57,  103.50, 0]   // mai — S4 correto
     ]
   },
-  pace:{diasUteis:25,diasTrabalhados:21,diasFaltantes:4,items:[
-    {lbl:'Receita×Dias',meta:57540,  real:56004.49,pct:0.9733,fmt:v=>fmtR(v)},
-    {lbl:'Receita/dia', meta:2740,   real:2666.88, pct:0.9733,fmt:v=>fmtR(v)},
-    {lbl:'Ticket médio',meta:110.48, real:111.34,  pct:1.0078,fmt:v=>fmtR(v)},
-    {lbl:'Serviços×Dias',meta:521,   real:503,     pct:0.9654,fmt:v=>fmtN(v)},
-    {lbl:'Serviços/dia', meta:24.8,  real:24,      pct:0.9677,fmt:v=>fmtN(v)},
+  pace:{diasUteis:25,diasTrabalhados:25,diasFaltantes:0,items:[
+    {lbl:'Receita×Dias',meta:68500,  real:67485.14,pct:0.9852,fmt:v=>fmtR(v)},
+    {lbl:'Receita/dia', meta:2740,   real:2699.41, pct:0.9852,fmt:v=>fmtR(v)},
+    {lbl:'Ticket médio',meta:110.48, real:109.55,  pct:0.9916,fmt:v=>fmtR(v)},
+    {lbl:'Serviços×Dias',meta:620,   real:616,     pct:0.9935,fmt:v=>fmtN(v)},
+    {lbl:'Serviços/dia', meta:24.8,  real:25,      pct:1.0000,fmt:v=>fmtN(v)},
   ]},
-  metaPct:[81.76, 81.76, 92.84, 88.06, 88.06, 65.00, 141.73]
+  metaPct:[98.52, 98.52, 99.16, 99.35, 99.35, 172.50, 162.03]
 };
 
 // ── utilidades ──────────────────────────────────────────
@@ -1206,23 +1206,31 @@ function renderAll(d){
   renderKPIs(d);
 
   // ── Mês parcial — lógica central ────────────────────────
-  const idxParcial = d.receita.reduce((last,v,i)=>v>0?i:last, -1);
-  const {diasTrabalhados, diasFaltantes} = d.pace;
-  const recAtual = d.receita[idxParcial] || 0;
+  const idxUltimoComDados = d.receita.reduce((last,v,i)=>v>0?i:last, -1);
+  const {diasTrabalhados, diasFaltantes, diasUteis} = d.pace;
+  const mesFechado = diasFaltantes === 0 || diasTrabalhados >= diasUteis;
+
+  // Se mês fechado, não há parcial — idxParcial aponta além do array
+  const idxParcial = mesFechado ? -1 : idxUltimoComDados;
+
+  const recAtual = d.receita[idxUltimoComDados] || 0;
   const ritmoDiaProj = diasTrabalhados > 0 ? recAtual / diasTrabalhados : 0;
-  const recProj = recAtual + ritmoDiaProj * diasFaltantes;
+  const recProj = mesFechado ? recAtual : recAtual + ritmoDiaProj * diasFaltantes;
 
-  // Labels: meses completos normais, parcial com " (parcial)"
-  const MESES_LBL = MESES.map((m,i)=> i === idxParcial ? m + ' (parcial)' : m);
+  // Labels: se mês fechado, todos normais; se parcial, último com " (parcial)"
+  const MESES_LBL = MESES.map((m,i)=> (!mesFechado && i === idxUltimoComDados) ? m + ' (parcial)' : m);
 
-  // Linha sólida SÓ até o mês anterior ao parcial — evita queda visual
-  // Mês parcial aparece APENAS como projeção pontilhada
-  const dataCompletos = d.receita.map((v,i)=> i < idxParcial ? v : null);
-  // Dataset de projeção: conecta do último mês completo até o acumulado parcial
-  // e mostra a projeção de fechamento como ponto separado em Mai
+  // Linha sólida: se fechado, todos os meses; se parcial, até o anterior
+  const dataCompletos = d.receita.map((v,i)=> {
+    if(mesFechado) return v > 0 ? v : null;
+    return i < idxUltimoComDados ? v : null;
+  });
+
+  // Dataset de projeção: só aparece se mês parcial
   const dataComProj = MESES.map((m,i)=>{
-    if(i === idxParcial - 1) return d.receita[idxParcial - 1]; // ponto de conexão (Abr)
-    if(i === idxParcial)     return recProj;  // projeção de fechamento
+    if(mesFechado) return null;
+    if(i === idxUltimoComDados - 1) return d.receita[idxUltimoComDados - 1];
+    if(i === idxUltimoComDados)     return recProj;
     return null;
   });
 
@@ -1288,14 +1296,15 @@ function renderAll(d){
     });
   }
 
-  // Badge "parcial" no card de receita
+  // Badge "parcial" no card de receita — só aparece se mês parcial
   const badgeEl = document.getElementById('badge-parcial');
-  if(badgeEl) badgeEl.style.display = 'inline-block';
+  if(badgeEl) badgeEl.style.display = mesFechado ? 'none' : 'inline-block';
 
-  mkBar('custoChart',MESES5,
-    [{label:'Receita',data:d.receita.slice(1),backgroundColor:d.receita.slice(1).map((v,i)=>i===idxParcial-1?'rgba(255,184,77,.7)':'rgba(61,255,160,.7)'),borderRadius:4},
-     {label:'Custo',data:d.custo.slice(1),backgroundColor:'rgba(255,95,95,.6)',borderRadius:4}],
-    {yTick:{callback:v=>fmtR(v)},extra:{barPercentage:.7}});
+  const MESES5 = MESES.slice(1);
+  mkBar('custoChart', MESES5,
+    [{label:'Receita', data:d.receita.slice(1), backgroundColor:d.receita.slice(1).map((v,i)=>(!mesFechado && i===idxParcial-1)?'rgba(255,184,77,.7)':'rgba(61,255,160,.7)'), borderRadius:4},
+     {label:'Custo',   data:d.custo.slice(1),   backgroundColor:'rgba(255,95,95,.6)', borderRadius:4}],
+    {yTick:{callback:v=>fmtR(v)}, extra:{barPercentage:.7}});
 
   // Ticket e Serviços/dia — mesmo padrão do gráfico de receita
   const mkLinePartial = (id, data, color, bgColor) => {
@@ -1308,14 +1317,14 @@ function renderAll(d){
     const fmt = v => isTicket ? fmtR(v) : fmtN(v);
     const yFmt = v => isTicket ? fmtR(v) : v;
 
-    // Linha sólida até mês anterior ao parcial
-    const dataSolid = data.map((v,i)=> i < idxParcial ? v : null);
+    // Linha sólida — todos os meses se fechado, até anterior se parcial
+    const dataSolid = data.map((v,i)=> mesFechado ? (v||null) : (i < idxUltimoComDados ? v : null));
 
-    // Sem projeção — ticket e serviços/dia são médias, não acumulados
-    // Mostra só o ponto parcial atual em âmbar
+    // Pontilhado — só se parcial
     const dataProj = data.map((v,i)=>{
-      if(i === idxParcial - 1) return data[idxParcial - 1]; // conexão
-      if(i === idxParcial)     return data[idxParcial];     // valor atual parcial
+      if(mesFechado) return null;
+      if(i === idxUltimoComDados - 1) return data[idxUltimoComDados - 1];
+      if(i === idxUltimoComDados)     return data[idxUltimoComDados];
       return null;
     });
 
@@ -1341,7 +1350,7 @@ function renderAll(d){
             backgroundColor: 'transparent',
             borderDash: [6,4],
             fill: false, tension: .4,
-            pointRadius: dataProj.map((_,i)=> i===idxParcial ? 7 : 0),
+            pointRadius: dataProj.map((_,i)=> i===idxUltimoComDados ? 7 : 0),
             pointBackgroundColor: '#ffb84d',
             spanGaps: false,
           }
