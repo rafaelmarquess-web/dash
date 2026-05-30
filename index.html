@@ -846,7 +846,7 @@ function parseTabela(csv){
   const vendas    = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+5]):null; });
   const vendasDia = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+6]):null; });
   const hidrat    = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+7]):null; });
-  const produtos  = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+8]):null; });
+  const produtos  = mesesKey.map(m=>{ const r=byMes[m]; const v=r?parseBR(r.cols[r.mesIdx+8]):null; if(m==='mai') console.log('DEBUG produtos mai:', r?.cols[r.mesIdx+8], '->', v); return v; });
   const taxiDog   = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+9]):null; });
   const escovacao = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+10]):null; });
 
