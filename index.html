@@ -918,9 +918,9 @@ function parseTabela(csv){
     }
     return null;
   };
-  const diasUteis       = findDias('úteis')       || 25;
-  const diasTrabalhados = findDias('trabalhados')  || 16;
-  const diasFaltantes   = findDias('faltantes')    || 9;
+  const diasUteis       = findDias('úteis')       ?? 25;
+  const diasTrabalhados = findDias('trabalhados')  ?? 25;
+  const diasFaltantes   = findDias('faltantes')    ?? 0;
 
   // % da meta — coluna M (índice 12 no Excel = última coluna com %)
   // Busca linhas que têm % na última coluna não vazia
