@@ -1497,7 +1497,7 @@ function renderAll(d){
       <td class="td-month" style="color:var(--green)">Produtos</td>
       ${mesesTab.map((m,i)=>{
         const v = d.produtos[i] || 0;
-        const isParcial = i === idxUltimoComDados;
+        const isParcial = !mesFechado && i === idxUltimoComDados;
         return `<td class="${isParcial?'td-amber':'td-num'}">${fmtR(v)}</td>`;
       }).join('')}
     </tr>`;
@@ -1510,7 +1510,7 @@ function renderAll(d){
   const tblDesktop = document.getElementById('tbl-desktop-body');
   if(tblDesktop) tblDesktop.innerHTML = d.receita.map((rec,i)=>{
     const c   = d.custo[i];
-    const isParcial = i === idxUltimoComDados;
+    const isParcial = !mesFechado && i === idxUltimoComDados;
     const margem = (!isParcial && c) ? ((rec-c)/rec*100) : null;
     const recCor = isParcial ? 'td-amber' : 'td-green';
     const custoCor = c ? (margem >= 0 ? 'td-amber' : 'td-red') : 'td-num';
@@ -1533,7 +1533,7 @@ function renderAll(d){
   const tblMobile = document.getElementById('tbl-mobile-body');
   if(tblMobile) tblMobile.innerHTML = d.receita.map((rec,i)=>{
     const c = d.custo[i];
-    const isParcial = i === idxUltimoComDados;
+    const isParcial = !mesFechado && i === idxUltimoComDados;
     const margem = (!isParcial && c) ? ((rec-c)/rec*100) : null;
     const margemTxt = isParcial ? 'parcial' : margem !== null ? (margem>=0?'+':'')+margem.toFixed(1)+'%' : '—';
     const margemCor = isParcial ? 'var(--amber)' : margem !== null ? (margem>=0?'var(--green)':'var(--red)') : 'var(--muted)';
@@ -1555,7 +1555,7 @@ function renderAll(d){
   const alertBody = document.getElementById('alertBody');
   if(alertBody) alertBody.innerHTML = d.receita.map((rec,i)=>{
     const c = d.custo[i]; if(!c) return '';
-    const isParcial = i === idxUltimoComDados;
+    const isParcial = !mesFechado && i === idxUltimoComDados;
     if(isParcial) return '';
     const diff = rec - c;
     const ok = diff >= 0;
