@@ -353,7 +353,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
         </div>
         <div style="text-align:center">
           <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Meta mensal</div>
-          <div style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--muted2)">R$ 68,5K</div>
+          <div style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--muted2)" id="proj-meta-val">R$ 68,5K</div>
         </div>
       </div>
       <!-- Mini tabela mínimo diário aceitável -->
@@ -374,20 +374,20 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     <!-- METAS -->
     <div class="card" id="card-meta">
       <div class="card-head">
-        <div><div class="card-title">Metas — Fevereiro (referência +8%)</div><div class="card-sub">Parcial acumulado Jan–Mai vs metas definidas</div></div>
+        <div><div class="card-title" id="meta-card-title">Metas — Fevereiro (referência +8%)</div><div class="card-sub" id="meta-card-sub">Parcial acumulado Jan–Mai vs metas definidas</div></div>
         <span class="badge badge-blue">META</span>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
         <div>
           <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;font-weight:600">Valores-alvo</div>
           <div style="display:flex;flex-direction:column;gap:8px">
-            <div class="meta-row"><span class="meta-lbl">Receita</span><span class="meta-target">R$ 68,5K</span></div>
-            <div class="meta-row"><span class="meta-lbl">Receita / dia</span><span class="meta-target">R$ 2,74K</span></div>
-            <div class="meta-row"><span class="meta-lbl">Ticket médio</span><span class="meta-target">R$ 110,48</span></div>
-            <div class="meta-row"><span class="meta-lbl">Serviços</span><span class="meta-target">620</span></div>
-            <div class="meta-row"><span class="meta-lbl">Serviços / dia</span><span class="meta-target">24,8</span></div>
-            <div class="meta-row"><span class="meta-lbl">Hidratação</span><span class="meta-target">40</span></div>
-            <div class="meta-row"><span class="meta-lbl">Produtos / loja</span><span class="meta-target">R$ 4,0K</span></div>
+            <div class="meta-row"><span class="meta-lbl">Receita</span><span class="meta-target" id="mt-receita">R$ 68,5K</span></div>
+            <div class="meta-row"><span class="meta-lbl">Receita / dia</span><span class="meta-target" id="mt-recdia">R$ 2,74K</span></div>
+            <div class="meta-row"><span class="meta-lbl">Ticket médio</span><span class="meta-target" id="mt-ticket">R$ 110,48</span></div>
+            <div class="meta-row"><span class="meta-lbl">Serviços</span><span class="meta-target" id="mt-vendas">620</span></div>
+            <div class="meta-row"><span class="meta-lbl">Serviços / dia</span><span class="meta-target" id="mt-vendasdia">24,8</span></div>
+            <div class="meta-row"><span class="meta-lbl">Hidratação</span><span class="meta-target" id="mt-hidrat">40</span></div>
+            <div class="meta-row"><span class="meta-lbl">Produtos / loja</span><span class="meta-target" id="mt-produtos">R$ 4,0K</span></div>
           </div>
         </div>
         <div>
@@ -850,19 +850,53 @@ function parseTabela(csv){
   const taxiDog   = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+9]):null; });
   const escovacao = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+10]):null; });
 
-  // Meta de produtos — quadro de metas col N=14, O=15
-  let metaProdutos = 4000;
+  // Metas mensais — quadro de metas col N (índice 13) e O (índice 14) no CSV
+  // (col A vazia no CSV → A=0, B=1, ... N=13, O=14)
+  let metaReceita   = 68500;
+  let metaRecDia    = 2740;
+  let metaTicket    = 110.48;
+  let metaVendas    = 620;
+  let metaVendasDia = 24.8;
+  let metaHidrat    = 40;
+  let metaProdutos  = 4000;
+
+  // Mapeamento de labels → campo
+  const metaMap = {
+    'receita':    v=>{ metaReceita = v; },
+    'receita/dia':v=>{ metaRecDia  = v; },
+    'receitadia': v=>{ metaRecDia  = v; },
+    'ticket':     v=>{ metaTicket  = v; },
+    'vendas':     v=>{ metaVendas  = v; },
+    'vendas/dia': v=>{ metaVendasDia = v; },
+    'vendasdia':  v=>{ metaVendasDia = v; },
+    'hidrata':    v=>{ metaHidrat  = v; },
+    'loja':       v=>{ metaProdutos= v; },
+  };
+
   let emQuadroMeta = false;
   lines.forEach(line=>{
     const cols = splitLine(line);
-    const labelN = (cols[14]||'').toUpperCase().trim();
-    if(labelN === 'RECEITA'){
-      const v = parseBR(cols[15]);
-      if(v && v >= 10000) emQuadroMeta = true;
-    }
-    if(emQuadroMeta && labelN === 'LOJA'){
-      const v = parseBR(cols[15]);
-      if(v && v >= 100){ metaProdutos = v; emQuadroMeta = false; }
+    // Detecta início do quadro de metas pela label RECEITA com valor >= 10000 na col O
+    const labelN13 = (cols[13]||'').toUpperCase().trim();
+    const labelN14 = (cols[14]||'').toUpperCase().trim();
+    // Tenta col índice 13 (N) ou 14 (O-1) como label
+    for(const [colLabel, colVal] of [[cols[13], cols[14]], [cols[14], cols[15]]]){
+      const lbl = (colLabel||'').toLowerCase().trim();
+      if(lbl === 'receita'){
+        const v = parseBR(colVal);
+        if(v && v >= 10000){ emQuadroMeta = true; }
+      }
+      if(emQuadroMeta){
+        for(const [key, fn] of Object.entries(metaMap)){
+          if(lbl.replace(/[^a-záéíóúâêôãõç\/]/gi,'').includes(key.replace('/',''))){
+            const v = parseBR(colVal);
+            if(v && v > 0) fn(v);
+            break;
+          }
+        }
+        // Fim do bloco de metas quando encontra linha vazia ou outro bloco
+        if(lbl === '' && !(cols[13]||'').trim() && !(cols[14]||'').trim()) emQuadroMeta = false;
+      }
     }
   });
 
@@ -922,21 +956,7 @@ function parseTabela(csv){
   const diasTrabalhados = findDias('trabalhados')  ?? 25;
   const diasFaltantes   = findDias('faltantes')    ?? 0;
 
-  // % da meta — coluna M (índice 12 no Excel = última coluna com %)
-  // Busca linhas que têm % na última coluna não vazia
-  const metaPct = [];
-  lines.forEach(line=>{
-    const cols = splitLine(line);
-    // Procura célula com % que não seja #DIV/0!
-    const pctIdx = cols.map((c,i)=>({c,i}))
-      .filter(({c})=> c && c.includes('%') && !c.includes('#') && !c.includes('META'))
-      .map(({i})=>i);
-    if(!pctIdx.length) return;
-    // Pega o último % da linha (coluna M)
-    const pctStr = cols[pctIdx[pctIdx.length-1]].replace('%','').replace(',','.');
-    const pct = parseFloat(pctStr);
-    if(!isNaN(pct) && pct > 0 && pct <= 200) metaPct.push(pct);
-  });
+  // % da meta agora calculado via JS abaixo (após extrair metas e reais)
 
   // Data de última atualização manual — col L (label) e M (valor) linha 24
   let dataAtualizacao = null;
@@ -963,9 +983,35 @@ function parseTabela(csv){
     {lbl:'Serviços/dia',  meta:gp(lineMeta,8), real:gp(lineReal,8), fmt:v=>fmtN(v)},
   ].map(p=>({...p,pct:p.meta&&p.real?p.real/p.meta:1})) : defaults.pace.items;
 
-  return {receita,ticket,vendas,vendasDia,hidrat,produtos,taxiDog,escovacao,metaProdutos,custo,dataAtualizacao,
+  // % da meta — calcula do JS com os valores reais e metas extraídas da planilha
+  const idxUltReal = receita.reduce((last,v,i)=>v>0?i:last,-1);
+  const recReal   = idxUltReal >= 0 ? (receita[idxUltReal]||0) : 0;
+  const srvReal   = idxUltReal >= 0 ? (vendas[idxUltReal]||0)  : 0;
+  const tickReal  = idxUltReal >= 0 ? (ticket[idxUltReal]||0)  : 0;
+  const srvDiaReal= idxUltReal >= 0 ? (vendasDia[idxUltReal]||0) : 0;
+  const hidReal   = idxUltReal >= 0 ? (hidrat[idxUltReal]||0)  : 0;
+  const prodReal  = idxUltReal >= 0 ? (produtos[idxUltReal]||0): 0;
+  const recDiaReal= diasTrabalhados > 0 ? recReal / diasTrabalhados : 0;
+
+  const calcPct = (real, meta) => meta > 0 ? parseFloat((real / meta * 100).toFixed(1)) : 0;
+  const metaPctCalc = [
+    calcPct(recReal,    metaReceita),
+    calcPct(recDiaReal, metaRecDia),
+    calcPct(tickReal,   metaTicket),
+    calcPct(srvReal,    metaVendas),
+    calcPct(srvDiaReal, metaVendasDia),
+    calcPct(hidReal,    metaHidrat),
+    calcPct(prodReal,   metaProdutos),
+  ];
+
+  // Usa % calculado pelo JS (mais confiável que o da planilha que pode ter #DIV/0!)
+  const metaPctFinal = metaPctCalc;
+
+  return {receita,ticket,vendas,vendasDia,hidrat,produtos,taxiDog,escovacao,
+    metaProdutos,metaReceita,metaRecDia,metaTicket,metaVendas,metaVendasDia,metaHidrat,
+    custo,dataAtualizacao,
     pace:{diasUteis,diasTrabalhados,diasFaltantes,items:paceItems},
-    metaPct:metaPct.length>=5?metaPct.slice(0,7):defaults.metaPct,
+    metaPct:metaPctFinal,
     planos:defaults.planos, ads:defaults.ads, semanal:defaults.semanal};
 }
 
@@ -1147,7 +1193,7 @@ function renderKPIs(d){
 
   // ── Capacidade operacional ──────────────────────────────
   const CAP_MAX = 850;
-  const META_SRV = 620;
+  const META_SRV = d.metaVendas || 620;
   const vendasMes = d.vendas.filter(v=>v>0);
   const vendasAtual = vendasMes[vendasMes.length-1] || 0;
   const capPct = Math.round(vendasAtual / CAP_MAX * 100);
@@ -1185,7 +1231,7 @@ function renderKPIs(d){
   const receitaAtual = receitaAcum[receitaAcum.length-1] || 0;
   const ritmoDia = diasTrabalhados > 0 ? receitaAtual / diasTrabalhados : 0;
   const projecao = receitaAtual + (ritmoDia * diasFaltantes);
-  const META_MENSAL = 68500;
+  const META_MENSAL = d.metaReceita || 68500;
   const projPct = (projecao / META_MENSAL * 100).toFixed(1);
   const projAcima = projecao >= META_MENSAL;
   const projCol = projAcima ? '#3dffa0' : '#ff5f5f';
@@ -1940,6 +1986,40 @@ function renderAll(d){
   const {diasUteis:_dU,items}=d.pace;
   const pctDias=Math.round(d.pace.diasTrabalhados/d.pace.diasUteis*100);
 
+
+  // ── Card de Metas — título, subtítulo e valores-alvo dinâmicos ────────────
+  const MESES_NOME = ['dez/25','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const idxUltimoReal = d.receita.reduce((last,v,i)=>v>0?i:last,-1);
+  const nomeMesCard = MESES_NOME[idxUltimoReal+1] || MESES_NOME[idxUltimoReal] || 'atual';
+  const mesesAntNomes = ['dez/25','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov'].slice(0, idxUltimoReal+1);
+  const subLbl = mesesAntNomes.length > 1
+    ? `Parcial acumulado ${mesesAntNomes[0]}–${mesesAntNomes[mesesAntNomes.length-1]} vs metas definidas`
+    : `Parcial acumulado vs metas definidas`;
+
+  const elMCT = document.getElementById('meta-card-title');
+  const elMCS = document.getElementById('meta-card-sub');
+  if(elMCT) elMCT.textContent = `Metas — ${nomeMesCard} (referência +8%)`;
+  if(elMCS) elMCS.textContent = subLbl;
+
+  // Valores-alvo
+  const fmtMeta = (v, isR) => isR ? fmtR(v) : fmtN(v);
+  const setMT = (id, val, isR=true) => { const el=document.getElementById(id); if(el) el.textContent=fmtMeta(val,isR); };
+  setMT('mt-receita',   d.metaReceita||68500,  true);
+  setMT('mt-recdia',    d.metaRecDia||2740,    true);
+  setMT('mt-ticket',    d.metaTicket||110.48,  true);
+  setMT('mt-vendas',    d.metaVendas||620,     false);
+  setMT('mt-vendasdia', d.metaVendasDia||24.8, false);
+  setMT('mt-hidrat',    d.metaHidrat||40,      false);
+  setMT('mt-produtos',  d.metaProdutos||4000,  true);
+
+  // Meta mensal no card projeção
+  const elProjMeta = document.getElementById('proj-meta-val');
+  if(elProjMeta) elProjMeta.textContent = fmtR(d.metaReceita||68500);
+
+  // Meta de serviços no card capacidade (label embaixo da barra)
+  const elCapMeta = document.getElementById('cap-bar-meta');
+  if(elCapMeta) elCapMeta.textContent = fmtN(d.metaVendas||620) + ' meta';
+
   // Atualiza textos de dias no card de metas e PACE
   const elDU   = document.getElementById('meta-dias-uteis');
   const elDT   = document.getElementById('meta-dias-trab');
@@ -1949,7 +2029,7 @@ function renderAll(d){
   if(elDU) elDU.textContent = d.pace.diasUteis;
   if(elDT) elDT.textContent = d.pace.diasTrabalhados;
   if(elDF) elDF.textContent = d.pace.diasFaltantes;
-  if(elML) elML.textContent = `% da meta atingido — parcial Mai (${d.pace.diasTrabalhados} de ${d.pace.diasUteis} dias)`;
+  if(elML) elML.textContent = `% da meta atingido — parcial ${nomeMesCard} (${d.pace.diasTrabalhados} de ${d.pace.diasUteis} dias)`;
   if(elPS) elPS.textContent = `Comparativo entre o acumulado real e a meta esperada para ${d.pace.diasTrabalhados} de ${d.pace.diasUteis} dias trabalhados`;
   document.getElementById('diasBar').style.width=pctDias+'%';
   document.getElementById('diasLabel').innerHTML=`${d.pace.diasTrabalhados} de ${d.pace.diasUteis} dias úteis <span style="color:var(--muted)">· ${d.pace.diasFaltantes} faltantes</span>`;
