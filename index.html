@@ -722,16 +722,16 @@ const SHEET_SEMANAL = BASE + '?gid=622872267&single=true&output=csv';
 
 // Fallback com dados estáticos (usado se o fetch falhar)
 const defaults = {
-  receita:   [52061.79, 48471.60, 53914.98, 55588.16, 63526.50, 67485.14],
-  custo:     [null, 50110, 52500, 57200, 58000, 61500],
-  ticket:    [99.35, 100.98, 109.58, 109.00, 110.29, 109.55],
-  vendas:    [524, 480, 492, 510, 576, 616],
-  vendasDia: [20, 18, 23, 20, 24, 25],
-  hidrat:    [28, 30, 39, 27, 31, 69],
-  produtos:  [2572.46, 1486.32, 3174.90, 3723.26, 2870.13, 6481.32],
-  taxiDog:   [51, 56, 50, 65, 67, 57],
-  escovacao: [121, 184, 170, 163, 223, 231],
-  metaProdutos: 4000,
+  receita:   [52061.79, 48471.60, 53914.98, 55588.16, 63526.50, 68070.00, 0],
+  custo:     [null, 50110, 52500, 57200, 58000, 62350, null],
+  ticket:    [99.35, 100.98, 109.58, 109.00, 110.29, 110.50, 111.39],
+  vendas:    [524, 480, 492, 510, 576, 616, 0],
+  vendasDia: [20, 18, 23, 20, 24, 25, 0],
+  hidrat:    [28, 30, 39, 27, 31, 69, 0],
+  produtos:  [2572.46, 1486.32, 3174.90, 3723.26, 2870.13, 7426.52, 0],
+  taxiDog:   [51, 56, 50, 65, 67, 57, 0],
+  escovacao: [121, 184, 170, 163, 223, 231, 0],
+  metaProdutos: 8000,
   planos:    {meses:['dez/25','jan','fev','mar','abr','mai'],qtd:[26,36,30,38,49,50],rec:[8748.30,12412.00,10679.40,12604.60,16764.69,16925.40]},
   ads:{meses:['Jan','Fev','Mar','Abr'],invest:[900,1000,1200,2000],fat:[3543.9,3427.74,2421,5748],cac:[36,43.48,80,64.52],roas:[3.94,3.43,2.02,2.87],clientes:[25,23,15,31]},
   semanal:{
@@ -757,14 +757,14 @@ const defaults = {
       [93.84,  135.01, 96.57,  103.50, 0]   // mai — S4 correto
     ]
   },
-  pace:{diasUteis:25,diasTrabalhados:25,diasFaltantes:0,items:[
-    {lbl:'Receita×Dias',meta:68500,  real:67485.14,pct:0.9852,fmt:v=>fmtR(v)},
-    {lbl:'Receita/dia', meta:2740,   real:2699.41, pct:0.9852,fmt:v=>fmtR(v)},
-    {lbl:'Ticket médio',meta:110.48, real:109.55,  pct:0.9916,fmt:v=>fmtR(v)},
-    {lbl:'Serviços×Dias',meta:620,   real:616,     pct:0.9935,fmt:v=>fmtN(v)},
-    {lbl:'Serviços/dia', meta:24.8,  real:25,      pct:1.0000,fmt:v=>fmtN(v)},
+  pace:{diasUteis:25,diasTrabalhados:1,diasFaltantes:24,items:[
+    {lbl:'Receita×Dias',  meta:2940.60, real:0,      pct:0,      fmt:v=>fmtR(v)},
+    {lbl:'Receita/dia',   meta:2940.60, real:0,      pct:0,      fmt:v=>fmtR(v)},
+    {lbl:'Ticket médio',  meta:111.39,  real:0,      pct:0,      fmt:v=>fmtR(v)},
+    {lbl:'Serviços×Dias', meta:26,      real:0,      pct:0,      fmt:v=>fmtN(v)},
+    {lbl:'Serviços/dia',  meta:26,      real:0,      pct:0,      fmt:v=>fmtN(v)},
   ]},
-  metaPct:[98.52, 98.52, 99.16, 99.35, 99.35, 172.50, 162.03]
+  metaPct:[0, 0, 0, 0, 0, 0, 0]
 };
 
 // ── utilidades ──────────────────────────────────────────
@@ -1210,27 +1210,34 @@ function renderAll(d){
   const {diasTrabalhados, diasFaltantes, diasUteis} = d.pace;
   const mesFechado = diasFaltantes === 0 || diasTrabalhados >= diasUteis;
 
-  // Se mês fechado, não há parcial — idxUltimoComDados ?aponta além do array
-  const idxParcial = mesFechado ? -1 : idxUltimoComDados;
+  // idxMesAtual: se mês novo começou (próximo tem receita=0 e há dias trabalhados), usa o próximo
+  const proximoIdx = idxUltimoComDados + 1;
+  const proximoTemDados = d.receita[proximoIdx] > 0;
+  const idxMesAtual = (!mesFechado && !proximoTemDados && proximoIdx < d.receita.length && diasTrabalhados > 0)
+    ? proximoIdx
+    : idxUltimoComDados;
 
-  const recAtual = d.receita[idxUltimoComDados] || 0;
+  const idxParcial = mesFechado ? -1 : idxMesAtual;
+
+  // recAtual = receita do mês em andamento (0 no 1º dia é válido)
+  const recAtual = d.receita[idxMesAtual] || 0;
   const ritmoDiaProj = diasTrabalhados > 0 ? recAtual / diasTrabalhados : 0;
   const recProj = mesFechado ? recAtual : recAtual + ritmoDiaProj * diasFaltantes;
 
-  // Labels: se mês fechado, todos normais; se parcial, último com " (parcial)"
-  const MESES_LBL = MESES.map((m,i)=> (!mesFechado && i === idxUltimoComDados) ? m + ' (parcial)' : m);
+  // Labels
+  const MESES_LBL = MESES.map((m,i)=> (!mesFechado && i === idxMesAtual) ? m + ' (parcial)' : m);
 
-  // Linha sólida: se fechado, todos os meses; se parcial, até o anterior
+  // Linha sólida: até o mês anterior ao atual
   const dataCompletos = d.receita.map((v,i)=> {
     if(mesFechado) return v > 0 ? v : null;
-    return i < idxUltimoComDados ? v : null;
+    return i < idxMesAtual ? (v > 0 ? v : null) : null;
   });
 
-  // Dataset de projeção: só aparece se mês parcial
+  // Dataset de projeção: só se parcial e há dados para projetar
   const dataComProj = MESES.map((m,i)=>{
     if(mesFechado) return null;
-    if(i === idxUltimoComDados - 1) return d.receita[idxUltimoComDados - 1];
-    if(i === idxUltimoComDados)     return recProj;
+    if(i === idxMesAtual - 1) return d.receita[idxMesAtual - 1] || null;
+    if(i === idxMesAtual)     return recProj > 0 ? recProj : null;
     return null;
   });
 
@@ -1805,15 +1812,13 @@ function renderAll(d){
   const semColors = ['#3dffa0','#4da6ff','#ff6eb4','#ffb84d','#a78bfa'];
   const semMeses  = ['Jan','Fev','Mar','Abr','Mai'];
 
-  // KPIs — pega o último mês com dados
-  // d.receita: [dez/25, jan, fev, mar, abr, mai] → índice 5 = mai
-  // d.semanal: [jan, fev, mar, abr, mai] → índice 4 = mai (sem dez/25)
-  const idxMesAtual  = d.receita.reduce((last,v,i)=>v>0?i:last,-1);
-  const idxSemAtual  = Math.max(0, idxMesAtual - 1); // desconta dez/25
-  const nomeMesAtual = MESES[idxMesAtual] || 'Mai';
-  const fatMes  = d.receita[idxMesAtual] || 0;
-  const srvMes  = d.vendas[idxMesAtual]  || 0;
-  const tickMes = d.ticket[idxMesAtual]  || 0;
+  // KPIs — pega o último mês com dados (semanal usa índice próprio)
+  const idxMesSem  = d.receita.reduce((last,v,i)=>v>0?i:last,-1);
+  const idxSemAtual  = Math.max(0, idxMesSem - 1);
+  const nomeMesAtual = MESES[idxMesSem] || 'Mai';
+  const fatMes  = d.receita[idxMesSem] || 0;
+  const srvMes  = d.vendas[idxMesSem]  || 0;
+  const tickMes = d.ticket[idxMesSem]  || 0;
 
   // Dados semanais do mês atual
   const fatSemAtual  = d.semanal.fat[idxSemAtual]  || [];
