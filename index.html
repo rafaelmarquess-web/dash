@@ -851,7 +851,7 @@ function parseTabela(csv){
   const escovacao = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+10]):null; });
 
   // Metas mensais — quadro de metas col N (índice 13) e O (índice 14) no CSV
-  // (col A vazia no CSV → A=0, B=1, ... N=13, O=14)
+  // Planilha: N=label (RECEITA, RECEITA/DIA, TICKET MÉDIO, VENDAS, VENDAS/DIA, HIDRATAÇÃO, LOJA), O=valor
   let metaReceita   = 68500;
   let metaRecDia    = 2740;
   let metaTicket    = 110.48;
@@ -860,44 +860,26 @@ function parseTabela(csv){
   let metaHidrat    = 40;
   let metaProdutos  = 4000;
 
-  // Mapeamento de labels → campo
-  const metaMap = {
-    'receita':    v=>{ metaReceita = v; },
-    'receita/dia':v=>{ metaRecDia  = v; },
-    'receitadia': v=>{ metaRecDia  = v; },
-    'ticket':     v=>{ metaTicket  = v; },
-    'vendas':     v=>{ metaVendas  = v; },
-    'vendas/dia': v=>{ metaVendasDia = v; },
-    'vendasdia':  v=>{ metaVendasDia = v; },
-    'hidrata':    v=>{ metaHidrat  = v; },
-    'loja':       v=>{ metaProdutos= v; },
-  };
-
   let emQuadroMeta = false;
   lines.forEach(line=>{
     const cols = splitLine(line);
-    // Detecta início do quadro de metas pela label RECEITA com valor >= 10000 na col O
-    const labelN13 = (cols[13]||'').toUpperCase().trim();
-    const labelN14 = (cols[14]||'').toUpperCase().trim();
-    // Tenta col índice 13 (N) ou 14 (O-1) como label
-    for(const [colLabel, colVal] of [[cols[13], cols[14]], [cols[14], cols[15]]]){
-      const lbl = (colLabel||'').toLowerCase().trim();
-      if(lbl === 'receita'){
-        const v = parseBR(colVal);
-        if(v && v >= 10000){ emQuadroMeta = true; }
-      }
-      if(emQuadroMeta){
-        for(const [key, fn] of Object.entries(metaMap)){
-          if(lbl.replace(/[^a-záéíóúâêôãõç\/]/gi,'').includes(key.replace('/',''))){
-            const v = parseBR(colVal);
-            if(v && v > 0) fn(v);
-            break;
-          }
-        }
-        // Fim do bloco de metas quando encontra linha vazia ou outro bloco
-        if(lbl === '' && !(cols[13]||'').trim() && !(cols[14]||'').trim()) emQuadroMeta = false;
-      }
-    }
+    // Label está na col N (índice 13), valor na col O (índice 14)
+    const lbl = (cols[13]||'').toLowerCase().trim();
+    const val = parseBR(cols[14]);
+
+    // Detecta início: label RECEITA com valor >= 10000
+    if(lbl === 'receita' && val && val >= 10000){ emQuadroMeta = true; }
+
+    if(!emQuadroMeta) return;
+    if(!val || val <= 0) return;
+
+    if(lbl === 'receita'    && val >= 10000)  metaReceita   = val;
+    else if(lbl.startsWith('receita') && lbl.includes('dia') && val < 10000) metaRecDia = val;
+    else if(lbl.includes('ticket'))           metaTicket    = val;
+    else if(lbl === 'vendas' && val >= 100)   metaVendas    = val;
+    else if(lbl.includes('vendas') && lbl.includes('dia')) metaVendasDia = val;
+    else if(lbl.includes('hidrat'))           metaHidrat    = val;
+    else if(lbl === 'loja'  && val >= 100)    metaProdutos  = val;
   });
 
   // Segunda tabela CUSTO X RECEITA: col B=mês, col C=receita, col D=custo
@@ -983,35 +965,11 @@ function parseTabela(csv){
     {lbl:'Serviços/dia',  meta:gp(lineMeta,8), real:gp(lineReal,8), fmt:v=>fmtN(v)},
   ].map(p=>({...p,pct:p.meta&&p.real?p.real/p.meta:1})) : defaults.pace.items;
 
-  // % da meta — calcula do JS com os valores reais e metas extraídas da planilha
-  const idxUltReal = receita.reduce((last,v,i)=>v>0?i:last,-1);
-  const recReal   = idxUltReal >= 0 ? (receita[idxUltReal]||0) : 0;
-  const srvReal   = idxUltReal >= 0 ? (vendas[idxUltReal]||0)  : 0;
-  const tickReal  = idxUltReal >= 0 ? (ticket[idxUltReal]||0)  : 0;
-  const srvDiaReal= idxUltReal >= 0 ? (vendasDia[idxUltReal]||0) : 0;
-  const hidReal   = idxUltReal >= 0 ? (hidrat[idxUltReal]||0)  : 0;
-  const prodReal  = idxUltReal >= 0 ? (produtos[idxUltReal]||0): 0;
-  const recDiaReal= diasTrabalhados > 0 ? recReal / diasTrabalhados : 0;
-
-  const calcPct = (real, meta) => meta > 0 ? parseFloat((real / meta * 100).toFixed(1)) : 0;
-  const metaPctCalc = [
-    calcPct(recReal,    metaReceita),
-    calcPct(recDiaReal, metaRecDia),
-    calcPct(tickReal,   metaTicket),
-    calcPct(srvReal,    metaVendas),
-    calcPct(srvDiaReal, metaVendasDia),
-    calcPct(hidReal,    metaHidrat),
-    calcPct(prodReal,   metaProdutos),
-  ];
-
-  // Usa % calculado pelo JS (mais confiável que o da planilha que pode ter #DIV/0!)
-  const metaPctFinal = metaPctCalc;
-
   return {receita,ticket,vendas,vendasDia,hidrat,produtos,taxiDog,escovacao,
     metaProdutos,metaReceita,metaRecDia,metaTicket,metaVendas,metaVendasDia,metaHidrat,
     custo,dataAtualizacao,
     pace:{diasUteis,diasTrabalhados,diasFaltantes,items:paceItems},
-    metaPct:metaPctFinal,
+    metaPct: defaults.metaPct, // calculado depois em renderAll com idxMesAtual correto
     planos:defaults.planos, ads:defaults.ads, semanal:defaults.semanal};
 }
 
@@ -1191,11 +1149,13 @@ function renderKPIs(d){
     if(kpi) kpi.style.setProperty('--acc', col);
   });
 
-  // ── Capacidade operacional ──────────────────────────────
+  // ── Capacidade operacional — renderizada em renderAll com idxMesAtual ──
+}
+
+function renderCapacidade(d, idxMesAtual){
   const CAP_MAX = 850;
   const META_SRV = d.metaVendas || 620;
-  const vendasMes = d.vendas.filter(v=>v>0);
-  const vendasAtual = vendasMes[vendasMes.length-1] || 0;
+  const vendasAtual = d.vendas[idxMesAtual] || 0;
   const capPct = Math.round(vendasAtual / CAP_MAX * 100);
   const capLivre = CAP_MAX - vendasAtual;
   const capCol = capPct >= 90 ? '#ff5f5f' : capPct >= 70 ? '#ffb84d' : '#3dffa0';
@@ -1225,10 +1185,13 @@ function renderKPIs(d){
   if(capCard) capCard.style.setProperty('--acc', capCol);
   document.getElementById('cap-bar').style.boxShadow = `0 0 8px ${capCol}40`;
 
-  // ── Projeção de fechamento ──────────────────────────────
+  // ── Projeção de fechamento — calculada em renderAll com idxMesAtual ──
+  // (preenchida via renderProjecao chamado do renderAll)
+}
+
+function renderProjecao(d, idxMesAtual){
   const {diasTrabalhados, diasUteis, diasFaltantes} = d.pace;
-  const receitaAcum = d.receita.filter(v=>v>0);
-  const receitaAtual = receitaAcum[receitaAcum.length-1] || 0;
+  const receitaAtual = d.receita[idxMesAtual] || 0;
   const ritmoDia = diasTrabalhados > 0 ? receitaAtual / diasTrabalhados : 0;
   const projecao = receitaAtual + (ritmoDia * diasFaltantes);
   const META_MENSAL = d.metaReceita || 68500;
@@ -1265,8 +1228,29 @@ function renderAll(d){
 
   const idxParcial = mesFechado ? -1 : idxMesAtual;
 
+  // ── % da meta — usando idxMesAtual (mês em andamento, mesmo que seja 0) ──
+  const _recM   = d.receita[idxMesAtual]   || 0;
+  const _srvM   = d.vendas[idxMesAtual]    || 0;
+  const _tickM  = d.ticket[idxMesAtual]    || 0;
+  const _srvDM  = d.vendasDia[idxMesAtual] || 0;
+  const _hidM   = d.hidrat[idxMesAtual]    || 0;
+  const _prodM  = d.produtos[idxMesAtual]  || 0;
+  const _recDM  = diasTrabalhados > 0 ? _recM / diasTrabalhados : 0;
+  const _cp     = (r,m) => m > 0 ? parseFloat((r/m*100).toFixed(1)) : 0;
+  d.metaPct = [
+    _cp(_recM,  d.metaReceita   || 68500),
+    _cp(_recDM, d.metaRecDia    || 2740),
+    _cp(_tickM, d.metaTicket    || 110.48),
+    _cp(_srvM,  d.metaVendas    || 620),
+    _cp(_srvDM, d.metaVendasDia || 24.8),
+    _cp(_hidM,  d.metaHidrat    || 40),
+    _cp(_prodM, d.metaProdutos  || 4000),
+  ];
+
   // recAtual = receita do mês em andamento (0 no 1º dia é válido)
   const recAtual = d.receita[idxMesAtual] || 0;
+  renderCapacidade(d, idxMesAtual);
+  renderProjecao(d, idxMesAtual);
   const ritmoDiaProj = diasTrabalhados > 0 ? recAtual / diasTrabalhados : 0;
   const recProj = mesFechado ? recAtual : recAtual + ritmoDiaProj * diasFaltantes;
 
