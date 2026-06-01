@@ -848,7 +848,7 @@ function parseTabela(csv){
       if(result[mes]) return; // já tem — ignora duplicatas
       // Valida que col+1 é receita mensal (>10000) — diferencia da segunda tabela
       const v1 = parseBR(cols[mesIdx+1]);
-      if(v1 && v1 > 10000) result[mes] = {cols, mesIdx};
+      if(v1 && v1 > 10000) result[mes] = {cols, mesIdx, metaOk: (cols[0]||'').toLowerCase().trim()};
     });
     return result;
   }
@@ -866,6 +866,8 @@ function parseTabela(csv){
   const produtos  = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+8]):null; });
   const taxiDog   = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+9]):null; });
   const escovacao = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+10]):null; });
+  // col A (índice 0): "sim" = bateu a meta, "não" = não bateu, "" = sem dados
+  const metaOk    = mesesKey.map(m=>{ const r=byMes[m]; return r ? r.metaOk : null; }); // 'sim'|'não'|''|null
 
   // Metas mensais — quadro de metas col N (índice 13) e O (índice 14) no CSV
   // Planilha: N=label (RECEITA, RECEITA/DIA, TICKET MÉDIO, VENDAS, VENDAS/DIA, HIDRATAÇÃO, LOJA), O=valor
@@ -984,6 +986,7 @@ function parseTabela(csv){
 
   return {receita,ticket,vendas,vendasDia,hidrat,produtos,taxiDog,escovacao,
     metaProdutos,metaReceita,metaRecDia,metaTicket,metaVendas,metaVendasDia,metaHidrat,
+    metaOk,
     custo,dataAtualizacao,
     pace:{diasUteis,diasTrabalhados,diasFaltantes,items:paceItems},
     metaPct: defaults.metaPct, // calculado depois em renderAll com idxMesAtual correto
@@ -2074,34 +2077,34 @@ function renderAll(d){
   // ── Linha do tempo — meta atingida por mês ───────────────
   const tlEl = document.getElementById('timeline-meta');
   if(tlEl){
-    const metaRec = d.metaReceita || 68500;
-    // Meses com dados (exclui dez/25 índice 0, começa de Jan índice 1)
     const tlMeses = MESES.slice(1); // Jan..Jun
     const tlReceita = d.receita.slice(1);
+    const tlMetaOk  = (d.metaOk || []).slice(1); // 'sim'|'não'|''|null
     const tlNomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
     tlEl.innerHTML = tlMeses.map((m, i) => {
       const rec  = tlReceita[i] || 0;
-      const idx  = i + 1; // índice real no array (1=Jan)
+      const idx  = i + 1;
+      const status = (tlMetaOk[i] || '').toLowerCase().trim(); // 'sim', 'não', ''
       const temDados = rec > 0;
       const isParcialMes = !mesFechado && idx === idxMesAtual;
-      const isFuturo = idx > idxMesAtual || (!temDados && !isParcialMes);
+      const isFuturo = !temDados && !isParcialMes;
 
-      let cor, icone, bgCircle, label, pct;
+      let cor, icone, bgCircle, label, pctTxt;
+
       if(isFuturo){
-        cor = 'var(--muted)'; bgCircle = 'var(--border)'; icone = '·'; label = ''; pct = '';
+        cor = 'var(--muted)'; bgCircle = 'var(--border)'; icone = '·'; label = ''; pctTxt = '';
       } else if(isParcialMes){
-        const p = metaRec > 0 ? (rec / metaRec * 100) : 0;
-        pct = p.toFixed(0) + '%';
         cor = '#ffb84d'; bgCircle = 'rgba(255,184,77,.15)'; icone = '…'; label = 'parcial';
+        pctTxt = fmtR(rec);
+      } else if(status === 'sim'){
+        cor = '#3dffa0'; bgCircle = 'rgba(61,255,160,.12)'; icone = '✓'; label = 'meta ✓';
+        pctTxt = fmtR(rec);
+      } else if(status === 'não' || status === 'nao'){
+        cor = '#ff5f5f'; bgCircle = 'rgba(255,95,95,.12)'; icone = '✗'; label = 'abaixo';
+        pctTxt = fmtR(rec);
       } else {
-        const p = metaRec > 0 ? (rec / metaRec * 100) : 0;
-        pct = p.toFixed(0) + '%';
-        const atingiu = rec >= metaRec;
-        cor = atingiu ? '#3dffa0' : '#ff5f5f';
-        bgCircle = atingiu ? 'rgba(61,255,160,.12)' : 'rgba(255,95,95,.12)';
-        icone = atingiu ? '✓' : '✗';
-        label = atingiu ? 'meta' : 'abaixo';
+        cor = 'var(--muted)'; bgCircle = 'var(--border)'; icone = '·'; label = ''; pctTxt = '';
       }
 
       const isLast = i === tlMeses.length - 1;
@@ -2110,7 +2113,7 @@ function renderAll(d){
           <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:52px">
             <div style="width:44px;height:44px;border-radius:50%;background:${bgCircle};border:2px solid ${cor}40;display:flex;align-items:center;justify-content:center;font-size:18px;color:${cor};font-weight:700;transition:all .3s">${icone}</div>
             <div style="font-size:11px;font-weight:700;color:${isFuturo?'var(--muted)':'var(--txt)'};font-family:var(--font)">${tlNomes[i]}</div>
-            ${pct ? `<div style="font-size:10px;font-family:var(--mono);color:${cor};font-weight:600">${pct}</div>` : '<div style="font-size:10px;color:var(--muted)">—</div>'}
+            ${pctTxt ? `<div style="font-size:10px;font-family:var(--mono);color:${cor};font-weight:600">${pctTxt}</div>` : '<div style="font-size:10px;color:var(--muted)">—</div>'}
             ${label ? `<div style="font-size:9px;color:${cor};text-transform:uppercase;letter-spacing:.4px">${label}</div>` : ''}
           </div>
           ${!isLast ? `<div style="flex:1;height:2px;background:linear-gradient(90deg,${cor}60,var(--border));min-width:8px;max-width:32px;margin-bottom:24px"></div>` : ''}
