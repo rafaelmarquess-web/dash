@@ -1241,7 +1241,13 @@ function renderAll(d){
     return null;
   });
 
-  // ── Receita mensal com mês parcial ──────────────────────
+  console.log('DEBUG idxUltimoComDados:', idxUltimoComDados);
+  console.log('DEBUG idxMesAtual:', idxMesAtual);
+  console.log('DEBUG mesFechado:', mesFechado);
+  console.log('DEBUG diasTrabalhados:', diasTrabalhados, 'diasFaltantes:', diasFaltantes);
+  console.log('DEBUG receita:', d.receita);
+  console.log('DEBUG metaProdutos:', d.metaProdutos);
+  console.log('DEBUG pace items:', d.pace.items?.map(p=>p.real));
   const ctxR = document.getElementById('receitaChart')?.getContext('2d');
   if(ctxR){
     if(_charts['receitaChart']) _charts['receitaChart'].destroy();
