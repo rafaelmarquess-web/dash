@@ -1192,6 +1192,7 @@ function renderCapacidade(d, idxMesAtual){
 function renderProjecao(d, idxMesAtual){
   const {diasTrabalhados, diasUteis, diasFaltantes} = d.pace;
   const receitaAtual = d.receita[idxMesAtual] || 0;
+  console.log('DEBUG renderProjecao — idxMesAtual:', idxMesAtual, 'receitaAtual:', receitaAtual, 'receita array:', d.receita);
   const ritmoDia = diasTrabalhados > 0 ? receitaAtual / diasTrabalhados : 0;
   const projecao = receitaAtual + (ritmoDia * diasFaltantes);
   const META_MENSAL = d.metaReceita || 68500;
@@ -1219,10 +1220,11 @@ function renderAll(d){
   const {diasTrabalhados, diasFaltantes, diasUteis} = d.pace;
   const mesFechado = diasFaltantes === 0 || diasTrabalhados >= diasUteis;
 
-  // idxMesAtual: se mês novo começou (próximo tem receita=0 e há dias trabalhados), usa o próximo
+  // idxMesAtual: se mês novo começou (diasTrabalhados > 0 e próximo mês sem receita), aponta para o próximo
+  // Usa o próximo mesmo que o array não tenha dados lá ainda (Jun com receita=0)
   const proximoIdx = idxUltimoComDados + 1;
-  const proximoTemDados = d.receita[proximoIdx] > 0;
-  const idxMesAtual = (!mesFechado && !proximoTemDados && proximoIdx < d.receita.length && diasTrabalhados > 0)
+  const proximoTemReceita = (d.receita[proximoIdx] || 0) > 0;
+  const idxMesAtual = (!mesFechado && !proximoTemReceita && diasTrabalhados > 0)
     ? proximoIdx
     : idxUltimoComDados;
 
