@@ -175,7 +175,7 @@ tbody td{padding:10px 10px;font-size:12px}
   .chart-h220{height:260px}
   .chart-h180{height:220px}
   .chart-h140{height:190px}
-  #paceGrid{grid-template-columns:repeat(5,1fr)}
+  #paceGrid{grid-template-columns:repeat(6,1fr)}
   .pace-indicator{font-size:24px}
   tbody td{padding:12px 14px;font-size:13px}
   thead th{padding:10px 14px;font-size:11px}
@@ -423,7 +423,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
           <span>Início</span><span id="diasPct">← hoje (64%)</span><span>Fim do mês</span>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px" id="paceGrid"></div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px" id="paceGrid"></div>
     </div>
 
   </div>
@@ -2093,7 +2093,26 @@ function renderAll(d){
         <div class="pace-row"><span class="pace-row-lbl">Diferença</span><span class="pace-row-val" style="color:${col}">${diff>=0?'+':''}${p.fmt(diff)}</span></div>
       </div>
     </div>`;
-  }).join('');
+  }).join('') + (() => {
+    const pReal = d.produtos[idxMesAtual] || 0;
+    const pMeta = d.metaProdutos || 4000;
+    const pProp = pMeta * (d.pace.diasTrabalhados / d.pace.diasUteis);
+    const pPct  = pProp > 0 ? pReal / pProp : 0;
+    const pDiff = pReal - pProp;
+    const pCol  = paceColor(pPct);
+    const over  = pPct >= 1;
+    return `<div class="pace-cell" style="border-color:${pCol}30">
+      <div class="pace-cell-accent" style="background:${pCol}"></div>
+      <div class="pace-label">PROD./LOJA</div>
+      <div class="pace-indicator" style="color:${pCol}">${(pPct*100).toFixed(1)}%</div>
+      <div class="pace-badge" style="background:${paceBg(pPct)};color:${pCol}">${over?'▲ acima':'▼ abaixo'}</div>
+      <div class="pace-sub">
+        <div class="pace-row"><span class="pace-row-lbl">Real</span><span class="pace-row-val" style="color:var(--txt)">${fmtR(pReal)}</span></div>
+        <div class="pace-row"><span class="pace-row-lbl">Meta pro rata</span><span class="pace-row-val" style="color:var(--muted2)">${fmtR(pProp)}</span></div>
+        <div class="pace-row"><span class="pace-row-lbl">Diferença</span><span class="pace-row-val" style="color:${pCol}">${pDiff>=0?'+':''}${fmtR(pDiff)}</span></div>
+      </div>
+    </div>`;
+  })();
   // ── Mini tabela mínimo diário aceitável ──────────────
   const minDiario = [
     {dia:'Seg', min:25}, {dia:'Ter', min:20}, {dia:'Qua', min:20},
