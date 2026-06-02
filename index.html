@@ -846,9 +846,13 @@ function parseTabela(csv){
       if(mesIdx === -1) return;
       const mes = cols[mesIdx].toLowerCase();
       if(result[mes]) return; // já tem — ignora duplicatas
-      // Valida que col+1 é receita mensal (>10000) — diferencia da segunda tabela
-      const v1 = parseBR(cols[mesIdx+1]);
-      if(v1 && v1 > 10000) result[mes] = {cols, mesIdx, metaOk: (cols[0]||'').toLowerCase().trim()};
+      // Diferencia da segunda tabela (CUSTO X RECEITA): a tabela principal tem
+      // col de receita/dia logo depois. Aceita se receita > 0 OU se há valor em mesIdx+2
+      const v1 = parseBR(cols[mesIdx+1]); // receita
+      const v2 = parseBR(cols[mesIdx+2]); // receita/dia
+      // Aceita se: receita > 100 (mês parcial com pouca receita) OU receita/dia presente
+      if((v1 && v1 > 100) || (v2 && v2 > 0))
+        result[mes] = {cols, mesIdx, metaOk: (cols[0]||'').toLowerCase().trim()};
     });
     return result;
   }
