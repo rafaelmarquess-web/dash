@@ -845,15 +845,17 @@ function parseTabela(csv){
       const mesIdx = cols.findIndex(c=>keys.includes(c.toLowerCase()));
       if(mesIdx === -1) return;
       const mes = cols[mesIdx].toLowerCase();
-      // Tabela principal tem muitas colunas (ticket, vendas, hidrat, produtos, taxidog, escovacao)
-      // Segunda tabela (CUSTO X RECEITA) tem apenas 3-4 colunas com dados
-      // Diferenciamos pela presença de col mesIdx+4 (ticket médio) com valor
-      const v1  = parseBR(cols[mesIdx+1]); // receita
-      const v2  = parseBR(cols[mesIdx+2]); // receita/dia
-      const v4  = parseBR(cols[mesIdx+4]); // ticket médio — só na tabela principal
-      const isTabPrincipal = (v4 && v4 > 50) || (v1 && v1 > 10000);
+      // Tabela principal: col mesIdx+2 = receita/dia (ex: R$138,11 ou R$2.002,38)
+      // Tabela CUSTO X RECEITA: col mesIdx+2 = custo (ex: R$65.500,00 >> receita/dia)
+      // Distinção: tabela principal tem col mesIdx+5 (ticket médio) com valor
+      // OU tem col mesIdx+6 (total vendas) com valor numérico inteiro
+      const v5 = parseBR(cols[mesIdx+5]); // ticket médio (tab principal) ou vazio (tab custo)
+      const v6 = parseBR(cols[mesIdx+6]); // total vendas (tab principal) ou vazio (tab custo)
+      const v1 = parseBR(cols[mesIdx+1]); // receita
+      // Tabela principal tem ticket OU vendas; tabela custo não tem nenhum desses
+      const isTabPrincipal = (v5 && v5 > 0) || (v6 && v6 > 0) || (v1 && v1 > 10000);
       if(!isTabPrincipal) return;
-      if(result[mes]) return; // já tem
+      if(result[mes]) return;
       result[mes] = {cols, mesIdx, metaOk: (cols[0]||'').toLowerCase().trim()};
     });
     return result;
