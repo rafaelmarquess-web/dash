@@ -1276,7 +1276,7 @@ function renderAll(d){
   const ritmoDiaProj = diasTrabalhados > 0 ? recAtual / diasTrabalhados : 0;
   const recProj = mesFechado ? recAtual : recAtual + ritmoDiaProj * diasFaltantes;
 
-  // Labels — só até mês atual
+  // Labels — limitados ao mês atual
   const MESES_LBL = MESES.slice(0, idxMesAtual+1).map((m,i)=> (!mesFechado && i === idxMesAtual) ? m + ' (parcial)' : m);
 
   // Linha sólida: até o mês anterior ao atual
@@ -1365,10 +1365,11 @@ function renderAll(d){
   const badgeEl = document.getElementById('badge-parcial');
   if(badgeEl) badgeEl.style.display = mesFechado ? 'none' : 'inline-block';
 
-  const _mesesVis = MESES.slice(0, idxMesAtual+1);   // dez/25..Jun
-  const _meses5Vis = _mesesVis.slice(1);               // Jan..Jun
-  const _recSlice  = d.receita.slice(0, idxMesAtual+1).slice(1);
-  const _cusSlice  = d.custo.slice(0, idxMesAtual+1).slice(1);
+  // Slices limitados ao mês atual
+  const _mesesVis  = MESES.slice(0, idxMesAtual+1);
+  const _meses5Vis = _mesesVis.slice(1);
+  const _recSlice  = d.receita.slice(1, idxMesAtual+1);
+  const _cusSlice  = d.custo.slice(1, idxMesAtual+1);
 
   mkBar('custoChart', _meses5Vis,
     [{label:'Receita', data:_recSlice, backgroundColor:_recSlice.map((v,i)=>(!mesFechado && i===_meses5Vis.length-1)?'rgba(255,184,77,.7)':'rgba(61,255,160,.7)'), borderRadius:4},
@@ -1384,7 +1385,6 @@ function renderAll(d){
 
     // Limita ao mês atual
     const data = fullData.slice(0, idxMesAtual+1);
-    const lbl  = MESES_LBL; // já limitado ao idxMesAtual+1
 
     const isTicket = id === 'ticketChart';
     const fmt = v => isTicket ? fmtR(v) : fmtN(v);
@@ -1503,9 +1503,9 @@ function renderAll(d){
     });
   }
 
-  mkBar('hidratacaoChart',MESES,
-    [{label:'Hidratação',data:d.hidrat,
-      backgroundColor:d.hidrat.map((_,i)=>i===idxUltimoComDados ?'rgba(255,184,77,.8)':'rgba(255,184,77,.7)'),
+  mkBar('hidratacaoChart', MESES.slice(0, idxMesAtual+1),
+    [{label:'Hidratação', data:d.hidrat.slice(0, idxMesAtual+1),
+      backgroundColor:d.hidrat.slice(0,idxMesAtual+1).map((_,i)=>i===idxUltimoComDados?'rgba(255,184,77,.8)':'rgba(255,184,77,.7)'),
       borderRadius:4}],
     {extra:{plugins:{legend:{display:false}}}});
 
@@ -1576,12 +1576,12 @@ function renderAll(d){
     </tr>`;
   }
 
-  const mesesNomes = ['dez/25','Jan','Fev','Mar','Abr','Mai','Jun'];
-  const mesesNomesLong = ['dez/25','Janeiro','Fevereiro','Março','Abril','Maio'];
+  const mesesNomes     = ['dez/25','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const mesesNomesLong = ['dez/25','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
-  // Desktop tbody
+  // Desktop tbody — só até idxMesAtual (inclusive)
   const tblDesktop = document.getElementById('tbl-desktop-body');
-  if(tblDesktop) tblDesktop.innerHTML = d.receita.map((rec,i)=>{
+  if(tblDesktop) tblDesktop.innerHTML = d.receita.slice(0, idxMesAtual+1).map((rec,i)=>{
     const c   = d.custo[i];
     const isParcial = !mesFechado && i === idxMesAtual;
     const margem = (!isParcial && c) ? ((rec-c)/rec*100) : null;
@@ -1602,9 +1602,9 @@ function renderAll(d){
     </tr>`;
   }).join('');
 
-  // Mobile cards
+  // Mobile cards — só até idxMesAtual
   const tblMobile = document.getElementById('tbl-mobile-body');
-  if(tblMobile) tblMobile.innerHTML = d.receita.map((rec,i)=>{
+  if(tblMobile) tblMobile.innerHTML = d.receita.slice(0, idxMesAtual+1).map((rec,i)=>{
     const c = d.custo[i];
     const isParcial = !mesFechado && i === idxMesAtual;
     const margem = (!isParcial && c) ? ((rec-c)/rec*100) : null;
@@ -1626,7 +1626,7 @@ function renderAll(d){
 
   // Alerta Receita vs Custo
   const alertBody = document.getElementById('alertBody');
-  if(alertBody) alertBody.innerHTML = d.receita.map((rec,i)=>{
+  if(alertBody) alertBody.innerHTML = d.receita.slice(0, idxMesAtual+1).map((rec,i)=>{
     const c = d.custo[i]; if(!c) return '';
     const isParcial = !mesFechado && i === idxMesAtual;
     if(isParcial) return '';
