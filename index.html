@@ -584,7 +584,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <div class="kpi-accent"></div>
     </div>
     <div class="kpi" style="--acc:var(--pink)">
-      <div class="kpi-label">CAC atual · meta &lt;R$65</div>
+      <div class="kpi-label">CAC atual · meta &lt;R$55</div>
       <div class="kpi-val" id="mkt-cac">—</div>
       <div class="kpi-footer" id="mkt-cac-sub"><span class="delta">—</span></div>
       <div class="kpi-accent"></div>
@@ -828,12 +828,12 @@ function fmtR(v){
 // Formata número absoluto: sempre arredonda para cima, sem casas decimais
 function fmtN(v){ return Math.ceil(v).toLocaleString('pt-BR'); }
 
-const MESES  = ['dez/25','Jan','Fev','Mar','Abr','Mai','Jun'];
+const MESES  = ['dez/25','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const MESES5 = MESES.slice(1);
 
 // ── parsers por aba ──────────────────────────────────────
 function parseTabela(csv){
-  const mesesKey = ['dez/25','jan','fev','mar','abr','mai'];
+  const mesesKey = ['dez/25','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
   const lines = csv.trim().split('\n');
 
   // Para cada linha, encontra o índice do mês e mapeia as colunas relativas
@@ -1276,17 +1276,17 @@ function renderAll(d){
   const ritmoDiaProj = diasTrabalhados > 0 ? recAtual / diasTrabalhados : 0;
   const recProj = mesFechado ? recAtual : recAtual + ritmoDiaProj * diasFaltantes;
 
-  // Labels
-  const MESES_LBL = MESES.map((m,i)=> (!mesFechado && i === idxMesAtual) ? m + ' (parcial)' : m);
+  // Labels — só até mês atual
+  const MESES_LBL = MESES.slice(0, idxMesAtual+1).map((m,i)=> (!mesFechado && i === idxMesAtual) ? m + ' (parcial)' : m);
 
   // Linha sólida: até o mês anterior ao atual
-  const dataCompletos = d.receita.map((v,i)=> {
+  const dataCompletos = d.receita.slice(0, idxMesAtual+1).map((v,i)=> {
     if(mesFechado) return v > 0 ? v : null;
     return i < idxMesAtual ? (v > 0 ? v : null) : null;
   });
 
   // Dataset de projeção: só se parcial e há dados para projetar
-  const dataComProj = MESES.map((m,i)=>{
+  const dataComProj = MESES.slice(0, idxMesAtual+1).map((m,i)=>{
     if(mesFechado) return null;
     if(i === idxMesAtual - 1) return d.receita[idxMesAtual - 1] || null;
     if(i === idxMesAtual)     return recProj > 0 ? recProj : null;
@@ -1365,17 +1365,26 @@ function renderAll(d){
   const badgeEl = document.getElementById('badge-parcial');
   if(badgeEl) badgeEl.style.display = mesFechado ? 'none' : 'inline-block';
 
-  mkBar('custoChart', MESES5,
-    [{label:'Receita', data:d.receita.slice(1), backgroundColor:d.receita.slice(1).map((v,i)=>(!mesFechado && i===idxMesAtual-1)?'rgba(255,184,77,.7)':'rgba(61,255,160,.7)'), borderRadius:4},
-     {label:'Custo',   data:d.custo.slice(1),   backgroundColor:'rgba(255,95,95,.6)', borderRadius:4}],
+  const _mesesVis = MESES.slice(0, idxMesAtual+1);   // dez/25..Jun
+  const _meses5Vis = _mesesVis.slice(1);               // Jan..Jun
+  const _recSlice  = d.receita.slice(0, idxMesAtual+1).slice(1);
+  const _cusSlice  = d.custo.slice(0, idxMesAtual+1).slice(1);
+
+  mkBar('custoChart', _meses5Vis,
+    [{label:'Receita', data:_recSlice, backgroundColor:_recSlice.map((v,i)=>(!mesFechado && i===_meses5Vis.length-1)?'rgba(255,184,77,.7)':'rgba(61,255,160,.7)'), borderRadius:4},
+     {label:'Custo',   data:_cusSlice, backgroundColor:'rgba(255,95,95,.6)', borderRadius:4}],
     {yTick:{callback:v=>fmtR(v)}, extra:{barPercentage:.7}});
 
   // Ticket e Serviços/dia — mesmo padrão do gráfico de receita
-  const mkLinePartial = (id, data, color, bgColor) => {
+  const mkLinePartial = (id, fullData, color, bgColor) => {
     try {
     const ctx = document.getElementById(id)?.getContext('2d');
     if(!ctx) return;
     if(_charts[id]) _charts[id].destroy();
+
+    // Limita ao mês atual
+    const data = fullData.slice(0, idxMesAtual+1);
+    const lbl  = MESES_LBL; // já limitado ao idxMesAtual+1
 
     const isTicket = id === 'ticketChart';
     const fmt = v => isTicket ? fmtR(v) : fmtN(v);
@@ -1668,7 +1677,7 @@ function renderAll(d){
   }
 
   // ── Marketing ─────────────────────────────────────────
-  const META_CAC = 65;
+  const META_CAC = 55;
   const META_CLI = 35;
   const ads = d.ads;
   const n = ads.meses.length;
