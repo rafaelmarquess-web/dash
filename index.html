@@ -854,6 +854,9 @@ function parseTabela(csv){
   }
 
   const byMes = findMesRows(lines, mesesKey);
+  console.log('DEBUG byMes keys:', Object.keys(byMes));
+  console.log('DEBUG jun row:', byMes['jun'] ? byMes['jun'].cols.slice(0,15) : 'NÃO ENCONTRADO');
+  console.log('DEBUG receita raw:', mesesKey.map(m=>{ const r=byMes[m]; return m+':'+(r?parseBR(r.cols[r.mesIdx+1]):'null'); }));
 
   // Primeira tabela (cols relativas ao mês): RECEITA, RECEITA/DIA, col4, TICKET, VENDAS, VENDAS/DIA, HIDRAT, LOJA
   // Na planilha: B=mês, C=receita, D=rec/dia, E=vazio, F=ticket, G=vendas, H=vendas/dia, I=hidrat, J=loja
@@ -880,26 +883,32 @@ function parseTabela(csv){
   let metaProdutos  = 4000;
 
   let emQuadroMeta = false;
+  let metasLidas = 0;
+  const TOTAL_METAS = 7;
   lines.forEach(line=>{
+    if(metasLidas >= TOTAL_METAS) return;
     const cols = splitLine(line);
-    // Label está na col N (índice 13), valor na col O (índice 14)
     const lbl = (cols[13]||'').toLowerCase().trim();
     const val = parseBR(cols[14]);
 
-    // Detecta início: label RECEITA com valor >= 10000
+    // Detecta início do quadro META: label RECEITA com valor >= 10000
     if(lbl === 'receita' && val && val >= 10000){ emQuadroMeta = true; }
+
+    // Para se entrar na seção "% DA META" (val < 100 sendo % pequeno)
+    if(emQuadroMeta && lbl === 'receita' && val && val < 100){ emQuadroMeta = false; return; }
 
     if(!emQuadroMeta) return;
     if(!val || val <= 0) return;
 
-    if(lbl === 'receita'    && val >= 10000)  metaReceita   = val;
-    else if(lbl.startsWith('receita') && lbl.includes('dia') && val < 10000) metaRecDia = val;
-    else if(lbl.includes('ticket'))           metaTicket    = val;
-    else if(lbl === 'vendas' && val >= 100)   metaVendas    = val;
-    else if(lbl.includes('vendas') && lbl.includes('dia')) metaVendasDia = val;
-    else if(lbl.includes('hidrat'))           metaHidrat    = val;
-    else if(lbl === 'loja'  && val >= 100)    metaProdutos  = val;
+    if(lbl === 'receita'    && val >= 10000)                   { metaReceita   = val; metasLidas++; }
+    else if(lbl.startsWith('receita') && lbl.includes('dia'))  { metaRecDia    = val; metasLidas++; }
+    else if(lbl.includes('ticket'))                            { metaTicket    = val; metasLidas++; }
+    else if(lbl === 'vendas' && val >= 100)                    { metaVendas    = val; metasLidas++; }
+    else if(lbl.includes('vendas') && lbl.includes('dia'))     { metaVendasDia = val; metasLidas++; }
+    else if(lbl.includes('hidrat'))                            { metaHidrat    = val; metasLidas++; }
+    else if(lbl === 'loja'  && val >= 100)                     { metaProdutos  = val; metasLidas++; }
   });
+  console.log('DEBUG metas lidas:', {metaReceita,metaRecDia,metaTicket,metaVendas,metaVendasDia,metaHidrat,metaProdutos});
 
   // Segunda tabela CUSTO X RECEITA: col B=mês, col C=receita, col D=custo
   // No CSV: col0=vazio, col1=mês, col2=receita, col3=custo
