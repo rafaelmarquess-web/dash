@@ -1482,17 +1482,23 @@ function renderAll(d){
   mkLinePartial('vendasDiaChart', d.vendasDia.map(v=>v||null), '#ff6eb4', 'rgba(255,110,180,.05)');
 
   // ── KPI Produtos/loja ─────────────────────────────────
-  const prodAtual = d.produtos[idxMesAtual] || 0;
-  const metaProd  = d.metaProdutos || 4000;
-  const prodPct   = (prodAtual / metaProd * 100).toFixed(1);
-  const prodCor   = prodAtual >= metaProd ? 'var(--green)' : prodAtual >= metaProd*0.8 ? 'var(--amber)' : 'var(--red)';
-  const elProdVal = document.getElementById('kp-produtos-val');
+  const prodAtual   = d.produtos[idxMesAtual] || 0;
+  const metaProd    = d.metaProdutos || 4000;
+  const diasTrab    = d.pace.diasTrabalhados || 1;
+  const diasUt      = d.pace.diasUteis || 25;
+  // Meta proporcional aos dias trabalhados
+  const metaProdProp = metaProd * (diasTrab / diasUt);
+  const prodPct      = metaProdProp > 0 ? (prodAtual / metaProdProp * 100).toFixed(1) : 0;
+  // Meta diária de produtos
+  const metaProdDia  = metaProd / diasUt;
+  const prodCor = prodAtual >= metaProdProp ? 'var(--green)' : prodAtual >= metaProdProp*0.8 ? 'var(--amber)' : 'var(--red)';
+  const elProdVal   = document.getElementById('kp-produtos-val');
   const elProdDelta = document.getElementById('kp-produtos-delta');
   if(elProdVal){ elProdVal.textContent = fmtR(prodAtual); elProdVal.style.color = prodCor; }
   if(elProdDelta) elProdDelta.innerHTML =
     `<span style="color:${prodCor};font-weight:600;font-size:12px">${prodPct>=100?'↑':'↓'} ${prodPct}%</span>`+
     `<span style="color:var(--muted);font-size:11px"> · </span>`+
-    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${fmtR(metaProd)}</span>`;
+    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta/dia ${fmtR(metaProdDia)}</span>`;
   const kpiProd = elProdVal?.closest('.kpi');
   if(kpiProd) kpiProd.style.setProperty('--acc', prodCor);
 
