@@ -1260,13 +1260,18 @@ function renderAll(d){
   const {diasTrabalhados, diasFaltantes, diasUteis} = d.pace;
   const mesFechado = diasFaltantes === 0 || diasTrabalhados >= diasUteis;
 
-  // idxMesAtual: se mês novo começou (diasTrabalhados > 0 e próximo mês sem receita), aponta para o próximo
-  // Usa o próximo mesmo que o array não tenha dados lá ainda (Jun com receita=0)
-  const proximoIdx = idxUltimoComDados + 1;
-  const proximoTemReceita = (d.receita[proximoIdx] || 0) > 0;
-  const idxMesAtual = (!mesFechado && !proximoTemReceita && diasTrabalhados > 0)
-    ? proximoIdx
-    : idxUltimoComDados;
+  // Usa a data de atualização da planilha para determinar o mês atual
+  // dataAtualizacao formato: "01/06/2026" → mês=6 → índice=6 (dez/25=0,jan=1,...,jun=6)
+  let idxMesAtual = idxUltimoComDados;
+  if(d.dataAtualizacao && !mesFechado){
+    const partes = d.dataAtualizacao.split('/');
+    if(partes.length >= 2){
+      const mesData = parseInt(partes[1]); // 1=jan ... 12=dez
+      const idxData = mesData; // dez/25=0, jan=1, fev=2, ..., jun=6
+      if(idxData > 0 && idxData <= 12) idxMesAtual = idxData;
+    }
+  }
+  console.log('DEBUG idxMesAtual por data:', idxMesAtual, 'dataAtualizacao:', d.dataAtualizacao);
 
   const idxParcial = mesFechado ? -1 : idxMesAtual;
 
