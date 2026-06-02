@@ -860,8 +860,11 @@ function parseTabela(csv){
   }
 
   const byMes = findMesRows(lines, mesesKey);
+  // Log das linhas brutas com "jun" para diagnóstico
+  const junLines = lines.filter(l => l.toLowerCase().includes('jun'));
+  console.log('DEBUG linhas com jun:', junLines.length);
+  junLines.forEach((l,i) => console.log(`  jun[${i}] cols:`, splitLine(l).slice(0,12)));
   console.log('DEBUG byMes keys:', Object.keys(byMes));
-  console.log('DEBUG jun row:', byMes['jun'] ? byMes['jun'].cols.slice(0,15) : 'NÃO ENCONTRADO');
   console.log('DEBUG receita raw:', mesesKey.map(m=>{ const r=byMes[m]; return m+':'+(r?parseBR(r.cols[r.mesIdx+1]):'null'); }));
 
   // Primeira tabela (cols relativas ao mês): RECEITA, RECEITA/DIA, col4, TICKET, VENDAS, VENDAS/DIA, HIDRAT, LOJA
