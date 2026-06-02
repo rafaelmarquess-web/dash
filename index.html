@@ -1041,10 +1041,10 @@ function parsePlanos(csv, d){
 
 function parseSemanal(csv, d){
   // Estrutura: blocos por semana, 3 linhas cada: serviços / faturamento / ticket médio
-  // Col A=vazio, Col B=label, Col C=Jan, D=Fev, E=Mar, F=Abr, G=Mai...
-  // Índices no CSV: 0=vazio, 1=label, 2=Jan, 3=Fev, 4=Mar, 5=Abr, 6=Mai
+  // Col A=vazio, Col B=label, Col C=Jan, D=Fev, E=Mar, F=Abr, G=Mai, H=Jun...
+  // Índices no CSV: 0=vazio, 1=label, 2=Jan(m=0), 3=Fev(m=1), ..., 7=Jun(m=5)
   const lines = csv.trim().split('\n');
-  const NUM_MESES = 5;
+  const NUM_MESES = 12;
   const NUM_SEMS  = 5;
 
   const fat  = Array.from({length:NUM_MESES}, ()=>Array(NUM_SEMS).fill(0));
@@ -1057,7 +1057,6 @@ function parseSemanal(csv, d){
     const cols = splitLine(line);
     const label = (cols[1]||'').toLowerCase().trim();
 
-    // Detecta início de novo bloco de semana pelo cabeçalho "semana X"
     if((cols[2]||'').toLowerCase().includes('semana')){
       semIdx++;
       return;
@@ -1907,12 +1906,12 @@ function renderAll(d){
   // ── Semanal ───────────────────────────────────────────
   const semLabels = ['S1','S2','S3','S4','S5'];
   const semColors = ['#3dffa0','#4da6ff','#ff6eb4','#ffb84d','#a78bfa'];
-  const semMeses  = ['Jan','Fev','Mar','Abr','Mai'];
+  // semMeses: meses com dados semanais (índice 0=Jan no array semanal)
+  const semMeses = MESES.slice(1, idxMesAtual+1); // Jan..Jun
 
-  // KPIs — pega o último mês com dados (semanal usa índice próprio)
-  const idxMesSem  = d.receita.reduce((last,v,i)=>v>0?i:last,-1);
-  const idxSemAtual  = Math.max(0, idxMesSem - 1);
-  const nomeMesAtual = MESES[idxMesSem] || 'Mai';
+  // idxSemAtual: índice no array semanal (0=Jan, 1=Fev, ..., 5=Jun)
+  const idxSemAtual  = idxMesAtual - 1; // semanal.fat[0]=Jan, [5]=Jun
+  const nomeMesAtual = MESES[idxMesAtual] || 'Jun';
   const fatMes  = d.receita[idxMesSem] || 0;
   const srvMes  = d.vendas[idxMesSem]  || 0;
   const tickMes = d.ticket[idxMesSem]  || 0;
@@ -1976,12 +1975,14 @@ function renderAll(d){
   // ── Tabela semanal dinâmica ───────────────────────────
   const tblSem = document.getElementById('tbl-semanal-body');
   if(tblSem){
-    // d.semanal.fat: [jan[s1..s5], fev[s1..s5], mar[s1..s5], abr[s1..s5], mai[s1..s5]]
     const semNames = ['S1','S2','S3','S4','S5'];
-    const nMeses = d.semanal.fat.length; // quantos meses têm dados
+    const fatSlice = d.semanal.fat.slice(0, idxSemAtual+1);
+    // Atualiza header dinamicamente
+    const tblSemHead = tblSem.closest('table')?.querySelector('thead tr');
+    if(tblSemHead) tblSemHead.innerHTML = `<th>Semana</th>` + semMeses.map(m=>`<th>${m}</th>`).join('');
     tblSem.innerHTML = semNames.map((s,si)=>`<tr>
       <td class="td-month">${s}</td>
-      ${d.semanal.fat.map((mesFat,mi)=>{
+      ${fatSlice.map((mesFat,mi)=>{
         const v = mesFat[si];
         const isAtual = mi === idxSemAtual;
         const cor = v > 0 ? (isAtual ? 'td-amber' : 'td-green') : 'td-num';
