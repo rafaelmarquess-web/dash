@@ -73,7 +73,8 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);min-height:10
 .chart-h140{position:relative;height:160px}
 
 /* ── TABLE ── */
-.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tbl-wrap table{min-width:480px}
 table{width:100%;border-collapse:collapse;min-width:420px}
 thead th{text-align:left;padding:8px 10px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:#13151f;font-weight:600;border-bottom:1px solid var(--border)}
 tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
