@@ -464,8 +464,8 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
         <span class="badge badge-blue">VOLUME</span>
       </div>
       <div class="chart-h180"><canvas id="servicosEvolChart"></canvas></div>
-      <div class="tbl-wrap" style="margin-top:12px">
-        <table>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:12px">
+        <table style="min-width:520px;width:100%">
           <thead><tr><th>Indicador</th><th>dez/25</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th></tr></thead>
           <tbody id="tbl-adicionais"></tbody>
         </table>
@@ -477,8 +477,8 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
         <span class="badge badge-green">R$</span>
       </div>
       <div class="chart-h180"><canvas id="produtosChart"></canvas></div>
-      <div class="tbl-wrap" style="margin-top:12px">
-        <table>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:12px">
+        <table style="min-width:520px;width:100%">
           <thead><tr><th>Indicador</th><th>dez/25</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th></tr></thead>
           <tbody id="tbl-produtos"></tbody>
         </table>
@@ -533,8 +533,8 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
         <div><div class="card-title">Detalhamento mensal</div><div class="card-sub">Todos os indicadores de operação</div></div>
       </div>
       <div class="tbl-mobile" id="tbl-mobile-body"></div>
-      <div class="tbl-desktop tbl-wrap">
-        <table>
+      <div class="tbl-desktop tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+        <table style="min-width:600px;width:100%">
           <thead><tr><th>Mês</th><th>Receita</th><th>Custo</th><th>Margem</th><th>Serviços</th><th>Ticket</th><th>Hidr.</th></tr></thead>
           <tbody id="tbl-desktop-body"></tbody>
         </table>
