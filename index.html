@@ -45,7 +45,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);min-height:10
 #sync-btn svg{width:11px;height:11px}
 
 /* ── LAYOUT ── */
-.wrap{padding:14px 14px;max-width:1920px;margin:0 auto}
+.wrap{padding:14px 14px;max-width:1920px;margin:0 auto;box-sizing:border-box;overflow-x:hidden}
 
 /* ── KPI GRID ── */
 .kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
@@ -59,8 +59,8 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);min-height:10
 .up{color:var(--green)}.down{color:var(--red)}.neu{color:var(--muted2)}
 
 /* ── ROWS ── */
-.row2,.row3,.row2b{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.row2,.row3,.row2b{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px;min-width:0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;box-sizing:border-box;min-width:0}
 .card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:8px}
 .card-title{font-size:14px;font-weight:600;color:var(--txt)}
 .card-sub{font-size:11px;color:var(--muted);margin-top:2px}
@@ -73,7 +73,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);min-height:10
 .chart-h140{position:relative;height:160px}
 
 /* ── TABLE ── */
-.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}
 .tbl-wrap table{min-width:480px}
 table{width:100%;border-collapse:collapse;min-width:420px}
 thead th{text-align:left;padding:8px 10px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:#13151f;font-weight:600;border-bottom:1px solid var(--border)}
@@ -464,7 +464,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
         <span class="badge badge-blue">VOLUME</span>
       </div>
       <div class="chart-h180"><canvas id="servicosEvolChart"></canvas></div>
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:12px">
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:12px;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px">
         <table style="min-width:520px;width:100%">
           <thead><tr><th>Indicador</th><th>dez/25</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th></tr></thead>
           <tbody id="tbl-adicionais"></tbody>
@@ -477,7 +477,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
         <span class="badge badge-green">R$</span>
       </div>
       <div class="chart-h180"><canvas id="produtosChart"></canvas></div>
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:12px">
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:12px;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px">
         <table style="min-width:520px;width:100%">
           <thead><tr><th>Indicador</th><th>dez/25</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th></tr></thead>
           <tbody id="tbl-produtos"></tbody>
