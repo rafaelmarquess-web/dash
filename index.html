@@ -180,6 +180,11 @@ tbody td{padding:10px 10px;font-size:12px}
   .chart-h220{height:260px}
   .chart-h180{height:220px}
   .chart-h140{height:190px}
+  #timeline-meta > div > div > div:first-child { width:44px !important; height:44px !important; font-size:18px !important; }
+  #timeline-meta > div > div > div:nth-child(2) { font-size:11px !important; }
+  #timeline-meta > div > div > div:nth-child(3) { font-size:10px !important; }
+  #timeline-meta > div > div > div:nth-child(4) { font-size:9px !important; }
+  #timeline-meta > div > div { width:60px !important; gap:5px !important; }
   #paceGrid{grid-template-columns:repeat(6,1fr)}
   .pace-cell{padding:14px 12px}
   .pace-indicator{font-size:24px}
@@ -290,11 +295,11 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <div class="kpi-footer" id="kp-vendas-delta"><span class="delta">carregando...</span></div>
       <div class="kpi-accent"></div>
     </div>
-    <div class="kpi" style="--acc:#a78bfa">
+    <div class="kpi" id="kpi-venddia" style="--acc:var(--green)">
       <div class="kpi-label">Serviços / dia</div>
       <div class="kpi-val" id="kp-venddia-val">—</div>
       <div class="kpi-footer" id="kp-venddia-delta"><span class="delta">carregando...</span></div>
-      <div class="kpi-accent" style="background:#a78bfa"></div>
+      <div class="kpi-accent" id="kpi-venddia-accent"></div>
     </div>
     <div class="kpi" style="--acc:var(--green)">
       <div class="kpi-label">Produtos / loja</div>
@@ -494,14 +499,19 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       </div>
       <div class="planos-bars" id="planosBars" style="margin-top:8px"></div>
       <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;text-align:center">
           <div>
             <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Maior mês</div>
             <div id="planos-maior-qtd" style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--green)">—</div>
             <div id="planos-maior-sub" style="font-size:9px;color:var(--muted2);margin-top:2px;white-space:nowrap">—</div>
           </div>
           <div>
-            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Ticket plano</div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Receita mês vigente</div>
+            <div id="planos-rec-vigente" style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--green)">—</div>
+            <div id="planos-rec-vigente-sub" style="font-size:9px;color:var(--muted2);margin-top:2px;white-space:nowrap">—</div>
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Ticket plano mês vigente</div>
             <div id="planos-ticket" style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--blue)">—</div>
             <div id="planos-ticket-sub" style="font-size:9px;color:var(--muted2);margin-top:2px;white-space:nowrap">—</div>
           </div>
@@ -1202,7 +1212,11 @@ function renderKPIs(d){
       `<span style="color:var(--muted);font-size:11px"> · </span>`+
       `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${p.fmt(p.meta)}</span>`;
     const kpi = elVal?.closest('.kpi');
-    if(kpi) kpi.style.setProperty('--acc', col);
+    if(kpi){
+      kpi.style.setProperty('--acc', col);
+      const acc = kpi.querySelector('.kpi-accent');
+      if(acc) acc.style.background = col;
+    }
   });
 
   // ── Capacidade operacional — renderizada em renderAll com idxMesAtual ──
@@ -1704,9 +1718,6 @@ function renderAll(d){
   const planos = d.planos;
   if(planos && planos.meses.length){
     const maxIdx = planos.qtd.indexOf(Math.max(...planos.qtd));
-    const totalRec = planos.rec.reduce((a,b)=>a+b,0);
-    const totalQtd = planos.qtd.reduce((a,b)=>a+b,0);
-    const ticketMedio = totalQtd > 0 ? totalRec / totalQtd : 0;
     const crescimento = planos.qtd.length > 1
       ? ((planos.qtd[planos.qtd.length-1] - planos.qtd[0]) / planos.qtd[0] * 100).toFixed(0)
       : 0;
@@ -1715,10 +1726,18 @@ function renderAll(d){
     const crescCor = crescimento >= 0 ? 'var(--amber)' : 'var(--red)';
     const nomeMaior = planos.meses[maxIdx].charAt(0).toUpperCase()+planos.meses[maxIdx].slice(1);
 
+    // Mês vigente = último com dados
+    const lastIdx = planos.meses.length - 1;
+    const ticketVigente = planos.qtd[lastIdx] > 0 ? planos.rec[lastIdx] / planos.qtd[lastIdx] : 0;
+    const recVigente = planos.rec[lastIdx] || 0;
+    const nomeVigente = planos.meses[lastIdx].charAt(0).toUpperCase()+planos.meses[lastIdx].slice(1);
+
     const elMQ = document.getElementById('planos-maior-qtd'); if(elMQ) elMQ.textContent = planos.qtd[maxIdx];
     const elMS = document.getElementById('planos-maior-sub'); if(elMS) elMS.textContent = `${nomeMaior} (${fmtR(planos.rec[maxIdx])})`;
-    const elTK = document.getElementById('planos-ticket'); if(elTK) elTK.textContent = fmtR(ticketMedio);
-    const elTS = document.getElementById('planos-ticket-sub'); if(elTS) elTS.textContent = `média ${primeiroMes}–${ultimoMes}`;
+    const elRV = document.getElementById('planos-rec-vigente'); if(elRV) elRV.textContent = fmtR(recVigente);
+    const elRS = document.getElementById('planos-rec-vigente-sub'); if(elRS) elRS.textContent = `${nomeVigente} · ${planos.qtd[lastIdx]} planos`;
+    const elTK = document.getElementById('planos-ticket'); if(elTK) elTK.textContent = fmtR(ticketVigente);
+    const elTS = document.getElementById('planos-ticket-sub'); if(elTS) elTS.textContent = `${nomeVigente}`;
     const elCR = document.getElementById('planos-cresc'); if(elCR){ elCR.textContent = (crescimento>=0?'+':'')+crescimento+'%'; elCR.style.color=crescCor; }
     const elCS = document.getElementById('planos-cresc-sub'); if(elCS) elCS.textContent = `${primeiroMes}→${ultimoMes}`;
   }
@@ -2192,8 +2211,7 @@ function renderAll(d){
             <div style="width:38px;height:38px;border-radius:50%;background:${bgCircle};border:2px solid ${cor}40;display:flex;align-items:center;justify-content:center;font-size:16px;color:${cor};font-weight:700;flex-shrink:0">${icone}</div>
             <div style="font-size:10px;font-weight:700;color:${isFuturo?'var(--muted)':'var(--txt)'};font-family:var(--font)">${tlNomes[i]}</div>
             ${pctTxt ? `<div style="font-size:9px;font-family:var(--mono);color:${cor};font-weight:600;white-space:nowrap">${pctTxt}</div>` : '<div style="font-size:9px;color:var(--muted)">—</div>'}
-            ${label ? `<div style="font-size:8px;color:${cor};text-transform:uppercase;letter-spacing:.3px;white-space:nowrap">${label}</div>` : '<div style="font-size:8px"> </div>'}
-          </div>
+            ${label ? `<div style="font-size:8px;color:${cor};text-transform:uppercase;letter-spacing:.3px;white-space:nowrap">${label}</div>` : '<div style="font-size:8px"> </div>'}          </div>
           ${!isLast ? `<div style="width:16px;height:2px;background:linear-gradient(90deg,${cor}60,var(--border));flex-shrink:0;margin-bottom:28px"></div>` : ''}
         </div>`;
     }).join('');
