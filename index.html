@@ -1577,32 +1577,47 @@ function renderAll(d){
   const _fatSemOp      = (d.semanal?.fat[_idxSemOp]) || [];
   const _diasSemPorMes = (d.semanal?.diasSemPorMes)  || null;
 
-  // Semana em andamento = primeira semana sem faturamento fechado
-  const _semFechadasN  = _fatSemOp.filter(v=>v>0).length; // ex: 2 = S1 e S2 fechadas, S3 em andamento
-  const _semAtualN     = _semFechadasN; // índice da semana atual (0-based): 0=S1, 1=S2...
+  // Semanas fechadas = com faturamento > 0
+  const _semFechadasN  = _fatSemOp.filter(v=>v>0).length; // ex: 2 = S1 e S2 fechadas
+  const _semAtualN     = _semFechadasN; // semana em andamento (0-based)
 
-  // Dias totais da semana atual (do mês atual)
+  // Dias totais da semana atual
   const _diasSemAtual  = _diasSemPorMes
     ? (_diasSemPorMes[_idxSemOp]?.[_semAtualN] || 5)
     : 5;
 
-  // Dias das semanas já fechadas neste mês
+  // Dias das semanas fechadas neste mês para calcular dias já vividos
   const _diasSemFechadas = _semFechadasN > 0 && _diasSemPorMes
     ? _diasSemPorMes[_idxSemOp].slice(0, _semFechadasN).reduce((a,b)=>a+(b||5),0)
     : _semFechadasN * 5;
 
-  // Dias já trabalhados na semana atual = total do mês - dias das semanas fechadas
-  const _diasNaSem     = Math.max(1, Math.min(diasTrab - _diasSemFechadas, _diasSemAtual));
-  const _recDiaOp      = diasTrab > 0 ? recAtual / diasTrab : 0;
-  const _recParcSem    = _recDiaOp * _diasNaSem;
+  // Dias já vividos na semana atual
+  const _diasNaSem = Math.max(1, Math.min(diasTrab - _diasSemFechadas, _diasSemAtual));
 
-  // Meta semanal = meta mensal ÷ 4, proporcional aos dias na semana
-  const _metaSemOp     = (d.metaReceita || 68500) / 4;
-  const _metaSemProp   = _metaSemOp * (_diasNaSem / _diasSemAtual);
-  const _paceSemPct    = _metaSemProp > 0 ? (_recParcSem / _metaSemProp) : 0;
-  const _paceSemCor    = _paceSemPct >= 1 ? '#3dffa0' : _paceSemPct >= 0.8 ? '#ffb84d' : '#ff5f5f';
-  const _paceSemDiff   = _recParcSem - _metaSemProp;
-  const _paceSemSeta   = _paceSemPct >= 1 ? '↑' : '↓';
+  // Realizado S atual = faturamento real da semana na planilha semanal
+  // Se a semana ainda não foi fechada, usa o faturamento parcial da última semana com dado
+  // Caso não tenha nada ainda nesta semana, usa receita/dia × dias na semana
+  const _fatSemAtualReal = _fatSemOp[_semAtualN] || 0;
+  const _recDiaOp        = diasTrab > 0 ? recAtual / diasTrab : 0;
+  // Usa o real da planilha se já preenchido, senão estima pelo ritmo diário
+  const _recParcSem = _fatSemAtualReal > 0
+    ? _fatSemAtualReal
+    : _recDiaOp * _diasNaSem;
+
+  // Meta S atual = Meta mensal - faturado nas semanas anteriores
+  // Distribuída pelas semanas restantes, proporcional aos dias
+  const _fatAnteriores  = _fatSemOp.slice(0, _semFechadasN).reduce((a,b)=>a+b,0);
+  const _metaRestante   = Math.max(0, (d.metaReceita || 68500) - _fatAnteriores);
+  // Semanas restantes (incluindo a atual)
+  const _semsRestantes  = 5 - _semFechadasN;
+  const _metaSemAtual   = _semsRestantes > 0 ? _metaRestante / _semsRestantes : _metaRestante;
+  // Proporcional aos dias já vividos na semana
+  const _metaSemProp    = _metaSemAtual * (_diasNaSem / _diasSemAtual);
+
+  const _paceSemPct  = _metaSemProp > 0 ? (_recParcSem / _metaSemProp) : 0;
+  const _paceSemCor  = _paceSemPct >= 1 ? '#3dffa0' : _paceSemPct >= 0.8 ? '#ffb84d' : '#ff5f5f';
+  const _paceSemDiff = _recParcSem - _metaSemProp;
+  const _paceSemSeta = _paceSemPct >= 1 ? '↑' : '↓';
 
   const elPSVal   = document.getElementById('kp-pace-sem-val');
   const elPSDelta = document.getElementById('kp-pace-sem-delta');
