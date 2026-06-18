@@ -1566,7 +1566,7 @@ function renderAll(d){
   const prodPct      = metaProdProp > 0 ? (prodAtual / metaProdProp * 100).toFixed(1) : 0;
   // Meta diária de produtos
   const metaProdDia  = metaProd / diasUt;
-  const prodCor = prodAtual >= metaProdProp ? 'var(--green)' : prodAtual >= metaProdProp*0.8 ? 'var(--amber)' : 'var(--red)';
+  const prodCor = prodAtual >= metaProdProp ? 'var(--green)' : 'var(--red)';
   const elProdVal   = document.getElementById('kp-produtos-val');
   const elProdDelta = document.getElementById('kp-produtos-delta');
   if(elProdVal){ elProdVal.textContent = fmtR(prodAtual); elProdVal.style.color = prodCor; }
