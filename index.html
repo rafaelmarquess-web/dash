@@ -1105,17 +1105,27 @@ function parseSemanal(csv, d){
   let semIdx = -1;
 
   const diasSem = [5, 5, 5, 5, 5]; // default 5 dias úteis por semana
+  // diasSemPorMes[mes][semana] — cada mês pode ter dias diferentes por semana
+  const diasSemPorMes = Array.from({length:NUM_MESES}, ()=>[5,5,5,5,5]);
 
   lines.forEach(line=>{
     const cols = splitLine(line);
     const label = (cols[1]||'').toLowerCase().trim();
-    const headerCell = (cols[2]||'').toLowerCase();
 
-    if(headerCell.includes('semana')){
+    // Detecta linha de header de semana em qualquer coluna de mês
+    const isHeaderSem = cols.slice(2).some(c=>(c||'').toLowerCase().includes('semana'));
+    if(isHeaderSem){
       semIdx++;
-      // Extrai dias: "SEMANA 3 (6 dias)" → 6
-      const match = headerCell.match(/\((\d+)\s*dia/);
-      if(match) diasSem[semIdx] = parseInt(match[1]);
+      // Para cada mês (col 2 = Jan, col 3 = Fev, ..., col 7 = Jun)
+      for(let m=0; m<NUM_MESES; m++){
+        const cell = (cols[m+2]||'').toLowerCase();
+        const match = cell.match(/\((\d+)\s*dia/);
+        if(match) diasSemPorMes[m][semIdx] = parseInt(match[1]);
+      }
+      // diasSem: usa a linha mais recente para cada semana (sobrescreve)
+      for(let m=0; m<NUM_MESES; m++){
+        if(diasSemPorMes[m][semIdx] !== 5) diasSem[semIdx] = diasSemPorMes[m][semIdx];
+      }
       return;
     }
     if(semIdx < 0 || semIdx >= NUM_SEMS) return;
@@ -1140,7 +1150,7 @@ function parseSemanal(csv, d){
 
   const totalFat = fat.flat().reduce((a,b)=>a+b,0);
   if(totalFat === 0) return d;
-  return {...d, semanal:{fat, srv, tick, diasSem}};
+  return {...d, semanal:{fat, srv, tick, diasSem, diasSemPorMes}};
 }
 
 function parseAds(csv, d){
@@ -1564,16 +1574,17 @@ function renderAll(d){
 
   // ── KPI Pace Semana ───────────────────────────────────
   // Identifica semana atual: última semana com dado na aba semanal
-  const _idxSemOp   = idxMesAtual - 1; // índice no array semanal
+  const _idxSemOp   = idxMesAtual - 1; // índice no array semanal (0=Jan..5=Jun)
   const _fatSemOp   = (d.semanal?.fat[_idxSemOp])  || [];
   const _srvSemOp   = (d.semanal?.srv[_idxSemOp])  || [];
-  const _diasSemArr = (d.semanal?.diasSem) || [5,5,5,5,5];
-  const _semNOp     = _fatSemOp.filter(v=>v>0).length; // qual semana estamos (1-5)
+  const _diasSemPorMes = (d.semanal?.diasSemPorMes) || null;
+  const _semNOp     = _fatSemOp.filter(v=>v>0).length; // semanas já fechadas
 
-  // Dias já trabalhados na semana = receita/dia × (dias do mês mod dias_semana)
-  // Estimativa: usa receita/dia da operação × dias corridos dentro da semana atual
-  const _recDiaOp   = diasTrab > 0 ? recAtual / diasTrab : 0;
-  const _diasSemAtual = _diasSemArr[_semNOp] || 5; // dias totais desta semana
+  // Dias da semana atual para o mês atual
+  const _diasSemAtual = _diasSemPorMes
+    ? (_diasSemPorMes[_idxSemOp]?.[_semNOp] || 5)
+    : ((d.semanal?.diasSem?.[_semNOp]) || 5);
+  const _recDiaOp    = diasTrab > 0 ? recAtual / diasTrab : 0;
   // Dias já vividos nesta semana = dias trabalhados no mês mod dias_semana
   const _diasNaSem  = Math.min(diasTrab % _diasSemAtual || _diasSemAtual, _diasSemAtual);
   const _recParcSem = _recDiaOp * _diasNaSem; // estimativa parcial da semana
