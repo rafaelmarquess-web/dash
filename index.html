@@ -422,6 +422,11 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
           </div>
         </div>
       </div>
+      <!-- Pace semanal dentro do card de metas -->
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;font-weight:600" id="meta-pace-sem-title">PACE SEMANA — S1</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="metaPaceSemGrid"></div>
+      </div>
     </div>
 
     <!-- RITMO DO MÊS -->
@@ -1646,6 +1651,45 @@ function renderAll(d){
     `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta sem. ${fmtR(_metaSemAtual)}</span>`;
   if(elPSAcc) elPSAcc.style.background = _paceSemCor;
   if(kpiPS) kpiPS.style.setProperty('--acc', _paceSemCor);
+
+  // ── Pace semanal no card de Metas ────────────────────
+  const metaPaceSemGrid  = document.getElementById('metaPaceSemGrid');
+  const metaPaceSemTitle = document.getElementById('meta-pace-sem-title');
+  if(metaPaceSemTitle) metaPaceSemTitle.textContent =
+    `PACE SEMANA — S${_semAtualN+1} (${_diasNaSem} de ${_diasSemAtual}d) · meta sem.`;
+
+  if(metaPaceSemGrid){
+    // Serviços parcial S atual
+    const _srvSemOp       = (d.semanal?.srv[_idxSemOp]) || [];
+    const _srvSemFechadas = _srvSemOp.slice(0, _semFechadasN).reduce((a,b)=>a+b, 0);
+    const _srvParcSem     = Math.max(0, (d.vendas[idxMesAtual]||0) - _srvSemFechadas);
+    const _metaSemSrv     = (_metaDiaSaldo / ((d.metaReceita||68500) / (d.metaVendas||660))) * _diasSemAtual;
+    // Ticket parcial S atual
+    const _tickSemOp      = (d.semanal?.tick[_idxSemOp]) || [];
+    const _tickParcSem    = _tickSemOp[_semAtualN] || (d.ticket[idxMesAtual]||0);
+    const _metaSemTick    = d.metaTicket || 111.39;
+
+    const mkMetaPaceCard = (label, real, metaSem, fmt, isTicket=false) => {
+      const metaProp = isTicket ? metaSem : metaSem * (_diasNaSem / _diasSemAtual);
+      const pct  = metaProp > 0 ? real / metaProp : 0;
+      const col  = pct >= 1 ? '#3dffa0' : pct >= 0.8 ? '#ffb84d' : '#ff5f5f';
+      const diff = real - metaProp;
+      return `<div style="background:var(--s2);border:1px solid ${col}30;border-radius:8px;padding:10px 12px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:${col}"></div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px;font-weight:600">${label}</div>
+        <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:${col}">${fmt(real)}</div>
+        <div style="font-size:10px;margin-top:4px;display:flex;justify-content:space-between;align-items:center">
+          <span style="color:${col};font-weight:600">${diff>=0?'↑':'↓'} ${fmt(Math.abs(diff))}</span>
+          <span style="color:#4da6ff;font-family:var(--mono)">${fmt(metaSem)}</span>
+        </div>
+      </div>`;
+    };
+
+    metaPaceSemGrid.innerHTML =
+      mkMetaPaceCard('Faturamento', _recParcSem, _metaSemAtual, fmtR) +
+      mkMetaPaceCard('Serviços',    _srvParcSem, Math.round((d.metaVendas||660)/4), fmtN) +
+      mkMetaPaceCard('Ticket',      _tickParcSem, _metaSemTick, fmtR, true);
+  }
 
   // ── Evolução de serviços complementares (barras agrupadas) ──
   const ctxSE = document.getElementById('servicosEvolChart')?.getContext('2d');
