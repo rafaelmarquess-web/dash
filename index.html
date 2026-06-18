@@ -2359,20 +2359,32 @@ function renderAll(d){
     </div>`;
   }).join('') + (() => {
     const pReal = d.produtos[idxMesAtual] || 0;
-    const pMeta = d.metaProdutos || 4000;
-    const pProp = pMeta * (d.pace.diasTrabalhados / d.pace.diasUteis);
-    const pPct  = pProp > 0 ? pReal / pProp : 0;
-    const pDiff = pReal - pProp;
-    const pCol  = paceColor(pPct);
+    // Meta usando lógica de pace semanal: saldo ÷ dias semanas restantes × dias semana
+    const _pFatSemOp      = (d.semanal?.fat[idxMesAtual-1]) || [];
+    const _pSemFechadasN  = _pFatSemOp.filter(v=>v>0).length;
+    const _pFatSemFech    = _pFatSemOp.slice(0, _pSemFechadasN).reduce((a,b)=>a+b, 0);
+    const _pProdSemFech   = (() => {
+      // Estimativa proporcional: produtos fechados = pReal × (fat semanas fech / recAtual)
+      return recAtual > 0 ? (pReal * (_pFatSemFech / recAtual)) : 0;
+    })();
+    const _pSaldo  = Math.max(0, (d.metaProdutos||4000) - _pProdSemFech);
+    const _pMetaSemAtual = _diasSemsRestantes > 0
+      ? (_pSaldo / _diasSemsRestantes) * _diasSemAtual
+      : d.metaProdutos / 4;
+    const _pMetaProp = _pMetaSemAtual * (_diasNaSem / _diasSemAtual);
+    const _pParcSem  = Math.max(0, pReal - _pProdSemFech);
+    const pPct  = _pMetaProp > 0 ? _pParcSem / _pMetaProp : 0;
+    const pDiff = _pParcSem - _pMetaProp;
+    const pCol  = pPct >= 1 ? '#3dffa0' : '#ff5f5f'; // só verde ou vermelho
     const over  = pPct >= 1;
     return `<div class="pace-cell" style="border-color:${pCol}30">
       <div class="pace-cell-accent" style="background:${pCol}"></div>
       <div class="pace-label">PROD./LOJA</div>
-      <div class="pace-indicator" style="color:${pCol}">${(pPct*100).toFixed(1)}%</div>
+      <div class="pace-indicator" style="color:${pCol}">${fmtR(_pParcSem)}</div>
       <div class="pace-badge" style="background:${paceBg(pPct)};color:${pCol}">${over?'▲ acima':'▼ abaixo'}</div>
       <div class="pace-sub">
-        <div class="pace-row"><span class="pace-row-lbl">Real</span><span class="pace-row-val" style="color:var(--txt)">${fmtR(pReal)}</span></div>
-        <div class="pace-row"><span class="pace-row-lbl">Meta pro rata</span><span class="pace-row-val" style="color:var(--muted2)">${fmtR(pProp)}</span></div>
+        <div class="pace-row"><span class="pace-row-lbl">Meta sem.</span><span class="pace-row-val" style="color:var(--muted2)">${fmtR(_pMetaSemAtual)}</span></div>
+        <div class="pace-row"><span class="pace-row-lbl">Meta pro rata</span><span class="pace-row-val" style="color:var(--muted2)">${fmtR(_pMetaProp)}</span></div>
         <div class="pace-row"><span class="pace-row-lbl">Diferença</span><span class="pace-row-val" style="color:${pCol}">${pDiff>=0?'+':''}${fmtR(pDiff)}</span></div>
       </div>
     </div>`;
