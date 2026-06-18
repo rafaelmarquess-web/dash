@@ -1622,13 +1622,13 @@ function renderAll(d){
   const elPSAcc   = document.getElementById('kpi-pace-sem-accent');
   const kpiPS     = elPSVal?.closest('.kpi');
 
-  if(elPSLabel) elPSLabel.textContent = `PACE S${_semAtualN+1} (${_diasNaSem}/${_diasSemAtual}d)`;
+  if(elPSLabel) elPSLabel.textContent = `PACE SEMANA (S${_semAtualN+1} · ${_diasNaSem} DE ${_diasSemAtual}D)`;
   if(elPSVal){
-    elPSVal.textContent = `${(_paceSemPct*100).toFixed(0)}%`;
+    elPSVal.textContent = fmtR(_recParcSem);
     elPSVal.style.color = _paceSemCor;
   }
   if(elPSDelta) elPSDelta.innerHTML =
-    `<span style="color:${_paceSemCor};font-weight:600;font-size:12px">${_paceSemSeta} ${fmtR(_paceSemDiff)}</span>`+
+    `<span style="color:${_paceSemCor};font-weight:600;font-size:12px">${_paceSemSeta} ${fmtR(Math.abs(_paceSemDiff))}</span>`+
     `<span style="color:var(--muted);font-size:11px"> · </span>`+
     `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${fmtR(_metaSemProp)}</span>`;
   if(elPSAcc) elPSAcc.style.background = _paceSemCor;
