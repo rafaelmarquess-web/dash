@@ -1601,8 +1601,13 @@ function renderAll(d){
   // Saldo de meta = meta mensal - receita acumulada REAL do mês
   const _metaSaldo = Math.max(0, (d.metaReceita || 68500) - recAtual);
 
-  // Meta diária do saldo = saldo ÷ dias faltantes no mês
-  const _diasFalt = Math.max(1, d.pace.diasFaltantes || 1);
+  // Dias das semanas restantes (S atual + próximas) = base para distribuir o saldo
+  const _diasSemsRestantes = _diasSemPorMes
+    ? _diasSemPorMes[_idxSemOp].slice(_semAtualN).reduce((a,b)=>a+(b||5), 0)
+    : (5 - _semAtualN) * 5;
+
+  // Meta diária do saldo = saldo ÷ dias das semanas restantes
+  const _diasFalt = Math.max(1, _diasSemsRestantes);
   const _metaDiaSaldo = _metaSaldo / _diasFalt;
 
   // Meta da semana atual = meta diária × dias totais da semana
