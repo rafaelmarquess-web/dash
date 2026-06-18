@@ -1598,8 +1598,9 @@ function renderAll(d){
   // Realizado S atual = receita acumulada do mês - faturado semanas fechadas
   const _recParcSem = Math.max(0, recAtual - _fatSemFechadas);
 
-  // Saldo de meta = meta mensal - receita acumulada REAL do mês
-  const _metaSaldo = Math.max(0, (d.metaReceita || 68500) - recAtual);
+  // Saldo de meta = meta mensal - semanas JÁ FECHADAS (S1+S2)
+  // S3 parcial ainda está dentro das semanas restantes, não deduz do saldo
+  const _metaSaldo = Math.max(0, (d.metaReceita || 68500) - _fatSemFechadas);
 
   // Dias das semanas restantes (S atual + próximas) = base para distribuir o saldo
   const _diasSemsRestantes = _diasSemPorMes
