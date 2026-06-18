@@ -2375,7 +2375,7 @@ function renderAll(d){
       <div class="pace-cell-accent" style="background:${pCol}"></div>
       <div class="pace-label">PROD./LOJA</div>
       <div class="pace-indicator" style="color:${pCol}">${fmtR(pParcSem)}</div>
-      <div class="pace-badge" style="background:${paceBg(pPct)};color:${pCol}">${over?'▲ acima':'▼ abaixo'}</div>
+      <div class="pace-badge" style="background:${over?'rgba(61,255,160,.08)':'rgba(255,95,95,.08)'};color:${pCol}">${over?'▲ acima':'▼ abaixo'}</div>
       <div class="pace-sub">
         <div class="pace-row"><span class="pace-row-lbl">Meta sem.</span><span class="pace-row-val" style="color:var(--muted2)">${fmtR(pMetaSem)}</span></div>
         <div class="pace-row"><span class="pace-row-lbl">Meta pro rata</span><span class="pace-row-val" style="color:var(--muted2)">${fmtR(pMetaProp)}</span></div>
