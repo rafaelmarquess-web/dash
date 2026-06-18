@@ -1567,11 +1567,12 @@ function renderAll(d){
   // Meta diária de produtos
   const metaProdDia  = metaProd / diasUt;
   const prodCor = prodAtual >= metaProdProp ? 'var(--green)' : 'var(--red)';
+  const prodDiff = prodAtual - metaProdProp;
   const elProdVal   = document.getElementById('kp-produtos-val');
   const elProdDelta = document.getElementById('kp-produtos-delta');
   if(elProdVal){ elProdVal.textContent = fmtR(prodAtual); elProdVal.style.color = prodCor; }
   if(elProdDelta) elProdDelta.innerHTML =
-    `<span style="color:${prodCor};font-weight:600;font-size:12px">${prodPct>=100?'↑':'↓'} ${prodPct}%</span>`+
+    `<span style="color:${prodCor};font-weight:600;font-size:12px">${prodDiff>=0?'↑':'↓'} ${fmtR(Math.abs(prodDiff))}</span>`+
     `<span style="color:var(--muted);font-size:11px"> · </span>`+
     `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta/dia ${fmtR(metaProdDia)}</span>`;
   const kpiProd = elProdVal?.closest('.kpi');
@@ -2360,25 +2361,25 @@ function renderAll(d){
   }).join('') + (() => {
     const pReal  = d.produtos[idxMesAtual] || 0;
     const pMeta  = d.metaProdutos || 4000;
+    // Meta pro rata mensal (igual aos outros cards do ritmo)
+    const pProp  = pMeta * (d.pace.diasTrabalhados / d.pace.diasUteis);
     // Saldo = meta - realizado até hoje
     const pSaldo = Math.max(0, pMeta - pReal);
     // Meta semanal = saldo ÷ dias semanas restantes × dias da semana atual
     const pMetaSem  = _diasSemsRestantes > 0 ? (pSaldo / _diasSemsRestantes) * _diasSemAtual : pMeta / 4;
     const pMetaProp = pMetaSem * (_diasNaSem / _diasSemAtual);
-    // Realizado semana = produtos acumulados - estimativa proporcional das semanas fechadas
-    const pParcSem  = pReal; // usa total do mês pois produtos não têm histórico semanal detalhado
-    const pPct  = pMetaProp > 0 ? pParcSem / pMetaProp : 0;
-    const pDiff = pParcSem - pMetaProp;
+    const pPct  = pProp > 0 ? pReal / pProp : 0;
+    const pDiff = pReal - pProp;
     const pCol  = pPct >= 1 ? '#3dffa0' : '#ff5f5f';
     const over  = pPct >= 1;
     return `<div class="pace-cell" style="border-color:${pCol}30">
       <div class="pace-cell-accent" style="background:${pCol}"></div>
       <div class="pace-label">PROD./LOJA</div>
-      <div class="pace-indicator" style="color:${pCol}">${fmtR(pParcSem)}</div>
+      <div class="pace-indicator" style="color:${pCol}">${fmtR(pReal)}</div>
       <div class="pace-badge" style="background:${over?'rgba(61,255,160,.08)':'rgba(255,95,95,.08)'};color:${pCol}">${over?'▲ acima':'▼ abaixo'}</div>
       <div class="pace-sub">
+        <div class="pace-row"><span class="pace-row-lbl">Meta pro rata</span><span class="pace-row-val" style="color:var(--muted2)">${fmtR(pProp)}</span></div>
         <div class="pace-row"><span class="pace-row-lbl">Meta sem.</span><span class="pace-row-val" style="color:var(--muted2)">${fmtR(pMetaSem)}</span></div>
-        <div class="pace-row"><span class="pace-row-lbl">Meta pro rata</span><span class="pace-row-val" style="color:var(--muted2)">${fmtR(pMetaProp)}</span></div>
         <div class="pace-row"><span class="pace-row-lbl">Diferença</span><span class="pace-row-val" style="color:${pCol}">${pDiff>=0?'+':''}${fmtR(pDiff)}</span></div>
       </div>
     </div>`;
