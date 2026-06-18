@@ -2377,10 +2377,10 @@ function renderAll(d){
       <div class="pace-label">PROD./LOJA</div>
       <div class="pace-indicator" style="color:${pCol}">${fmtR(pReal)}</div>
       <div class="pace-badge" style="background:${over?'rgba(61,255,160,.08)':'rgba(255,95,95,.08)'};color:${pCol}">${over?'▲ acima':'▼ abaixo'}</div>
-      <div class="pace-sub">
-        <div class="pace-row"><span class="pace-row-lbl" style="font-size:9px">Meta pro rata</span><span class="pace-row-val" style="color:var(--muted2);font-size:9px">${fmtR(pProp)}</span></div>
-        <div class="pace-row"><span class="pace-row-lbl" style="font-size:9px">Meta sem.</span><span class="pace-row-val" style="color:var(--muted2);font-size:9px">${fmtR(pMetaSem)}</span></div>
-        <div class="pace-row"><span class="pace-row-lbl" style="font-size:9px">Diferença</span><span class="pace-row-val" style="color:${pCol};font-size:9px">${pDiff>=0?'+':''}${fmtR(pDiff)}</span></div>
+      <div class="pace-sub" style="font-size:9px">
+        <div class="pace-row"><span class="pace-row-lbl">Meta p.r.</span><span class="pace-row-val" style="color:var(--muted2)">${fmtR(pProp)}</span></div>
+        <div class="pace-row"><span class="pace-row-lbl">Meta sem.</span><span class="pace-row-val" style="color:var(--muted2)">${fmtR(pMetaSem)}</span></div>
+        <div class="pace-row"><span class="pace-row-lbl">Difer.</span><span class="pace-row-val" style="color:${pCol}">${pDiff>=0?'+':''}${fmtR(pDiff)}</span></div>
       </div>
     </div>`;
   })();
