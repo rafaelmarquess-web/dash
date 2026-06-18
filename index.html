@@ -1573,29 +1573,36 @@ function renderAll(d){
   if(kpiProd) kpiProd.style.setProperty('--acc', prodCor);
 
   // ── KPI Pace Semana ───────────────────────────────────
-  // Identifica semana atual: última semana com dado na aba semanal
-  const _idxSemOp   = idxMesAtual - 1; // índice no array semanal (0=Jan..5=Jun)
-  const _fatSemOp   = (d.semanal?.fat[_idxSemOp])  || [];
-  const _srvSemOp   = (d.semanal?.srv[_idxSemOp])  || [];
-  const _diasSemPorMes = (d.semanal?.diasSemPorMes) || null;
-  const _semNOp     = _fatSemOp.filter(v=>v>0).length; // semanas já fechadas
+  const _idxSemOp      = idxMesAtual - 1;
+  const _fatSemOp      = (d.semanal?.fat[_idxSemOp]) || [];
+  const _diasSemPorMes = (d.semanal?.diasSemPorMes)  || null;
 
-  // Dias da semana atual para o mês atual
-  const _diasSemAtual = _diasSemPorMes
-    ? (_diasSemPorMes[_idxSemOp]?.[_semNOp] || 5)
-    : ((d.semanal?.diasSem?.[_semNOp]) || 5);
-  const _recDiaOp    = diasTrab > 0 ? recAtual / diasTrab : 0;
-  // Dias já vividos nesta semana = dias trabalhados no mês mod dias_semana
-  const _diasNaSem  = Math.min(diasTrab % _diasSemAtual || _diasSemAtual, _diasSemAtual);
-  const _recParcSem = _recDiaOp * _diasNaSem; // estimativa parcial da semana
+  // Semana em andamento = primeira semana sem faturamento fechado
+  const _semFechadasN  = _fatSemOp.filter(v=>v>0).length; // ex: 2 = S1 e S2 fechadas, S3 em andamento
+  const _semAtualN     = _semFechadasN; // índice da semana atual (0-based): 0=S1, 1=S2...
 
-  // Meta semanal = meta mensal ÷ 4
-  const _metaSemOp  = (d.metaReceita || 68500) / 4;
-  const _metaSemProp = _metaSemOp * (_diasNaSem / _diasSemAtual); // proporcional aos dias
-  const _paceSemPct  = _metaSemProp > 0 ? (_recParcSem / _metaSemProp) : 0;
-  const _paceSemCor  = _paceSemPct >= 1 ? '#3dffa0' : _paceSemPct >= 0.8 ? '#ffb84d' : '#ff5f5f';
-  const _paceSemDiff = _recParcSem - _metaSemProp;
-  const _paceSemSeta = _paceSemPct >= 1 ? '↑' : '↓';
+  // Dias totais da semana atual (do mês atual)
+  const _diasSemAtual  = _diasSemPorMes
+    ? (_diasSemPorMes[_idxSemOp]?.[_semAtualN] || 5)
+    : 5;
+
+  // Dias das semanas já fechadas neste mês
+  const _diasSemFechadas = _semFechadasN > 0 && _diasSemPorMes
+    ? _diasSemPorMes[_idxSemOp].slice(0, _semFechadasN).reduce((a,b)=>a+(b||5),0)
+    : _semFechadasN * 5;
+
+  // Dias já trabalhados na semana atual = total do mês - dias das semanas fechadas
+  const _diasNaSem     = Math.max(1, Math.min(diasTrab - _diasSemFechadas, _diasSemAtual));
+  const _recDiaOp      = diasTrab > 0 ? recAtual / diasTrab : 0;
+  const _recParcSem    = _recDiaOp * _diasNaSem;
+
+  // Meta semanal = meta mensal ÷ 4, proporcional aos dias na semana
+  const _metaSemOp     = (d.metaReceita || 68500) / 4;
+  const _metaSemProp   = _metaSemOp * (_diasNaSem / _diasSemAtual);
+  const _paceSemPct    = _metaSemProp > 0 ? (_recParcSem / _metaSemProp) : 0;
+  const _paceSemCor    = _paceSemPct >= 1 ? '#3dffa0' : _paceSemPct >= 0.8 ? '#ffb84d' : '#ff5f5f';
+  const _paceSemDiff   = _recParcSem - _metaSemProp;
+  const _paceSemSeta   = _paceSemPct >= 1 ? '↑' : '↓';
 
   const elPSVal   = document.getElementById('kp-pace-sem-val');
   const elPSDelta = document.getElementById('kp-pace-sem-delta');
@@ -1603,7 +1610,7 @@ function renderAll(d){
   const elPSAcc   = document.getElementById('kpi-pace-sem-accent');
   const kpiPS     = elPSVal?.closest('.kpi');
 
-  if(elPSLabel) elPSLabel.textContent = `PACE S${_semNOp+1} (${_diasNaSem}/${_diasSemAtual}d)`;
+  if(elPSLabel) elPSLabel.textContent = `PACE S${_semAtualN+1} (${_diasNaSem}/${_diasSemAtual}d)`;
   if(elPSVal){
     elPSVal.textContent = `${(_paceSemPct*100).toFixed(0)}%`;
     elPSVal.style.color = _paceSemCor;
