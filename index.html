@@ -1606,6 +1606,13 @@ function renderAll(d){
     ? _diasSemPorMes[_idxSemOp].slice(_semAtualN).reduce((a,b)=>a+(b||5), 0)
     : (5 - _semAtualN) * 5;
 
+  console.log('DEBUG pace sem:', {
+    _semAtualN, _semFechadasN, _diasSemAtual, _diasNaSem,
+    _fatSemFechadas, _recParcSem, _metaSaldo,
+    _diasSemsRestantes,
+    diasSemRestantes_raw: _diasSemPorMes ? _diasSemPorMes[_idxSemOp] : 'null'
+  });
+
   // Meta diária do saldo = saldo ÷ dias das semanas restantes
   const _diasFalt = Math.max(1, _diasSemsRestantes);
   const _metaDiaSaldo = _metaSaldo / _diasFalt;
