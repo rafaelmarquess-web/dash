@@ -1,0 +1,2565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operação & Marketing 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08090c;
+  --s1:#0f1117;
+  --s2:#161920;
+  --card:#1a1d27;
+  --border:#242736;
+  --border2:#2e3245;
+  --txt:#e6e8f0;
+  --muted:#5a6080;
+  --muted2:#8890b0;
+  --green:#3dffa0;
+  --blue:#4da6ff;
+  --pink:#ff6eb4;
+  --amber:#ffb84d;
+  --red:#ff5f5f;
+  --font:'Syne',sans-serif;
+  --mono:'DM Mono',monospace;
+}
+body{background:var(--bg);color:var(--txt);font-family:var(--font);min-height:100vh;font-size:14px}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--s1);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(8px);gap:8px}
+.brand{display:flex;align-items:center;gap:8px;flex-shrink:0;min-width:0}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:glow 2s ease-in-out infinite;flex-shrink:0}
+@keyframes glow{0%,100%{opacity:1;box-shadow:0 0 8px var(--green)}50%{opacity:.5;box-shadow:0 0 3px var(--green)}}
+.brand h1{font-size:13px;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-meta{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.meta-pill{font-size:10px;color:var(--muted2);background:var(--s2);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-family:var(--mono);white-space:nowrap}
+.tab-row{display:flex;gap:2px;background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:2px}
+.tab{padding:5px 10px;border-radius:5px;font-size:11px;cursor:pointer;color:var(--muted2);border:none;background:transparent;font-family:var(--font);transition:all .15s;font-weight:500;white-space:nowrap}
+.tab.active,.tab:hover{background:var(--card);color:var(--txt)}
+.tab.active{color:var(--green)}
+#sync-btn{padding:5px 10px!important;font-size:11px!important}
+#sync-btn svg{width:11px;height:11px}
+
+/* ── LAYOUT ── */
+.wrap{padding:14px 14px;max-width:1920px;margin:0 auto;box-sizing:border-box;overflow-x:hidden}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 14px;position:relative;overflow:hidden;cursor:default;transition:border-color .2s}
+.kpi:hover{border-color:var(--border2)}
+.kpi-accent{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--acc,var(--green));opacity:.6}
+.kpi-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;font-weight:600}
+.kpi-val{font-size:22px;font-weight:700;letter-spacing:-1px;font-family:var(--mono);margin-bottom:5px;color:var(--txt)}
+.kpi-footer{font-size:11px;color:var(--muted2);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.delta{font-weight:600;font-family:var(--mono)}
+.up{color:var(--green)}.down{color:var(--red)}.neu{color:var(--muted2)}
+
+/* ── ROWS ── */
+.row2,.row3,.row2b{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px;min-width:0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;box-sizing:border-box;min-width:0}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:8px}
+.card-title{font-size:14px;font-weight:600;color:var(--txt)}
+.card-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.badge{font-size:9px;padding:3px 7px;border-radius:4px;font-weight:600;letter-spacing:.3px;font-family:var(--mono);white-space:nowrap;flex-shrink:0}
+.badge-green{background:#0a2e1a;color:var(--green)}
+.badge-blue{background:#0a1e3a;color:var(--blue)}
+.badge-amber{background:#2a1e08;color:var(--amber)}
+.chart-h180{position:relative;height:180px}
+.chart-h220{position:relative;height:200px}
+.chart-h140{position:relative;height:160px}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px}
+.tbl-wrap table{min-width:480px}
+table{width:100%;border-collapse:collapse;min-width:420px}
+thead th{text-align:left;padding:8px 10px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;background:#13151f;font-weight:600;border-bottom:1px solid var(--border)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#1e2130}
+tbody td{padding:10px 10px;font-size:12px}
+.td-month{font-weight:600;color:var(--txt);font-family:var(--mono)}
+.td-num{font-family:var(--mono);color:var(--muted2)}
+.td-green{font-family:var(--mono);color:var(--green);font-weight:500}
+.td-red{font-family:var(--mono);color:var(--red)}
+.td-amber{font-family:var(--mono);color:var(--amber)}
+
+/* ── BARS ── */
+.bar-row{display:flex;flex-direction:column;gap:10px}
+.bar-item{display:flex;align-items:center;gap:10px}
+.bar-lbl{font-size:11px;color:var(--muted2);width:30px;flex-shrink:0;font-family:var(--mono)}
+.bar-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.bar-val{font-size:11px;font-family:var(--mono);color:var(--txt);width:46px;text-align:right;flex-shrink:0}
+
+/* ── CUSTO ALERT ── */
+.custo-row{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.custo-item{display:flex;align-items:flex-start;flex-direction:column;gap:4px;padding:10px 12px;border-radius:8px;border:1px solid var(--border)}
+.custo-mes{font-size:13px;font-weight:600;font-family:var(--mono)}
+.custo-vals{display:flex;gap:10px;font-size:11px;font-family:var(--mono);flex-wrap:wrap}
+.custo-ok{background:#0a1a0d;border-color:#1a3a20}
+.custo-warn{background:#1a1208;border-color:#3a2a10}
+.custo-bad{background:#1a0808;border-color:#3a1010}
+
+/* ── PLANOS ── */
+.planos-bars{display:flex;flex-direction:column;gap:8px}
+.plano-row{display:flex;align-items:center;gap:10px}
+.plano-mes{font-size:11px;font-family:var(--mono);color:var(--muted2);width:38px;flex-shrink:0}
+.plano-track{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.plano-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#3dffa0,#4da6ff);transition:width 1s cubic-bezier(.4,0,.2,1)}
+.plano-count{font-size:11px;font-family:var(--mono);color:var(--green);width:28px;text-align:right;flex-shrink:0}
+
+/* ── PACE GRID ── */
+#paceGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.pace-cell{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;position:relative;overflow:hidden;transition:border-color .2s}
+.pace-cell:hover{border-color:var(--border2)}
+.pace-cell-accent{position:absolute;top:0;left:0;right:0;height:2px}
+.pace-indicator{font-size:18px;font-weight:700;font-family:var(--mono);margin-bottom:2px;line-height:1}
+.pace-label{font-size:8px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pace-sub{display:flex;flex-direction:column;gap:3px;margin-top:6px;padding-top:6px;border-top:1px solid var(--border)}
+.pace-row{display:flex;justify-content:space-between;align-items:center;font-size:10px;gap:4px}
+.pace-row-lbl{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.pace-row-val{font-family:var(--mono);font-size:10px;flex-shrink:0}
+.pace-badge{display:inline-block;margin-top:4px;font-size:9px;font-family:var(--mono);font-weight:600;padding:2px 6px;border-radius:4px}
+
+/* ── META ROWS ── */
+.meta-row{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--s2);border:1px solid var(--border);border-radius:7px}
+.meta-lbl{font-size:12px;color:var(--muted2)}
+.meta-target{font-size:12px;font-family:var(--mono);font-weight:500;color:var(--blue)}
+.meta-bar-item{display:flex;align-items:center;gap:8px}
+.meta-bar-lbl{font-size:11px;color:var(--muted2);width:80px;flex-shrink:0}
+.meta-bar-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.meta-bar-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.meta-bar-pct{font-size:11px;font-family:var(--mono);width:42px;text-align:right;flex-shrink:0}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.kpi{animation:fadeUp .35s ease both}
+.kpi:nth-child(1){animation-delay:.04s}.kpi:nth-child(2){animation-delay:.08s}
+.kpi:nth-child(3){animation-delay:.12s}.kpi:nth-child(4){animation-delay:.16s}
+.kpi:nth-child(5){animation-delay:.20s}
+.card{animation:fadeUp .4s ease .15s both}
+.tab-content{display:none}.tab-content.active{display:block}
+
+/* ── TABLET ── */
+@media(min-width:600px){
+  .wrap{padding:20px 20px}
+  .kpi-grid{grid-template-columns:repeat(3,1fr);gap:14px}
+  .kpi{padding:20px 18px}
+  .kpi-val{font-size:26px}
+  .row2b{grid-template-columns:repeat(2,1fr)}
+  .chart-h220{height:240px}
+  .chart-h140{height:180px}
+  #paceGrid{grid-template-columns:repeat(3,1fr)}
+  .pace-indicator{font-size:20px}
+  .pace-label{font-size:9px}
+  .pace-row{font-size:11px}
+  .pace-row-val{font-size:11px}
+  .custo-item{flex-direction:row;align-items:center}
+}
+
+/* ── DESKTOP ── */
+@media(min-width:1024px){
+  .topbar{padding:16px 32px;gap:20px}
+  .brand h1{font-size:15px}
+  .tab{padding:6px 16px;font-size:13px}
+  .meta-pill{font-size:12px;padding:5px 14px}
+  .wrap{padding:28px 32px}
+  .kpi-grid{grid-template-columns:repeat(7,1fr);gap:16px;margin-bottom:20px}
+  .kpi{padding:22px 20px}
+  .kpi-val{font-size:26px}
+  .kpi-label{font-size:11px}
+  .row2{grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px}
+  .row3{grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+  .row2b{grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .card{padding:22px}
+  .card-title{font-size:15px}
+  .chart-h220{height:260px}
+  .chart-h180{height:220px}
+  .chart-h140{height:190px}
+  #timeline-meta > div > div > div:first-child { width:44px !important; height:44px !important; font-size:18px !important; }
+  #timeline-meta > div > div > div:nth-child(2) { font-size:11px !important; }
+  #timeline-meta > div > div > div:nth-child(3) { font-size:10px !important; }
+  #timeline-meta > div > div > div:nth-child(4) { font-size:9px !important; }
+  #timeline-meta > div > div { width:60px !important; gap:5px !important; }
+  #paceGrid{grid-template-columns:repeat(6,1fr)}
+  .pace-cell{padding:14px 12px}
+  .pace-indicator{font-size:24px}
+  .pace-label{font-size:9px}
+  .pace-row{font-size:11px}
+  .pace-row-val{font-size:11px}
+  .pace-badge{font-size:10px;padding:2px 8px}
+  .pace-indicator{font-size:24px}
+  tbody td{padding:12px 14px;font-size:13px}
+  thead th{padding:10px 14px;font-size:11px}
+}
+
+/* ── WIDE ── */
+@media(min-width:1440px){
+  .wrap{padding:32px 40px}
+  .kpi{padding:26px 24px}
+  .kpi-val{font-size:30px}
+  .card{padding:28px}
+  .card-title{font-size:16px}
+  .card-sub{font-size:13px}
+  .chart-h220{height:300px}
+  .chart-h180{height:240px}
+  .chart-h140{height:200px}
+  .meta-bar-lbl{width:100px}
+  .pace-indicator{font-size:26px}
+}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;font-family:var(--mono);font-size:11px}
+
+/* Tabela detalhamento — mobile vs desktop */
+@media(min-width:700px){.tbl-mobile{display:none!important}.tbl-desktop{display:block}}
+@media(max-width:699px){.tbl-mobile{display:block}.tbl-desktop{display:none!important}}
+.tbl-mobile .mes-card{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px}
+.tbl-mobile .mes-card:last-child{margin-bottom:0}
+.tbl-mobile .mes-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tbl-mobile .mes-nome{font-family:var(--mono);font-weight:700;font-size:14px;color:var(--txt)}
+.tbl-mobile .mes-margem{font-family:var(--mono);font-size:13px;font-weight:600}
+.tbl-mobile .mes-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.tbl-mobile .mes-item{text-align:center}
+.tbl-mobile .mes-item-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.tbl-mobile .mes-item-val{font-size:12px;font-family:var(--mono);font-weight:500}
+
+/* Pill de data - esconde texto no mobile muito pequeno */
+@media(max-width:480px){
+  #sync-status { display:none !important; }
+  #sync-btn::after {
+    content: '';
+    width:6px; height:6px; border-radius:50%;
+    background: var(--muted);
+    display:inline-block;
+    margin-left:2px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <h1>Operação & Marketing — 2026</h1>
+  </div>
+  <div class="topbar-meta">
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('operacao',this)">Operação</button>
+      <button class="tab" onclick="switchTab('marketing',this)">Marketing</button>
+      <button class="tab" onclick="switchTab('semanal',this)">Semanal</button>
+    </div>
+    <div class="meta-pill" id="sync-status" style="display:flex;align-items:center;gap:6px;cursor:default">
+      <span id="data-banner-dot" style="width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;display:inline-block"></span>
+      <span id="data-banner-txt" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px">Jan–Mai 2026</span>
+    </div>
+    <button id="sync-btn" onclick="forceRefresh()" style="display:flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--border);color:var(--muted2);border-radius:8px;padding:5px 12px;font-size:12px;font-family:var(--font);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted2)'">
+      <svg id="sync-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Atualizar
+    </button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ===== ABA OPERAÇÃO ===== -->
+<div id="tab-operacao" class="tab-content active">
+
+  <div class="kpi-grid" id="kpi-pace-top">
+    <div class="kpi" style="--acc:var(--green)">
+      <div class="kpi-label">Receita × dias</div>
+      <div class="kpi-val" id="kp-receita-val">—</div>
+      <div class="kpi-footer" id="kp-receita-delta"><span class="delta">carregando...</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--blue)">
+      <div class="kpi-label">Receita / dia</div>
+      <div class="kpi-val" id="kp-recdia-val">—</div>
+      <div class="kpi-footer" id="kp-recdia-delta"><span class="delta">carregando...</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--pink)">
+      <div class="kpi-label">Ticket médio</div>
+      <div class="kpi-val" id="kp-ticket-val">—</div>
+      <div class="kpi-footer" id="kp-ticket-delta"><span class="delta">carregando...</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--amber)">
+      <div class="kpi-label">Serviços × dias</div>
+      <div class="kpi-val" id="kp-vendas-val">—</div>
+      <div class="kpi-footer" id="kp-vendas-delta"><span class="delta">carregando...</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" id="kpi-venddia" style="--acc:var(--green)">
+      <div class="kpi-label">Serviços / dia</div>
+      <div class="kpi-val" id="kp-venddia-val">—</div>
+      <div class="kpi-footer" id="kp-venddia-delta"><span class="delta">carregando...</span></div>
+      <div class="kpi-accent" id="kpi-venddia-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--green)">
+      <div class="kpi-label">Produtos / loja</div>
+      <div class="kpi-val" id="kp-produtos-val">—</div>
+      <div class="kpi-footer" id="kp-produtos-delta"><span class="delta">carregando...</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" id="kpi-pace-sem" style="--acc:#a78bfa">
+      <div class="kpi-label" id="kpi-pace-sem-label">PACE SEMANA</div>
+      <div class="kpi-val" id="kp-pace-sem-val">—</div>
+      <div class="kpi-footer" id="kp-pace-sem-delta"><span class="delta">carregando...</span></div>
+      <div class="kpi-accent" id="kpi-pace-sem-accent"></div>
+    </div>
+  </div>
+
+  <!-- CARDS ESTRATÉGICOS — nova ordem: Capacidade | Projeção | Meta | Ritmo -->
+  <div class="row2b" style="margin-bottom:14px">
+
+    <!-- Capacidade operacional -->
+    <div class="kpi" style="--acc:var(--blue);border-radius:14px;padding:20px">
+      <div class="kpi-accent"></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:8px">
+        <div style="min-width:0">
+          <div class="kpi-label">Capacidade operacional</div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-top:4px;flex-wrap:wrap">
+            <span class="kpi-val" id="cap-atual" style="font-size:28px">—</span>
+            <span style="font-size:14px;color:var(--muted2);font-family:var(--mono)">/&nbsp;850</span>
+          </div>
+          <div class="kpi-footer" style="margin-top:5px" id="cap-footer"><span class="delta">carregando...</span></div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Capacidade utilizada</div>
+          <div id="cap-pct" style="font-size:28px;font-weight:700;font-family:var(--mono);color:var(--green)">—%</div>
+          <div id="cap-livre" style="font-size:11px;color:var(--muted2);margin-top:2px">— serviços disponíveis</div>
+        </div>
+      </div>
+      <div style="height:8px;background:var(--border);border-radius:4px;overflow:visible;position:relative;margin-top:4px">
+        <div id="cap-bar" style="height:100%;border-radius:4px;background:var(--green);width:0%;transition:width 1s cubic-bezier(.4,0,.2,1)"></div>
+        <!-- Marcador de meta -->
+        <div id="cap-meta-marker" style="position:absolute;top:-4px;height:16px;width:2px;background:#4da6ff;border-radius:1px;transition:left 1s cubic-bezier(.4,0,.2,1)" title="Meta mensal"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--muted);position:relative">
+        <span>0</span>
+        <span id="cap-bar-atual" style="color:var(--green);font-family:var(--mono);font-weight:600">—</span>
+        <span id="cap-bar-meta" style="color:#4da6ff;font-family:var(--mono);font-weight:600">— meta</span>
+        <span>850</span>
+      </div>
+    </div>
+
+    <!-- Projeção de fechamento + mínimo diário -->
+    <div class="kpi" style="--acc:var(--green);border-radius:14px;padding:20px" id="proj-card">
+      <div class="kpi-accent" id="proj-accent"></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:8px">
+        <div style="min-width:0">
+          <div class="kpi-label">Projeção de fechamento</div>
+          <div id="proj-receita" class="kpi-val" style="font-size:28px;margin-top:4px">—</div>
+          <div style="font-size:11px;color:var(--muted2);margin-top:2px">receita projetada no mês</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">vs meta mensal</div>
+          <div id="proj-pct" style="font-size:28px;font-weight:700;font-family:var(--mono)">—%</div>
+          <div id="proj-status" style="font-size:11px;margin-top:2px">—</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:12px;border-top:1px solid var(--border);margin-bottom:12px">
+        <div style="text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Média diária</div>
+          <div id="proj-ritmo" style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--txt)">—</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Dias restantes</div>
+          <div id="proj-dias" style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--amber)">—</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">Meta mensal</div>
+          <div style="font-size:13px;font-weight:600;font-family:var(--mono);color:var(--muted2)" id="proj-meta-val">R$ 68,5K</div>
+        </div>
+      </div>
+      <!-- Mini tabela mínimo diário aceitável -->
+      <div style="padding-top:10px;border-top:1px solid var(--border)">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px">Mín. diário aceitável</div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px" id="min-diario">
+          <!-- gerado pelo JS -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Meta + Ritmo do mês -->
+  <!-- Meta + Ritmo do mês — logo após Capacidade/Projeção -->
+  <div class="row2b" style="margin-bottom:14px">
+
+    <!-- METAS -->
+    <div class="card" id="card-meta">
+      <div class="card-head">
+        <div><div class="card-title" id="meta-card-title">Metas — Fevereiro (referência +8%)</div><div class="card-sub" id="meta-card-sub">Parcial acumulado Jan–Mai vs metas definidas</div></div>
+        <span class="badge badge-blue">META</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;font-weight:600">Valores-alvo</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="meta-row"><span class="meta-lbl">Receita</span><span class="meta-target" id="mt-receita">R$ 68,5K</span></div>
+            <div class="meta-row"><span class="meta-lbl">Receita / dia</span><span class="meta-target" id="mt-recdia">R$ 2,74K</span></div>
+            <div class="meta-row"><span class="meta-lbl">Ticket médio</span><span class="meta-target" id="mt-ticket">R$ 110,48</span></div>
+            <div class="meta-row"><span class="meta-lbl">Serviços</span><span class="meta-target" id="mt-vendas">620</span></div>
+            <div class="meta-row"><span class="meta-lbl">Serviços / dia</span><span class="meta-target" id="mt-vendasdia">24,8</span></div>
+            <div class="meta-row"><span class="meta-lbl">Hidratação</span><span class="meta-target" id="mt-hidrat">40</span></div>
+            <div class="meta-row"><span class="meta-lbl">Produtos / loja</span><span class="meta-target" id="mt-produtos">R$ 4,0K</span></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;font-weight:600" id="meta-dias-label">% da meta atingido — parcial Mai</div>
+          <div style="display:flex;flex-direction:column;gap:10px" id="metaBars"></div>
+          <div style="margin-top:14px;padding:10px 12px;background:var(--s2);border:1px solid var(--border);border-radius:8px;font-size:11px;color:var(--muted2);line-height:1.6">
+            <span style="color:var(--txt);font-weight:600">Dias úteis:</span> <span id="meta-dias-uteis">25</span> &nbsp;·&nbsp;
+            <span style="color:var(--amber);font-weight:600">Trabalhados:</span> <span id="meta-dias-trab">16</span> &nbsp;·&nbsp;
+            <span style="color:var(--muted2)">Faltantes:</span> <span id="meta-dias-falt">9</span>
+          </div>
+        </div>
+      </div>
+      <!-- Pace semanal dentro do card de metas -->
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;font-weight:600" id="meta-pace-sem-title">PACE SEMANA — S1</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="metaPaceSemGrid"></div>
+      </div>
+    </div>
+
+    <!-- RITMO DO MÊS -->
+    <div class="card" id="card-ritmo">
+      <div class="card-head">
+        <div>
+          <div class="card-title">Ritmo do mês — Real vs Meta proporcional ao dia</div>
+          <div class="card-sub" id="pace-sub">Comparativo entre o acumulado real e a meta esperada</div>
+        </div>
+        <span class="badge badge-green">PACE</span>
+      </div>
+      <div style="margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:11px;color:var(--muted2)">Progresso do mês</span>
+          <span style="font-size:11px;font-family:var(--mono);color:var(--amber)" id="diasLabel">16 de 25 dias úteis <span style="color:var(--muted)">· 9 faltantes</span></span>
+        </div>
+        <div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;position:relative">
+          <div id="diasBar" style="width:64%;height:100%;background:linear-gradient(90deg,#ffb84d,#ff9020);border-radius:4px;transition:width 1s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted)">
+          <span>Início</span><span id="diasPct">← hoje (64%)</span><span>Fim do mês</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px" id="paceGrid"></div>
+    </div>
+
+  </div>
+
+  <!-- Linha do tempo — Meta atingida por mês -->
+  <div class="card" style="margin-bottom:14px" id="card-timeline-meta">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Histórico de metas — Receita mensal</div>
+        <div class="card-sub">Meses com meta atingida ✓ ou não ✗ — baseado na meta vigente</div>
+      </div>
+      <span class="badge badge-green">HISTÓRICO</span>
+    </div>
+    <div id="timeline-meta" style="display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none"></div>
+    <div style="display:flex;justify-content:flex-end;gap:16px;margin-top:12px;font-size:10px;color:var(--muted)">
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#3dffa0;display:inline-block"></span>Meta atingida</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#ff5f5f;display:inline-block"></span>Abaixo da meta</span>
+      <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:#5a6080;display:inline-block;opacity:.5"></span>Sem dados</span>
+    </div>
+  </div>
+
+  <!-- Adicionais + Produtos lado a lado -->
+  <div class="row2b" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Adicionais</div><div class="card-sub">Hidratação · Táxi Dog · Escovação Dental — mês a mês</div></div>
+        <span class="badge badge-blue">VOLUME</span>
+      </div>
+      <div class="chart-h180"><canvas id="servicosEvolChart"></canvas></div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:12px;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px">
+        <table style="min-width:520px;width:100%">
+          <thead><tr><th>Indicador</th><th>dez/25</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th></tr></thead>
+          <tbody id="tbl-adicionais"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Produtos / loja</div><div class="card-sub">Evolução mensal — R$</div></div>
+        <span class="badge badge-green">R$</span>
+      </div>
+      <div class="chart-h180"><canvas id="produtosChart"></canvas></div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:12px;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px">
+        <table style="min-width:520px;width:100%">
+          <thead><tr><th>Indicador</th><th>dez/25</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th></tr></thead>
+          <tbody id="tbl-produtos"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Planos mensais largura total -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+        <div><div class="card-title">Planos mensais</div><div class="card-sub">Quantidade de planos ativos por mês</div></div>
+        <span class="badge badge-blue">PLANOS</span>
+      </div>
+      <div class="planos-bars" id="planosBars" style="margin-top:8px"></div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;text-align:center">
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Maior mês</div>
+            <div id="planos-maior-qtd" style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--green)">—</div>
+            <div id="planos-maior-sub" style="font-size:9px;color:var(--muted2);margin-top:2px;white-space:nowrap">—</div>
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Receita mês vigente</div>
+            <div id="planos-rec-vigente" style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--green)">—</div>
+            <div id="planos-rec-vigente-sub" style="font-size:9px;color:var(--muted2);margin-top:2px;white-space:nowrap">—</div>
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Ticket plano mês vigente</div>
+            <div id="planos-ticket" style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--blue)">—</div>
+            <div id="planos-ticket-sub" style="font-size:9px;color:var(--muted2);margin-top:2px;white-space:nowrap">—</div>
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">Crescimento</div>
+            <div id="planos-cresc" style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--amber)">—</div>
+            <div id="planos-cresc-sub" style="font-size:9px;color:var(--muted2);margin-top:2px;white-space:nowrap">—</div>
+          </div>
+        </div>
+      </div>
+  </div>
+
+  <!-- Ticket + Serviços/dia -->
+  <div class="row2b" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Ticket médio</div><div class="card-sub">R$ por atendimento</div></div></div>
+      <div class="chart-h140"><canvas id="ticketChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div><div class="card-title">Serviços / dia</div><div class="card-sub">Média diária por mês</div></div></div>
+      <div class="chart-h140"><canvas id="vendasDiaChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Detalhamento mensal + Alerta Receita vs Custo -->
+  <div class="row2b" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Detalhamento mensal</div><div class="card-sub">Todos os indicadores de operação</div></div>
+      </div>
+      <div class="tbl-mobile" id="tbl-mobile-body"></div>
+      <div class="tbl-desktop tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+        <table style="min-width:600px;width:100%">
+          <thead><tr><th>Mês</th><th>Receita</th><th>Custo</th><th>Margem</th><th>Serviços</th><th>Ticket</th><th>Hidr.</th></tr></thead>
+          <tbody id="tbl-desktop-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Alerta: Receita vs Custo</div><div class="card-sub">Meses com margem negativa precisam de atenção</div></div>
+      </div>
+      <div class="custo-row" id="alertBody"></div>
+    </div>
+  </div>
+
+  <!-- Receita vs Custo (largura total) -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div><div class="card-title">Receita vs Custo</div><div class="card-sub">Margem por mês</div></div>
+      <span class="badge badge-amber">JAN–MAI</span>
+    </div>
+    <div class="chart-h220"><canvas id="custoChart"></canvas></div>
+  </div>
+
+  <!-- Receita mensal (largura total, por último) -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div><div class="card-title">Receita mensal</div><div class="card-sub">Evolução Jan–Mai 2026 + referência dez/25</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span id="badge-parcial" style="display:none;font-size:10px;padding:3px 8px;border-radius:4px;font-weight:600;letter-spacing:.3px;font-family:var(--mono);background:#2a1e08;color:#ffb84d;border:1px solid #ffb84d40">● MÊS EM ANDAMENTO</span>
+        <span class="badge badge-green">REAL</span>
+      </div>
+    </div>
+    <div class="chart-h220"><canvas id="receitaChart"></canvas></div>
+  </div>
+
+</div>
+
+<!-- ===== ABA MARKETING ===== -->
+<div id="tab-marketing" class="tab-content">
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi" style="--acc:var(--amber)">
+      <div class="kpi-label">Investimento mês</div>
+      <div class="kpi-val" id="mkt-invest">—</div>
+      <div class="kpi-footer" id="mkt-invest-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--green)">
+      <div class="kpi-label">Faturamento Ads</div>
+      <div class="kpi-val" id="mkt-fat">—</div>
+      <div class="kpi-footer" id="mkt-fat-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--blue)">
+      <div class="kpi-label">ROAS atual vs anterior</div>
+      <div class="kpi-val" id="mkt-roas">—</div>
+      <div class="kpi-footer" id="mkt-roas-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--pink)">
+      <div class="kpi-label">CAC atual · meta &lt;R$55</div>
+      <div class="kpi-val" id="mkt-cac">—</div>
+      <div class="kpi-footer" id="mkt-cac-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#a78bfa">
+      <div class="kpi-label">Clientes captados · meta 35</div>
+      <div class="kpi-val" id="mkt-cli">—</div>
+      <div class="kpi-footer" id="mkt-cli-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent" style="background:#a78bfa"></div>
+    </div>
+  </div>
+
+  <!-- Badge de decisão -->
+  <div id="mkt-badge-wrap" style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div id="mkt-badge" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:700;font-family:var(--mono)">—</div>
+      <div id="mkt-badge-desc" style="font-size:12px;color:var(--muted2)">carregando...</div>
+    </div>
+    <div id="mkt-ads-status" style="display:none;font-size:11px;font-family:var(--mono);padding:5px 12px;border-radius:6px;background:rgba(255,184,77,.1);border:1px solid rgba(255,184,77,.3);color:#ffb84d"></div>
+  </div>
+
+  <!-- Gráfico 1: ROAS + CAC -->
+  <div class="row2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">ROAS + CAC por mês</div><div class="card-sub">Retorno e custo de aquisição — eixos independentes</div></div>
+        <span class="badge badge-amber">GOOGLE ADS</span>
+      </div>
+      <div class="chart-h220"><canvas id="roasCacChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Clientes captados × Investimento</div><div class="card-sub">Volume vs gasto por mês</div></div>
+      </div>
+      <div class="chart-h220"><canvas id="cliInvestChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Tabela enxugada -->
+  <div class="card">
+    <div class="card-head">
+      <div><div class="card-title">Histórico Google Ads</div><div class="card-sub">Mês · Campanha · Investimento · Clientes · CAC · ROAS</div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Mês</th><th>Campanha</th><th>Investimento</th><th>Clientes</th><th>CAC</th><th>ROAS</th><th>Status</th></tr></thead>
+        <tbody id="mkt-tabela-body">
+          <tr><td class="td-month">Jan</td><td class="td-num">GMB</td><td class="td-amber">R$ 900,00</td><td class="td-num">25</td><td class="td-green">R$ 36,00</td><td class="td-green">3.94x</td><td>🟢 Escalar</td></tr>
+          <tr><td class="td-month">Fev</td><td class="td-num">GMB+Clínica</td><td class="td-amber">R$ 1,0K</td><td class="td-num">23</td><td class="td-green">R$ 43,48</td><td class="td-green">3.43x</td><td>🟢 Escalar</td></tr>
+          <tr><td class="td-month">Mar</td><td class="td-num">GMB</td><td class="td-amber">R$ 1,2K</td><td class="td-num">15</td><td class="td-red">R$ 80,00</td><td class="td-amber">2.02x</td><td>🔴 Revisar</td></tr>
+          <tr><td class="td-month">Abr</td><td class="td-num">GMB+Search</td><td class="td-amber">R$ 2,0K</td><td class="td-num">31</td><td class="td-red">R$ 64,52</td><td class="td-amber">2.87x</td><td>🟡 Manter</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== ABA SEMANAL ===== -->
+<div id="tab-semanal" class="tab-content">
+
+  <!-- 5 KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi" style="--acc:var(--green)">
+      <div class="kpi-label">Faturamento mês</div>
+      <div class="kpi-val" id="sem-fat">—</div>
+      <div class="kpi-footer" id="sem-fat-sub">—</div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--blue)">
+      <div class="kpi-label">Serviços</div>
+      <div class="kpi-val" id="sem-srv">—</div>
+      <div class="kpi-footer" id="sem-srv-sub">—</div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--pink)">
+      <div class="kpi-label">Ticket médio</div>
+      <div class="kpi-val" id="sem-ticket">—</div>
+      <div class="kpi-footer" id="sem-ticket-sub">—</div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--amber)">
+      <div class="kpi-label">Semana vs anterior</div>
+      <div class="kpi-val" id="sem-vsant">—</div>
+      <div class="kpi-footer" id="sem-vsant-sub">—</div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#a78bfa">
+      <div class="kpi-label">Ritmo do mês</div>
+      <div class="kpi-val" id="sem-ritmo">—</div>
+      <div class="kpi-footer" id="sem-ritmo-sub">—</div>
+      <div class="kpi-accent" style="background:#a78bfa"></div>
+    </div>
+  </div>
+
+  <!-- Badge semana atual -->
+  <div style="margin-bottom:14px">
+    <div id="sem-status" style="display:none;font-size:11px;font-family:var(--mono);padding:5px 12px;border-radius:6px;background:rgba(255,184,77,.1);border:1px solid rgba(255,184,77,.3);color:#ffb84d"></div>
+  </div>
+
+  <!-- Pace Semanal -->
+  <div class="card" style="margin-bottom:14px" id="card-pace-semanal">
+    <div class="card-head">
+      <div>
+        <div class="card-title" id="sem-pace-title">Pace semanal — S1 de Jun</div>
+        <div class="card-sub" id="sem-pace-sub">Semana atual vs meta proporcional · comparativo histórico</div>
+      </div>
+      <span class="badge badge-green">PACE</span>
+    </div>
+    <!-- 3 cards de pace -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px" id="semPaceGrid"></div>
+    <!-- Contexto histórico -->
+    <div style="padding:12px;background:var(--s2);border:1px solid var(--border);border-radius:8px">
+      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;font-weight:600">Comparativo histórico — mesma semana</div>
+      <div style="display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch" id="semHistGrid"></div>
+    </div>
+  </div>
+
+  <!-- Gráfico principal: Faturamento semanal por mês -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Faturamento semanal</div>
+        <div class="card-sub">Cada linha = um mês — identifique semanas historicamente fortes</div>
+      </div>
+      <span class="badge badge-green">SEMANAL</span>
+    </div>
+    <div class="chart-h220"><canvas id="semanalChart"></canvas></div>
+  </div>
+
+  <!-- Gráficos 2 e 3 -->
+  <div class="row2b">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Serviços por semana</div><div class="card-sub">Volume de atendimentos</div></div>
+      </div>
+      <div class="chart-h180"><canvas id="servicosChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Ticket médio por semana</div><div class="card-sub">R$ médio por atendimento</div></div>
+      </div>
+      <div class="chart-h180"><canvas id="ticketSemChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Tabela -->
+  <div class="card">
+    <div class="card-head">
+      <div><div class="card-title">Detalhamento semanal</div><div class="card-sub">Faturamento por semana × mês</div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Semana</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th></tr></thead>
+        <tbody id="tbl-semanal-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+const BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSGb4fpK871TkpyPynaHKan90Ls_TWX8eMXiyY4cKTGGtyuFAxQHLK7ZKGQdtIDGal3cFs27ztQNZ8h/pub';
+const SHEET_TABELA  = BASE + '?gid=0&single=true&output=csv';
+const SHEET_PLANOS  = BASE + '?gid=2146534632&single=true&output=csv';
+const SHEET_ADS     = BASE + '?gid=136933923&single=true&output=csv';
+const SHEET_SEMANAL = BASE + '?gid=622872267&single=true&output=csv';
+
+// Fallback com dados estáticos (usado se o fetch falhar)
+const defaults = {
+  receita:   [52061.79, 48471.60, 53914.98, 55588.16, 63526.50, 68070.00, 3452.70, null, null, null, null, null, null],
+  custo:     [null, 50110, 52500, 57200, 58000, 62350, 65500, null, null, null, null, null, null],
+  ticket:    [99.35, 100.98, 109.58, 109.00, 110.29, 110.50, 25.77, null, null, null, null, null, null],
+  vendas:    [524, 480, 492, 510, 576, 616, 134, null, null, null, null, null, null],
+  vendasDia: [20, 18, 23, 20, 24, 25, 5, null, null, null, null, null, null],
+  hidrat:    [28, 30, 39, 27, 31, 69, 2, null, null, null, null, null, null],
+  produtos:  [2572.46, 1486.32, 3174.90, 3723.26, 2870.13, 7426.52, 696.89, null, null, null, null, null, null],
+  taxiDog:   [51, 56, 50, 65, 67, 57, 6, null, null, null, null, null, null],
+  escovacao: [121, 184, 170, 163, 223, 231, 4, null, null, null, null, null, null],
+  metaProdutos: 8000, metaReceita: 73515, metaRecDia: 2940.60, metaTicket: 111.39,
+  metaVendas: 660, metaVendasDia: 26, metaHidrat: 70,
+  metaOk: [null,'não','sim','não','sim','sim',null,null,null,null,null,null,null],
+  dataAtualizacao: '02/06/2026',
+  planos:    {meses:['dez/25','jan','fev','mar','abr','mai'],qtd:[26,36,30,38,49,50],rec:[8748.30,12412.00,10679.40,12604.60,16764.69,16925.40]},
+  ads:{meses:['Jan','Fev','Mar','Abr'],invest:[900,1000,1200,2000],fat:[3543.9,3427.74,2421,5748],cac:[36,43.48,80,64.52],roas:[3.94,3.43,2.02,2.87],clientes:[25,23,15,31]},
+  semanal:{
+    fat:[
+      [5617.75,  11269.36, 10771.23, 11507.06, 9214.48],  // jan
+      [14091.92, 14506.62, 10454.66, 14864.48, 0],         // fev
+      [13060.44, 13802.95, 12636.76, 11656.31, 4928.12],   // mar
+      [9062.29,  15907.14, 12454.14, 16807.78, 0],         // abr
+      [3941.45,  20115.76, 13229.50, 13766.15, 0],         // mai
+      [3452.70,  0, 0, 0, 0],                               // jun — S1 parcial
+    ],
+    srv:[
+      [41,  105, 106, 120, 108],
+      [118, 127, 107, 140, 0],
+      [116, 119, 115, 119, 40],
+      [81,  147, 126, 125, 0],
+      [42,  149, 137, 133, 0],
+      [134, 0,   0,   0,   0],  // jun
+    ],
+    tick:[
+      [137.02, 107.33, 101.62, 95.89,  85.32],
+      [119.42, 114.23, 115.99, 106.17, 0],
+      [112.59, 97.71,  109.88, 97.95,  123.20],
+      [111.88, 108.21, 98.84,  134.46, 0],
+      [93.84,  135.01, 96.57,  103.50, 0],
+      [25.77,  0,      0,      0,      0],  // jun
+    ]
+  },
+  pace:{diasUteis:25,diasTrabalhados:1,diasFaltantes:24,items:[
+    {lbl:'Receita×Dias',  meta:2940.60, real:0,      pct:0,      fmt:v=>fmtR(v)},
+    {lbl:'Receita/dia',   meta:2940.60, real:0,      pct:0,      fmt:v=>fmtR(v)},
+    {lbl:'Ticket médio',  meta:111.39,  real:0,      pct:0,      fmt:v=>fmtR(v)},
+    {lbl:'Serviços×Dias', meta:26,      real:0,      pct:0,      fmt:v=>fmtN(v)},
+    {lbl:'Serviços/dia',  meta:26,      real:0,      pct:0,      fmt:v=>fmtN(v)},
+  ]},
+  metaPct:[0, 0, 0, 0, 0, 0, 0]
+};
+
+// ── utilidades ──────────────────────────────────────────
+function parseBR(s){
+  if(!s) return null;
+  // Remove R$, espaços, pontos de milhar e converte vírgula decimal em ponto
+  const n = parseFloat(String(s).replace(/R\$\s*/,'').replace(/\./g,'').replace(',','.').trim());
+  return isNaN(n) ? null : n;
+}
+function parseCSV(txt){
+  const _lines = txt.trim().split('\n');
+  const sep = (_lines[0].split(';').length > _lines[0].split(',').length) ? ';' : ',';
+  return _lines.map(l=>l.split(sep).map(c=>c.replace(/^"|"$/g,'').trim()));
+}
+
+// Parser CSV que respeita vírgulas dentro de aspas
+function splitLine(line){
+  const result = [];
+  let cur = '', inQ = false;
+  for(let i=0; i<line.length; i++){
+    const c = line[i];
+    if(c==='"'){ inQ=!inQ; continue; }
+    if(c===',' && !inQ){ result.push(cur.trim()); cur=''; continue; }
+    cur += c;
+  }
+  result.push(cur.trim());
+  return result;
+}
+
+// Formata moeda: sempre arredonda para cima, usa K para milhares
+function fmtR(v){
+  if(v === null || v === undefined || isNaN(v)) return '—';
+  const neg = v < 0;
+  const abs = Math.abs(v);
+  const prefix = neg ? '-' : '';
+  if(abs >= 1000){
+    const k = abs / 1000;
+    const kstr = k % 1 === 0 ? k.toFixed(0) : k.toFixed(1).replace('.',',');
+    return prefix + 'R$ ' + kstr + 'K';
+  }
+  return prefix + 'R$ ' + abs.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+// Formata número absoluto: sempre arredonda para cima, sem casas decimais
+function fmtN(v){ return Math.ceil(v).toLocaleString('pt-BR'); }
+
+const MESES  = ['dez/25','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const MESES5 = MESES.slice(1);
+
+// ── parsers por aba ──────────────────────────────────────
+function parseTabela(csv){
+  const mesesKey = ['dez/25','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  const lines = csv.trim().split('\n');
+
+  // Para cada linha, encontra o índice do mês e mapeia as colunas relativas
+  // Só considera linhas onde col+1 = receita mensal (>1000), ignorando segunda tabela
+  function findMesRows(lines, keys){
+    const result = {};
+    lines.forEach(line=>{
+      const cols = splitLine(line);
+      const mesIdx = cols.findIndex(c=>keys.includes(c.toLowerCase()));
+      if(mesIdx === -1) return;
+      const mes = cols[mesIdx].toLowerCase();
+      // Tabela principal: col mesIdx+2 = receita/dia (ex: R$138,11 ou R$2.002,38)
+      // Tabela CUSTO X RECEITA: col mesIdx+2 = custo (ex: R$65.500,00 >> receita/dia)
+      // Distinção: tabela principal tem col mesIdx+5 (ticket médio) com valor
+      // OU tem col mesIdx+6 (total vendas) com valor numérico inteiro
+      const v5 = parseBR(cols[mesIdx+5]); // ticket médio (tab principal) ou vazio (tab custo)
+      const v6 = parseBR(cols[mesIdx+6]); // total vendas (tab principal) ou vazio (tab custo)
+      const v1 = parseBR(cols[mesIdx+1]); // receita
+      // Tabela principal tem ticket OU vendas; tabela custo não tem nenhum desses
+      const isTabPrincipal = (v5 && v5 > 0) || (v6 && v6 > 0) || (v1 && v1 > 10000);
+      if(!isTabPrincipal) return;
+      if(result[mes]) return;
+      result[mes] = {cols, mesIdx, metaOk: (cols[0]||'').toLowerCase().trim()};
+    });
+    return result;
+  }
+
+  const byMes = findMesRows(lines, mesesKey);
+  // Log das linhas brutas com "jun" para diagnóstico
+  const junLines = lines.filter(l => l.toLowerCase().includes('jun'));
+  console.log('DEBUG linhas com jun:', junLines.length);
+  junLines.forEach((l,i) => console.log(`  jun[${i}] cols:`, splitLine(l).slice(0,12)));
+  console.log('DEBUG byMes keys:', Object.keys(byMes));
+  console.log('DEBUG receita raw:', mesesKey.map(m=>{ const r=byMes[m]; return m+':'+(r?parseBR(r.cols[r.mesIdx+1]):'null'); }));
+
+  // Primeira tabela (cols relativas ao mês): RECEITA, RECEITA/DIA, col4, TICKET, VENDAS, VENDAS/DIA, HIDRAT, LOJA
+  // Na planilha: B=mês, C=receita, D=rec/dia, E=vazio, F=ticket, G=vendas, H=vendas/dia, I=hidrat, J=loja
+  // offset do mês: mesIdx+0=mês, +1=receita, +2=rec/dia, +3=vazio, +4=ticket, +5=vendas, +6=vendas/dia, +7=hidrat
+  const receita   = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+1]):null; });
+  const ticket    = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+4]):null; });
+  const vendas    = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+5]):null; });
+  const vendasDia = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+6]):null; });
+  const hidrat    = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+7]):null; });
+  const produtos  = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+8]):null; });
+  const taxiDog   = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+9]):null; });
+  const escovacao = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+10]):null; });
+  // col A (índice 0): "sim" = bateu a meta, "não" = não bateu, "" = sem dados
+  const metaOk    = mesesKey.map(m=>{ const r=byMes[m]; return r ? r.metaOk : null; }); // 'sim'|'não'|''|null
+
+  // Metas mensais — quadro de metas col N (índice 13) e O (índice 14) no CSV
+  // Planilha: N=label (RECEITA, RECEITA/DIA, TICKET MÉDIO, VENDAS, VENDAS/DIA, HIDRATAÇÃO, LOJA), O=valor
+  let metaReceita   = 68500;
+  let metaRecDia    = 2740;
+  let metaTicket    = 110.48;
+  let metaVendas    = 620;
+  let metaVendasDia = 24.8;
+  let metaHidrat    = 40;
+  let metaProdutos  = 4000;
+
+  let emQuadroMeta = false;
+  let metasLidas = 0;
+  const TOTAL_METAS = 7;
+  lines.forEach(line=>{
+    if(metasLidas >= TOTAL_METAS) return;
+    const cols = splitLine(line);
+    const lbl = (cols[13]||'').toLowerCase().trim();
+    const val = parseBR(cols[14]);
+
+    // Detecta início do quadro META: label RECEITA com valor >= 10000
+    if(lbl === 'receita' && val && val >= 10000){ emQuadroMeta = true; }
+
+    // Para se entrar na seção "% DA META" (val < 100 sendo % pequeno)
+    if(emQuadroMeta && lbl === 'receita' && val && val < 100){ emQuadroMeta = false; return; }
+
+    if(!emQuadroMeta) return;
+    if(!val || val <= 0) return;
+
+    if(lbl === 'receita'    && val >= 10000)                   { metaReceita   = val; metasLidas++; }
+    else if(lbl.startsWith('receita') && lbl.includes('dia'))  { metaRecDia    = val; metasLidas++; }
+    else if(lbl.includes('ticket'))                            { metaTicket    = val; metasLidas++; }
+    else if(lbl === 'vendas' && val >= 100)                    { metaVendas    = val; metasLidas++; }
+    else if(lbl.includes('vendas') && lbl.includes('dia'))     { metaVendasDia = val; metasLidas++; }
+    else if(lbl.includes('hidrat'))                            { metaHidrat    = val; metasLidas++; }
+    else if(lbl === 'loja'  && val >= 100)                     { metaProdutos  = val; metasLidas++; }
+  });
+  console.log('DEBUG metas lidas:', {metaReceita,metaRecDia,metaTicket,metaVendas,metaVendasDia,metaHidrat,metaProdutos});
+
+  // Segunda tabela CUSTO X RECEITA: col B=mês, col C=receita, col D=custo
+  // No CSV: col0=vazio, col1=mês, col2=receita, col3=custo
+  const custoMap = {};
+  lines.forEach(line=>{
+    const cols = splitLine(line);
+    const mesIdx = cols.findIndex(c=>mesesKey.slice(1).includes((c||'').toLowerCase().trim()));
+    if(mesIdx === -1) return;
+    const mes   = cols[mesIdx].toLowerCase().trim();
+    const custo = parseBR(cols[mesIdx+2]); // col D = mesIdx+2
+    if(custo && custo > 1000) custoMap[mes] = custo; // ignora valores pequenos/zerados
+  });
+  const custo = [null, ...mesesKey.slice(1).map(m=>custoMap[m]||null)];
+
+  // Pace — identifica linhas 19 (meta pro rata) e 20 (real acumulado) e 21 (%)
+  // Linha meta: mês=jan, col+4 e col+5 são valores absolutos grandes (>1000)
+  // Linha real: mês=fev, mesmos offsets
+  // Linha %: mês=mar, col+4 são valores entre 1.0 e 1.5
+
+  let lineMeta=null, lineReal=null;
+  lines.forEach(line=>{
+    const cols = splitLine(line);
+    const mesIdx = cols.findIndex(c=>['jan','fev','mar'].includes(c.toLowerCase()));
+    if(mesIdx === -1) return;
+    const mes = cols[mesIdx].toLowerCase();
+    const v4 = parseBR(cols[mesIdx+4]); const v5 = parseBR(cols[mesIdx+5]);
+    if(v4 && v4 > 1000 && v5 && v5 > 1000){
+      if(mes === 'jan') lineMeta = {cols, mi: mesIdx};
+      if(mes === 'fev') lineReal = {cols, mi: mesIdx};
+    }
+  });
+
+  const gp = (obj, off) => obj ? parseBR(obj.cols[obj.mi + off]) : null;
+
+  // Dias úteis/trabalhados/faltantes — col L (label) e M (valor), linhas 19-21
+  const findDias = (keyword) => {
+    for(const line of lines){
+      const cols = splitLine(line);
+      // Coluna N = índice 14, coluna O = índice 15 (col A vazia no CSV)
+      const labelN = (cols[14]||'').toLowerCase();
+      if(labelN.includes(keyword)){
+        const v = parseInt(cols[15]);
+        if(!isNaN(v)) return v;
+      }
+      // Fallback: busca em qualquer coluna
+      const idx = cols.findIndex(c=>(c||'').toLowerCase().includes(keyword));
+      if(idx >= 0){
+        const v = parseInt(cols[idx+1]);
+        if(!isNaN(v)) return v;
+      }
+    }
+    return null;
+  };
+  const diasUteis       = findDias('úteis')       ?? 25;
+  const diasTrabalhados = findDias('trabalhados')  ?? 25;
+  const diasFaltantes   = findDias('faltantes')    ?? 0;
+
+  // % da meta agora calculado via JS abaixo (após extrair metas e reais)
+
+  // Data de última atualização manual — col L (label) e M (valor) linha 24
+  let dataAtualizacao = null;
+  lines.forEach(line=>{
+    const cols = splitLine(line);
+    // Procura linha com label "ultima" ou "atualiz" em qualquer coluna
+    const hasLabel = cols.some(c=>c.toLowerCase().includes('ultima') || c.toLowerCase().includes('atualiz'));
+    if(hasLabel){
+      // Pega a próxima célula não vazia após o label
+      const idx = cols.findIndex(c=>c.toLowerCase().includes('ultima') || c.toLowerCase().includes('atualiz'));
+      for(let i=idx+1;i<cols.length;i++){
+        if(cols[i] && cols[i].trim()){
+          dataAtualizacao = cols[i].trim();
+          break;
+        }
+      }
+    }
+  });
+  const paceItems = lineMeta && lineReal ? [
+    {lbl:'Receita×Dias',meta:gp(lineMeta,4), real:gp(lineReal,4), fmt:v=>fmtR(v)},
+    {lbl:'Receita/dia', meta:gp(lineMeta,5), real:gp(lineReal,5), fmt:v=>fmtR(v)},
+    {lbl:'Ticket médio',meta:gp(lineMeta,6), real:gp(lineReal,6), fmt:v=>fmtR(v)},
+    {lbl:'Serviços×Dias', meta:gp(lineMeta,7), real:gp(lineReal,7), fmt:v=>fmtN(v)},
+    {lbl:'Serviços/dia',  meta:gp(lineMeta,8), real:gp(lineReal,8), fmt:v=>fmtN(v)},
+  ].map(p=>({...p,pct:p.meta&&p.real?p.real/p.meta:1})) : defaults.pace.items;
+
+  return {receita,ticket,vendas,vendasDia,hidrat,produtos,taxiDog,escovacao,
+    metaProdutos,metaReceita,metaRecDia,metaTicket,metaVendas,metaVendasDia,metaHidrat,
+    metaOk,
+    custo,dataAtualizacao,
+    pace:{diasUteis,diasTrabalhados,diasFaltantes,items:paceItems},
+    metaPct: defaults.metaPct, // calculado depois em renderAll com idxMesAtual correto
+    planos:defaults.planos, ads:defaults.ads, semanal:defaults.semanal};
+}
+
+function parsePlanos(csv, d){
+  // Estrutura: MÊS | RECEITA TOTAL | TICKET MÉDIO | TOTAL DE PLANOS
+  // Colunas P, Q, R, S — no CSV chegam como cols[0..3] ou com colunas vazias antes
+  const mesesKey = ['dez/25','jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  const lines = csv.trim().split('\n');
+  const meses=[], qtd=[], rec=[];
+
+  lines.forEach(line=>{
+    const cols = splitLine(line);
+    // Acha o mês em qualquer posição
+    const mesIdx = cols.findIndex(c=>mesesKey.includes((c||'').toLowerCase().trim()));
+    if(mesIdx === -1) return;
+    const mes = cols[mesIdx].trim();
+    // RECEITA TOTAL = mesIdx+1, TICKET = mesIdx+2, TOTAL DE PLANOS = mesIdx+3
+    const recVal = parseBR(cols[mesIdx+1]);
+    const qtdStr = (cols[mesIdx+3]||'').replace(/[^\d]/g,'');
+    const qtdVal = parseInt(qtdStr);
+    if(recVal && recVal > 0 && qtdVal && !isNaN(qtdVal) && qtdVal > 0){
+      meses.push(mes); rec.push(recVal); qtd.push(qtdVal);
+    }
+  });
+
+  if(!meses.length) return d;
+  return {...d, planos:{meses, qtd, rec}};
+}
+
+function parseSemanal(csv, d){
+  // Estrutura: blocos por semana, 3 linhas cada: serviços / faturamento / ticket médio
+  // Col A=vazio, Col B=label, Col C=Jan, D=Fev, E=Mar, F=Abr, G=Mai, H=Jun...
+  // Índices no CSV: 0=vazio, 1=label, 2=Jan(m=0), 3=Fev(m=1), ..., 7=Jun(m=5)
+  const lines = csv.trim().split('\n');
+  const NUM_MESES = 12;
+  const NUM_SEMS  = 5;
+
+  const fat  = Array.from({length:NUM_MESES}, ()=>Array(NUM_SEMS).fill(0));
+  const srv  = Array.from({length:NUM_MESES}, ()=>Array(NUM_SEMS).fill(0));
+  const tick = Array.from({length:NUM_MESES}, ()=>Array(NUM_SEMS).fill(0));
+
+  let semIdx = -1;
+
+  const diasSem = [5, 5, 5, 5, 5]; // default 5 dias úteis por semana
+  // diasSemPorMes[mes][semana] — cada mês pode ter dias diferentes por semana
+  const diasSemPorMes = Array.from({length:NUM_MESES}, ()=>[5,5,5,5,5]);
+
+  lines.forEach(line=>{
+    const cols = splitLine(line);
+    const label = (cols[1]||'').toLowerCase().trim();
+
+    // Detecta linha de header de semana em qualquer coluna de mês
+    const isHeaderSem = cols.slice(2).some(c=>(c||'').toLowerCase().includes('semana'));
+    if(isHeaderSem){
+      semIdx++;
+      // Para cada mês (col 2 = Jan, col 3 = Fev, ..., col 7 = Jun)
+      for(let m=0; m<NUM_MESES; m++){
+        const cell = (cols[m+2]||'').toLowerCase();
+        const match = cell.match(/\((\d+)\s*dia/);
+        if(match) diasSemPorMes[m][semIdx] = parseInt(match[1]);
+      }
+      // diasSem: usa a linha mais recente para cada semana (sobrescreve)
+      for(let m=0; m<NUM_MESES; m++){
+        if(diasSemPorMes[m][semIdx] !== 5) diasSem[semIdx] = diasSemPorMes[m][semIdx];
+      }
+      return;
+    }
+    if(semIdx < 0 || semIdx >= NUM_SEMS) return;
+
+    if(label.includes('faturamento') || label.includes('receita')){
+      for(let m=0; m<NUM_MESES; m++){
+        const v = parseBR(cols[m+2]);
+        if(v && v > 0) fat[m][semIdx] = v;
+      }
+    } else if(label === 'serviços' || label === 'servicos' || label.includes('servi')){
+      for(let m=0; m<NUM_MESES; m++){
+        const v = parseFloat((cols[m+2]||'').replace(',','.'));
+        if(!isNaN(v) && v > 0) srv[m][semIdx] = v;
+      }
+    } else if(label.includes('ticket')){
+      for(let m=0; m<NUM_MESES; m++){
+        const v = parseBR(cols[m+2]);
+        if(v && v > 0) tick[m][semIdx] = v;
+      }
+    }
+  });
+
+  const totalFat = fat.flat().reduce((a,b)=>a+b,0);
+  if(totalFat === 0) return d;
+  return {...d, semanal:{fat, srv, tick, diasSem, diasSemPorMes}};
+}
+
+function parseAds(csv, d){
+  // Estrutura: col0=campanha, col1=mês, col2=clientes, col3=investimento, col4=CAC, col5=faturamento, col6=ticket, col7=ROAS
+  const mesesKey=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+  const lines = csv.trim().split('\n');
+  const meses=[],invest=[],fat=[],cac=[],roas=[],clientes=[];
+
+  lines.forEach(line=>{
+    const cols = splitLine(line);
+    // mês está sempre na col1 (índice 1)
+    const mes = (cols[1]||'').toLowerCase().trim();
+    if(!mesesKey.includes(mes)) return;
+    const inv = parseBR(cols[3]);
+    if(!inv || inv <= 0) return; // ignora meses sem dados
+    meses.push(mes.charAt(0).toUpperCase()+mes.slice(1));
+    clientes.push(parseBR(cols[2])||0);
+    invest.push(inv);
+    cac.push(parseBR(cols[4])||0);
+    fat.push(parseBR(cols[5])||0);
+    roas.push(parseBR(cols[7])||0);
+  });
+
+  if(!meses.length) return d;
+  return {...d, ads:{meses,invest,fat,cac,roas,clientes}};
+}
+
+// ── charts ──────────────────────────────────────────────
+function chartDefaults(){
+  if(typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
+  Chart.defaults.color='#5a6080';Chart.defaults.borderColor='#242736';
+  Chart.defaults.font.family="'Syne', sans-serif";Chart.defaults.font.size=11;
+  if(Chart.defaults.plugins) Chart.defaults.plugins.datalabels = {display:false};
+}
+const _charts = {};
+function mkLine(id,labels,datasets,opts={}){
+  const ctx=document.getElementById(id)?.getContext('2d');if(!ctx)return;
+  if(_charts[id]) _charts[id].destroy();
+  const tooltipFmt = opts.yTick?.callback ? (v=>opts.yTick.callback(v)) : (v=>v);
+  _charts[id]=new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},tooltip:{callbacks:{label:(ctx)=>{const v=ctx.parsed.y;return v!=null?` ${tooltipFmt(v)}`:null;}}}},scales:{x:{grid:{color:'#1e2130'},ticks:{color:'#5a6080'}},y:{grid:{color:'#1e2130'},ticks:{color:'#5a6080',...(opts.yTick||{})}}}, ...opts.extra}});
+}
+function mkBar(id,labels,datasets,opts={}){
+  const ctx=document.getElementById(id)?.getContext('2d');if(!ctx)return;
+  if(_charts[id]) _charts[id].destroy();
+  const tooltipFmt = opts.yTick?.callback ? (v=>opts.yTick.callback(v)) : (v=>v);
+  _charts[id]=new Chart(ctx,{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},tooltip:{callbacks:{label:(ctx)=>{const v=ctx.parsed.y;return v!=null?` ${tooltipFmt(v)}`:null;}}}},scales:{x:{grid:{color:'#1e2130'},ticks:{color:'#5a6080'}},y:{grid:{color:'#1e2130'},ticks:{color:'#5a6080',...(opts.yTick||{})}}}, ...opts.extra}});
+}
+
+// ── render ───────────────────────────────────────────────
+function updateDataBanner(d){
+  const MESES_KEY = ['dez/25','jan','fev','mar','abr','mai'];
+  let ultimoMes = null;
+  d.receita.forEach((v,i)=>{ if(v>0) ultimoMes = MESES_KEY[i]; });
+
+  const dot = document.getElementById('data-banner-dot');
+  const txt = document.getElementById('data-banner-txt');
+  if(!dot || !txt || !ultimoMes) return;
+
+  const {diasTrabalhados, diasUteis} = d.pace;
+  const ehParcial = diasTrabalhados < diasUteis;
+  const mesesPT = {'dez/25':'dez/25','jan':'Jan','fev':'Fev','mar':'Mar','abr':'Abr','mai':'Mai'};
+  const nome = mesesPT[ultimoMes] || ultimoMes;
+
+  let msg, cor;
+  if(ehParcial){
+    msg = `Dados até ${diasTrabalhados}º/${diasUteis} dias de ${nome}`;
+    cor = '#ffb84d';
+  } else {
+    msg = `Dados até ${nome} — mês completo`;
+    cor = '#3dffa0';
+  }
+
+  dot.style.background = cor;
+  dot.style.boxShadow  = `0 0 5px ${cor}80`;
+  txt.textContent      = msg;
+  txt.style.color      = cor;
+
+  // No mobile o pill fica escondido — atualiza o dot do botão Atualizar
+  let styleEl = document.getElementById('dot-style');
+  if(!styleEl){ styleEl = document.createElement('style'); styleEl.id='dot-style'; document.head.appendChild(styleEl); }
+  styleEl.textContent = `@media(max-width:480px){ #sync-btn::after { background: ${cor} !important; box-shadow: 0 0 4px ${cor}80; } }`;
+}
+function paceColor(p){return p>=1?'#3dffa0':'#ff5f5f';}
+function paceBg(p){return p>=1?'rgba(61,255,160,.08)':'rgba(255,95,95,.08)';}
+function metaColor(p){return p>=80?'#3dffa0':p>=60?'#ffb84d':'#ff5f5f';}
+
+function renderKPIs(d){
+  const items = d.pace.items;
+  const ids = ['kp-receita','kp-recdia','kp-ticket','kp-vendas','kp-venddia'];
+  items.forEach((p,i)=>{
+    const pct  = (p.pct*100).toFixed(1);
+    const col  = paceColor(p.pct);
+    const seta = p.pct >= 1 ? '↑' : '↓';
+    const elVal   = document.getElementById(ids[i]+'-val');
+    const elDelta = document.getElementById(ids[i]+'-delta');
+    if(elVal)   elVal.textContent = p.fmt(p.real);
+    if(elDelta) elDelta.innerHTML =
+      `<span style="color:${col};font-weight:600;font-size:12px">${seta} ${pct}%</span>`+
+      `<span style="color:var(--muted);font-size:11px"> · </span>`+
+      `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${p.fmt(p.meta)}</span>`;
+    const kpi = elVal?.closest('.kpi');
+    if(kpi){
+      kpi.style.setProperty('--acc', col);
+      const acc = kpi.querySelector('.kpi-accent');
+      if(acc) acc.style.background = col;
+    }
+  });
+
+  // ── Capacidade operacional — renderizada em renderAll com idxMesAtual ──
+}
+
+function renderCapacidade(d, idxMesAtual){
+  const CAP_MAX = 850;
+  const META_SRV = d.metaVendas || 620;
+  const vendasAtual = d.vendas[idxMesAtual] || 0;
+  const capPct = Math.round(vendasAtual / CAP_MAX * 100);
+  const capLivre = CAP_MAX - vendasAtual;
+  const capCol = capPct >= 90 ? '#ff5f5f' : capPct >= 70 ? '#ffb84d' : '#3dffa0';
+  const capLabel = capPct >= 90 ? 'Saturação — atenção máxima' : capPct >= 70 ? 'Atenção — próximo do limite' : 'Saudável';
+  const metaSrvPct = Math.round(META_SRV / CAP_MAX * 100);
+
+  document.getElementById('cap-atual').textContent = fmtN(vendasAtual);
+  document.getElementById('cap-pct').textContent = capPct + '%';
+  document.getElementById('cap-pct').style.color = capCol;
+  document.getElementById('cap-livre').textContent = fmtN(capLivre) + ' serviços disponíveis';
+  document.getElementById('cap-bar').style.width = Math.min(capPct,100) + '%';
+  document.getElementById('cap-bar').style.background = capCol;
+  document.getElementById('cap-footer').innerHTML =
+    `<span style="color:${capCol};font-weight:600">${capLabel}</span>`+
+    `<span style="color:var(--muted)"> · máx. ${CAP_MAX} serviços</span>`;
+
+  // Marcador de meta
+  const marker = document.getElementById('cap-meta-marker');
+  if(marker) marker.style.left = metaSrvPct + '%';
+  const lblAtual = document.getElementById('cap-bar-atual');
+  if(lblAtual){ lblAtual.textContent = fmtN(vendasAtual); lblAtual.style.color = capCol; }
+  const lblMeta = document.getElementById('cap-bar-meta');
+  if(lblMeta) lblMeta.textContent = fmtN(META_SRV) + ' meta';
+
+  // Atualiza cor do accent
+  const capCard = document.getElementById('cap-atual')?.closest('.kpi');
+  if(capCard) capCard.style.setProperty('--acc', capCol);
+  document.getElementById('cap-bar').style.boxShadow = `0 0 8px ${capCol}40`;
+
+  // ── Projeção de fechamento — calculada em renderAll com idxMesAtual ──
+  // (preenchida via renderProjecao chamado do renderAll)
+}
+
+function renderProjecao(d, idxMesAtual){
+  const {diasTrabalhados, diasUteis, diasFaltantes} = d.pace;
+  const receitaAtual = d.receita[idxMesAtual] || 0;
+  console.log('DEBUG renderProjecao — idxMesAtual:', idxMesAtual, 'receitaAtual:', receitaAtual, 'receita array:', d.receita);
+  const ritmoDia = diasTrabalhados > 0 ? receitaAtual / diasTrabalhados : 0;
+  const projecao = receitaAtual + (ritmoDia * diasFaltantes);
+  const META_MENSAL = d.metaReceita || 68500;
+  const projPct = (projecao / META_MENSAL * 100).toFixed(1);
+  const projAcima = projecao >= META_MENSAL;
+  const projCol = projAcima ? '#3dffa0' : '#ff5f5f';
+
+  document.getElementById('proj-receita').textContent = fmtR(projecao);
+  document.getElementById('proj-receita').style.color = projCol;
+  document.getElementById('proj-pct').textContent = projPct + '%';
+  document.getElementById('proj-pct').style.color = projCol;
+  document.getElementById('proj-accent').style.background = projCol;
+  document.getElementById('proj-status').innerHTML =
+    `<span style="color:${projCol};font-weight:600">${projAcima ? '↑ acima da meta' : '↓ abaixo da meta'}</span>`;
+  document.getElementById('proj-ritmo').textContent = fmtR(ritmoDia) + '/dia';
+  document.getElementById('proj-dias').textContent = diasFaltantes + ' dias';
+}
+
+function renderAll(d){
+  chartDefaults();
+  renderKPIs(d);
+
+  // ── Mês parcial — lógica central ────────────────────────
+  const idxUltimoComDados = d.receita.reduce((last,v,i)=>v>0?i:last, -1);
+  const {diasTrabalhados, diasFaltantes, diasUteis} = d.pace;
+  const mesFechado = diasFaltantes === 0 || diasTrabalhados >= diasUteis;
+
+  // Usa a data de atualização da planilha para determinar o mês atual
+  // dataAtualizacao formato: "01/06/2026" → mês=6 → índice=6 (dez/25=0,jan=1,...,jun=6)
+  let idxMesAtual = idxUltimoComDados;
+  if(d.dataAtualizacao && !mesFechado){
+    const partes = d.dataAtualizacao.split('/');
+    if(partes.length >= 2){
+      const mesData = parseInt(partes[1]); // 1=jan ... 12=dez
+      const idxData = mesData; // dez/25=0, jan=1, fev=2, ..., jun=6
+      if(idxData > 0 && idxData <= 12) idxMesAtual = idxData;
+    }
+  }
+  console.log('DEBUG idxMesAtual por data:', idxMesAtual, 'dataAtualizacao:', d.dataAtualizacao);
+
+  const idxParcial = mesFechado ? -1 : idxMesAtual;
+
+  // ── % da meta — usando idxMesAtual (mês em andamento, mesmo que seja 0) ──
+  const _recM   = d.receita[idxMesAtual]   || 0;
+  const _srvM   = d.vendas[idxMesAtual]    || 0;
+  const _tickM  = d.ticket[idxMesAtual]    || 0;
+  const _srvDM  = d.vendasDia[idxMesAtual] || 0;
+  const _hidM   = d.hidrat[idxMesAtual]    || 0;
+  const _prodM  = d.produtos[idxMesAtual]  || 0;
+  const _recDM  = diasTrabalhados > 0 ? _recM / diasTrabalhados : 0;
+  const _cp     = (r,m) => m > 0 ? parseFloat((r/m*100).toFixed(1)) : 0;
+  d.metaPct = [
+    _cp(_recM,  d.metaReceita   || 68500),
+    _cp(_recDM, d.metaRecDia    || 2740),
+    _cp(_tickM, d.metaTicket    || 110.48),
+    _cp(_srvM,  d.metaVendas    || 620),
+    _cp(_srvDM, d.metaVendasDia || 24.8),
+    _cp(_hidM,  d.metaHidrat    || 40),
+    _cp(_prodM, d.metaProdutos  || 4000),
+  ];
+
+  // recAtual = receita do mês em andamento (0 no 1º dia é válido)
+  const recAtual = d.receita[idxMesAtual] || 0;
+  renderCapacidade(d, idxMesAtual);
+  renderProjecao(d, idxMesAtual);
+  const ritmoDiaProj = diasTrabalhados > 0 ? recAtual / diasTrabalhados : 0;
+  const recProj = mesFechado ? recAtual : recAtual + ritmoDiaProj * diasFaltantes;
+
+  // Labels — limitados ao mês atual
+  const MESES_LBL = MESES.slice(0, idxMesAtual+1).map((m,i)=> (!mesFechado && i === idxMesAtual) ? m + ' (parcial)' : m);
+
+  // Linha sólida: até o mês anterior ao atual
+  const dataCompletos = d.receita.slice(0, idxMesAtual+1).map((v,i)=> {
+    if(mesFechado) return v > 0 ? v : null;
+    return i < idxMesAtual ? (v > 0 ? v : null) : null;
+  });
+
+  // Dataset de projeção: só se parcial e há dados para projetar
+  const dataComProj = MESES.slice(0, idxMesAtual+1).map((m,i)=>{
+    if(mesFechado) return null;
+    if(i === idxMesAtual - 1) return d.receita[idxMesAtual - 1] || null;
+    if(i === idxMesAtual)     return recProj > 0 ? recProj : null;
+    return null;
+  });
+
+  console.log('DEBUG idxUltimoComDados:', idxUltimoComDados);
+  console.log('DEBUG idxMesAtual:', idxMesAtual);
+  console.log('DEBUG mesFechado:', mesFechado);
+  console.log('DEBUG diasTrabalhados:', diasTrabalhados, 'diasFaltantes:', diasFaltantes);
+  console.log('DEBUG receita:', d.receita);
+  console.log('DEBUG metaProdutos:', d.metaProdutos);
+  console.log('DEBUG pace items:', d.pace.items?.map(p=>p.real));
+  const ctxR = document.getElementById('receitaChart')?.getContext('2d');
+  if(ctxR){
+    if(_charts['receitaChart']) _charts['receitaChart'].destroy();
+    _charts['receitaChart'] = new Chart(ctxR, {
+      type: 'line',
+      data: {
+        labels: MESES_LBL,
+        datasets: [
+          {
+            label: 'Receita real',
+            data: dataCompletos,
+            borderColor: '#3dffa0',
+            backgroundColor: 'rgba(61,255,160,.06)',
+            fill: true, tension: .4,
+            pointRadius: 4,
+            pointBackgroundColor: '#3dffa0',
+            pointBorderColor: '#3dffa0',
+            spanGaps: false,
+          },
+          {
+            label: 'Parcial + projeção',
+            data: dataComProj,
+            borderColor: '#ffb84d',
+            backgroundColor: 'rgba(255,184,77,.04)',
+            borderDash: [6,4],
+            fill: false, tension: .3,
+            pointRadius: dataComProj.map((v,i)=> i===idxUltimoComDados ? 7 : (v?5:0)),
+            pointBackgroundColor: dataComProj.map((v,i)=> i===idxUltimoComDados ? '#ffb84d' : '#ff9020'),
+            pointStyle: dataComProj.map((v,i)=> i===idxUltimoComDados+1 ? 'triangle' : 'circle'),
+            spanGaps: false,
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color:'#5a6080', boxWidth:10, padding:14 } },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const i = ctx.dataIndex;
+                const v = ctx.parsed.y;
+                if(!v) return null;
+                if(ctx.datasetIndex === 1){
+                  if(i === idxUltimoComDados) return ` Projeção fechamento: ${fmtR(v)}`;
+                  return null;
+                }
+                if(i === idxUltimoComDados) return ` Acumulado (${diasTrabalhados}d): ${fmtR(recAtual)}`;
+                return ` ${fmtR(v)}`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid:{color:'#1e2130'}, ticks:{color:'#5a6080'} },
+          y: { grid:{color:'#1e2130'}, ticks:{color:'#5a6080', callback: v=>fmtR(v)} }
+        }
+      }
+    });
+  }
+
+  // Badge "parcial" no card de receita — só aparece se mês parcial
+  const badgeEl = document.getElementById('badge-parcial');
+  if(badgeEl) badgeEl.style.display = mesFechado ? 'none' : 'inline-block';
+
+  // Slices limitados ao mês atual
+  const _mesesVis  = MESES.slice(0, idxMesAtual+1);
+  const _meses5Vis = _mesesVis.slice(1);
+  const _recSlice  = d.receita.slice(1, idxMesAtual+1);
+  const _cusSlice  = d.custo.slice(1, idxMesAtual+1);
+
+  mkBar('custoChart', _meses5Vis,
+    [{label:'Receita', data:_recSlice, backgroundColor:_recSlice.map((v,i)=>(!mesFechado && i===_meses5Vis.length-1)?'rgba(255,184,77,.7)':'rgba(61,255,160,.7)'), borderRadius:4},
+     {label:'Custo',   data:_cusSlice, backgroundColor:'rgba(255,95,95,.6)', borderRadius:4}],
+    {yTick:{callback:v=>fmtR(v)}, extra:{barPercentage:.7}});
+
+  // Ticket e Serviços/dia — mesmo padrão do gráfico de receita
+  const mkLinePartial = (id, fullData, color, bgColor) => {
+    try {
+    const ctx = document.getElementById(id)?.getContext('2d');
+    if(!ctx) return;
+    if(_charts[id]) _charts[id].destroy();
+
+    // Limita ao mês atual
+    const data = fullData.slice(0, idxMesAtual+1);
+
+    const isTicket = id === 'ticketChart';
+    const fmt = v => isTicket ? fmtR(v) : fmtN(v);
+    const yFmt = v => isTicket ? fmtR(v) : v;
+
+    // Linha sólida — todos os meses se fechado, até anterior se parcial
+    const dataSolid = data.map((v,i)=> mesFechado ? (v||null) : (i < idxMesAtual ? v : null));
+
+    // Pontilhado — só se parcial (conecta último completo → mês atual)
+    const dataProj = data.map((v,i)=>{
+      if(mesFechado) return null;
+      if(i === idxMesAtual - 1) return data[idxMesAtual - 1];
+      if(i === idxMesAtual)     return data[idxMesAtual];
+      return null;
+    });
+
+    _charts[id] = new Chart(ctx, {
+      type:'line',
+      data:{
+        labels: MESES_LBL,
+        datasets:[
+          {
+            label: isTicket ? 'Ticket' : 'Serviços/dia',
+            data: dataSolid,
+            borderColor: color,
+            backgroundColor: bgColor,
+            fill: true, tension: .4,
+            pointRadius: 3,
+            pointBackgroundColor: color,
+            spanGaps: false,
+          },
+          {
+            label: '(parcial)',
+            data: dataProj,
+            borderColor: '#ffb84d',
+            backgroundColor: 'transparent',
+            borderDash: [6,4],
+            fill: false, tension: .4,
+            pointRadius: dataProj.map((_,i)=> i===idxMesAtual ? 7 : 0),
+            pointBackgroundColor: '#ffb84d',
+            spanGaps: false,
+          }
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{
+          legend:{labels:{color:'#5a6080',boxWidth:10,padding:12,
+            filter: item => item.text !== '(parcial)'
+          }},
+          tooltip:{callbacks:{label:(ctx)=>{
+            const i=ctx.dataIndex; const v=ctx.parsed.y;
+            if(!v) return null;
+            if(ctx.datasetIndex === 1 && i === idxMesAtual)
+              return ` Parcial (${d.pace.diasTrabalhados}d): ${fmt(v)}`;
+            if(ctx.datasetIndex === 1) return null;
+            return ` ${fmt(v)}`;
+          }}}
+        },
+        scales:{
+          x:{grid:{color:'#1e2130'},ticks:{color:'#5a6080'}},
+          y:{grid:{color:'#1e2130'},ticks:{color:'#5a6080',callback:yFmt}}
+        }
+      }
+    });
+    } catch(e){ console.warn('mkLinePartial erro:', id, e.message); }
+  };
+
+  mkLinePartial('ticketChart',    d.ticket.map(v=>v||null),    '#4da6ff', 'rgba(77,166,255,.05)');
+  mkLinePartial('vendasDiaChart', d.vendasDia.map(v=>v||null), '#ff6eb4', 'rgba(255,110,180,.05)');
+
+  // ── KPI Produtos/loja ─────────────────────────────────
+  const prodAtual   = d.produtos[idxMesAtual] || 0;
+  const metaProd    = d.metaProdutos || 4000;
+  const diasTrab    = d.pace.diasTrabalhados || 1;
+  const diasUt      = d.pace.diasUteis || 25;
+  // Meta proporcional aos dias trabalhados
+  const metaProdProp = metaProd * (diasTrab / diasUt);
+  const prodPct      = metaProdProp > 0 ? (prodAtual / metaProdProp * 100).toFixed(1) : 0;
+  // Meta diária de produtos
+  const metaProdDia  = metaProd / diasUt;
+  const prodCor = prodAtual >= metaProdProp ? 'var(--green)' : 'var(--red)';
+  const prodDiff = prodAtual - metaProdProp;
+  const elProdVal   = document.getElementById('kp-produtos-val');
+  const elProdDelta = document.getElementById('kp-produtos-delta');
+  if(elProdVal){ elProdVal.textContent = fmtR(prodAtual); elProdVal.style.color = prodCor; }
+  if(elProdDelta) elProdDelta.innerHTML =
+    `<span style="color:${prodCor};font-weight:600;font-size:12px">${prodDiff>=0?'↑':'↓'} ${fmtR(Math.abs(prodDiff))}</span>`+
+    `<span style="color:var(--muted);font-size:11px"> · </span>`+
+    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta/dia ${fmtR(metaProdDia)}</span>`;
+  const kpiProd = elProdVal?.closest('.kpi');
+  if(kpiProd) kpiProd.style.setProperty('--acc', prodCor);
+
+  // ── KPI Pace Semana ───────────────────────────────────
+  const _idxSemOp      = idxMesAtual - 1;
+  const _fatSemOp      = (d.semanal?.fat[_idxSemOp]) || [];
+  const _diasSemPorMes = (d.semanal?.diasSemPorMes)  || null;
+
+  // Semanas fechadas = com faturamento > 0 na planilha
+  const _semFechadasN  = _fatSemOp.filter(v=>v>0).length;
+  const _semAtualN     = _semFechadasN; // 0-based: 0=S1, 1=S2, 2=S3...
+
+  // Dias totais da semana atual (lido da planilha, ex: S3 = 6 dias)
+  const _diasSemAtual = _diasSemPorMes
+    ? (_diasSemPorMes[_idxSemOp]?.[_semAtualN] || 5)
+    : 5;
+
+  // Dias das semanas fechadas → para calcular dias vividos na semana atual
+  const _diasSemFechadas = _semFechadasN > 0 && _diasSemPorMes
+    ? _diasSemPorMes[_idxSemOp].slice(0, _semFechadasN).reduce((a,b)=>a+(b||5), 0)
+    : _semFechadasN * 5;
+  const _diasNaSem = Math.max(1, Math.min(diasTrab - _diasSemFechadas, _diasSemAtual));
+
+  // Faturado semanas fechadas (S1 + S2 + ...)
+  const _fatSemFechadas = _fatSemOp.slice(0, _semFechadasN).reduce((a,b)=>a+b, 0);
+
+  // Realizado S atual = receita acumulada do mês - faturado semanas fechadas
+  const _recParcSem = Math.max(0, recAtual - _fatSemFechadas);
+
+  // Saldo de meta = meta mensal - semanas JÁ FECHADAS (S1+S2)
+  // S3 parcial ainda está dentro das semanas restantes, não deduz do saldo
+  const _metaSaldo = Math.max(0, (d.metaReceita || 68500) - _fatSemFechadas);
+
+  // Dias das semanas restantes (S atual + próximas) = base para distribuir o saldo
+  const _diasSemsRestantes = _diasSemPorMes
+    ? _diasSemPorMes[_idxSemOp].slice(_semAtualN).reduce((a,b)=>a+(b||5), 0)
+    : (5 - _semAtualN) * 5;
+
+  console.log('DEBUG pace sem:', {
+    _semAtualN, _semFechadasN, _diasSemAtual, _diasNaSem,
+    _fatSemFechadas, _recParcSem, _metaSaldo,
+    _diasSemsRestantes,
+    diasSemRestantes_raw: _diasSemPorMes ? _diasSemPorMes[_idxSemOp] : 'null'
+  });
+
+  // Meta diária do saldo = saldo ÷ dias das semanas restantes
+  const _diasFalt = Math.max(1, _diasSemsRestantes);
+  const _metaDiaSaldo = _metaSaldo / _diasFalt;
+
+  // Meta da semana atual = meta diária × dias totais da semana
+  const _metaSemAtual = _metaDiaSaldo * _diasSemAtual;
+
+  // Meta proporcional aos dias já vividos na semana
+  const _metaSemProp = _metaSemAtual * (_diasNaSem / _diasSemAtual);
+
+  const _paceSemPct  = _metaSemProp > 0 ? (_recParcSem / _metaSemProp) : 0;
+  const _paceSemCor  = _paceSemPct >= 1 ? '#3dffa0' : _paceSemPct >= 0.8 ? '#ffb84d' : '#ff5f5f';
+  const _paceSemDiff = _recParcSem - _metaSemProp;
+  const _paceSemSeta = _paceSemPct >= 1 ? '↑' : '↓';
+
+  const elPSVal   = document.getElementById('kp-pace-sem-val');
+  const elPSDelta = document.getElementById('kp-pace-sem-delta');
+  const elPSLabel = document.getElementById('kpi-pace-sem-label');
+  const elPSAcc   = document.getElementById('kpi-pace-sem-accent');
+  const kpiPS     = elPSVal?.closest('.kpi');
+
+  if(elPSLabel) elPSLabel.textContent = `PACE SEMANA (S${_semAtualN+1} · ${_diasNaSem} DE ${_diasSemAtual}D)`;
+  if(elPSVal){
+    elPSVal.textContent = fmtR(_recParcSem);
+    elPSVal.style.color = _paceSemCor;
+  }
+  if(elPSDelta) elPSDelta.innerHTML =
+    `<span style="color:${_paceSemCor};font-weight:600;font-size:12px">${_paceSemSeta} ${fmtR(Math.abs(_paceSemDiff))}</span>`+
+    `<span style="color:var(--muted);font-size:11px"> · </span>`+
+    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta sem. ${fmtR(_metaSemAtual)}</span>`;
+  if(elPSAcc) elPSAcc.style.background = _paceSemCor;
+  if(kpiPS) kpiPS.style.setProperty('--acc', _paceSemCor);
+
+  // ── Pace semanal no card de Metas ────────────────────
+  const metaPaceSemGrid  = document.getElementById('metaPaceSemGrid');
+  const metaPaceSemTitle = document.getElementById('meta-pace-sem-title');
+  if(metaPaceSemTitle) metaPaceSemTitle.textContent =
+    `PACE SEMANA — S${_semAtualN+1} (${_diasNaSem} de ${_diasSemAtual}d) · meta sem.`;
+
+  if(metaPaceSemGrid){
+    // Serviços parcial S atual — usa pace items (acumulado real do mês)
+    const _srvSemOp       = (d.semanal?.srv[_idxSemOp]) || [];
+    const _srvSemFechadas = _srvSemOp.slice(0, _semFechadasN).reduce((a,b)=>a+b, 0);
+    const _srvRealMes     = d.pace.items[3]?.real || d.vendas[idxMesAtual] || 0;
+    const _srvParcSem     = Math.max(0, _srvRealMes - _srvSemFechadas);
+    // Saldo meta serviços = meta - semanas fechadas
+    const _metaSaldoSrv   = Math.max(0, (d.metaVendas||660) - _srvSemFechadas);
+    // Meta S atual = saldo ÷ dias semanas restantes × dias da semana
+    const _metaSemSrv     = (_metaSaldoSrv / _diasSemsRestantes) * _diasSemAtual;
+    // Ticket parcial S atual
+    const _tickSemOp      = (d.semanal?.tick[_idxSemOp]) || [];
+    const _tickParcSem    = _tickSemOp[_semAtualN] || (d.ticket[idxMesAtual]||0);
+    const _metaSemTick    = d.metaTicket || 111.39;
+
+    const mkMetaPaceCard = (label, real, metaSem, fmt, isTicket=false) => {
+      const metaProp = isTicket ? metaSem : metaSem * (_diasNaSem / _diasSemAtual);
+      const pct  = metaProp > 0 ? real / metaProp : 0;
+      const col  = pct >= 1 ? '#3dffa0' : pct >= 0.8 ? '#ffb84d' : '#ff5f5f';
+      const diff = real - metaProp;
+      return `<div style="background:var(--s2);border:1px solid ${col}30;border-radius:8px;padding:10px 12px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:${col}"></div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px;font-weight:600">${label}</div>
+        <div style="font-size:16px;font-weight:700;font-family:var(--mono);color:${col}">${fmt(real)}</div>
+        <div style="font-size:10px;margin-top:4px;display:flex;justify-content:space-between;align-items:center">
+          <span style="color:${col};font-weight:600">${diff>=0?'↑':'↓'} ${fmt(Math.abs(diff))}</span>
+          <span style="color:#4da6ff;font-family:var(--mono)">${fmt(metaSem)}</span>
+        </div>
+      </div>`;
+    };
+
+    metaPaceSemGrid.innerHTML =
+      mkMetaPaceCard('Faturamento', _recParcSem, _metaSemAtual, fmtR) +
+      mkMetaPaceCard('Serviços',    _srvParcSem, _metaSemSrv, fmtN) +
+      mkMetaPaceCard('Ticket',      _tickParcSem, _metaSemTick, fmtR, true);
+  }
+
+  // ── Evolução de serviços complementares (barras agrupadas) ──
+  const ctxSE = document.getElementById('servicosEvolChart')?.getContext('2d');
+  if(ctxSE){
+    if(_charts['servicosEvolChart']) _charts['servicosEvolChart'].destroy();
+    const mesesVisiveis = MESES.slice(0, idxMesAtual+1);
+    const cores = ['#ffb84d','#a78bfa','#4da6ff','#3dffa0'];
+    _charts['servicosEvolChart'] = new Chart(ctxSE, {
+      type: 'bar',
+      data: {
+        labels: mesesVisiveis,
+        datasets: [
+          { label:'Hidratação',      data:d.hidrat.slice(0,idxMesAtual+1),   backgroundColor:cores[0]+'b0', borderRadius:4, datalabels:{display:false} },
+          { label:'Táxi Dog',        data:d.taxiDog.slice(0,idxMesAtual+1),  backgroundColor:cores[2]+'b0', borderRadius:4, datalabels:{display:false} },
+          { label:'Escovação Dental',data:d.escovacao.slice(0,idxMesAtual+1),backgroundColor:cores[1]+'b0', borderRadius:4, datalabels:{display:false} },
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        layout:{ padding:{ top:4 } },
+        plugins:{
+          legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},
+          datalabels:{ display:true },
+          tooltip:{callbacks:{label:(ctx)=>{const v=ctx.parsed.y;return v!=null?` ${ctx.dataset.label}: ${fmtN(v)}`:null;}}}
+        },
+        scales:{
+          x:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080'} },
+          y:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080'}, title:{display:true,text:'Qtd.',color:'#5a6080'} }
+        }
+      }
+    });
+  }
+
+  mkBar('hidratacaoChart', MESES.slice(0, idxMesAtual+1),
+    [{label:'Hidratação', data:d.hidrat.slice(0, idxMesAtual+1),
+      backgroundColor:d.hidrat.slice(0,idxMesAtual+1).map((_,i)=>i===idxUltimoComDados?'rgba(255,184,77,.8)':'rgba(255,184,77,.7)'),
+      borderRadius:4}],
+    {extra:{plugins:{legend:{display:false}}}});
+
+  // ── Gráfico Produtos/loja ─────────────────────────────
+  const ctxProd = document.getElementById('produtosChart')?.getContext('2d');
+  if(ctxProd){
+    if(_charts['produtosChart']) _charts['produtosChart'].destroy();
+    const mesesVis = MESES.slice(0, idxMesAtual+1);
+    const prodData = d.produtos.slice(0, idxMesAtual+1);
+    const metaLine = prodData.map(()=> d.metaProdutos || 4000);
+    _charts['produtosChart'] = new Chart(ctxProd, {
+      type: 'bar',
+      data: {
+        labels: mesesVis,
+        datasets: [
+          {
+            label: 'Produtos/loja',
+            data: prodData,
+            backgroundColor: prodData.map((v,i)=>
+              i===idxUltimoComDados ? 'rgba(61,255,160,.6)' :
+              v >= (d.metaProdutos||4000) ? 'rgba(61,255,160,.7)' : 'rgba(255,184,77,.7)'
+            ),
+            borderRadius: 4,
+            datalabels: { display: false }
+          }
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        layout:{ padding:{ top:4 } },
+        plugins:{
+          legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},
+          datalabels: { display: false },
+          tooltip:{callbacks:{label:(ctx)=>{const v=ctx.parsed.y;return v!=null?` ${fmtR(v)}`:null;}}}
+        },
+        scales:{
+          x:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080'} },
+          y:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080', callback:v=>fmtR(v)} }
+        }
+      }
+    });
+  }
+
+  // ── Tabelas de adicionais e produtos ─────────────────
+  const mesesTab = MESES.slice(0, idxMesAtual+1);
+  const tblAdic = document.getElementById('tbl-adicionais');
+  if(tblAdic){
+    const rows = [
+      {label:'Hidratação', data:d.hidrat,   cor:'#ffb84d'},
+      {label:'Táxi Dog',   data:d.taxiDog,  cor:'#4da6ff'},
+      {label:'Escovação',  data:d.escovacao,cor:'#a78bfa'},
+    ];
+    tblAdic.innerHTML = rows.map(r=>`<tr>
+      <td class="td-month" style="color:${r.cor}">${r.label}</td>
+      ${mesesTab.map((m,i)=>`<td class="td-num">${r.data[i]||'—'}</td>`).join('')}
+    </tr>`).join('');
+  }
+
+  const tblProd = document.getElementById('tbl-produtos');
+  if(tblProd){
+    tblProd.innerHTML = `<tr>
+      <td class="td-month" style="color:var(--green)">Produtos</td>
+      ${mesesTab.map((m,i)=>{
+        const v = d.produtos[i] || 0;
+        const isParcial = !mesFechado && i === idxMesAtual;
+        return `<td class="${isParcial?'td-amber':'td-num'}">${fmtR(v)}</td>`;
+      }).join('')}
+    </tr>`;
+  }
+
+  const mesesNomes     = ['dez/25','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const mesesNomesLong = ['dez/25','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+  // Desktop tbody — só até idxMesAtual (inclusive)
+  const tblDesktop = document.getElementById('tbl-desktop-body');
+  if(tblDesktop) tblDesktop.innerHTML = d.receita.slice(0, idxMesAtual+1).map((rec,i)=>{
+    const c   = d.custo[i];
+    const isParcial = !mesFechado && i === idxMesAtual;
+    const margem = (!isParcial && c) ? ((rec-c)/rec*100) : null;
+    const recCor = isParcial ? 'td-amber' : 'td-green';
+    const custoCor = c ? (margem >= 0 ? 'td-amber' : 'td-red') : 'td-num';
+    const margemTxt = isParcial ? '<span style="color:var(--muted);font-size:10px">parcial</span>' : margem !== null ? (margem>=0?'+':'')+margem.toFixed(1)+'%' : '—';
+    const margemCor = margem !== null ? (margem>=0?'td-green':'td-red') : 'td-num';
+    const mesNome = mesesNomes[i] + (isParcial?' ●':'');
+    const ticketFmt = d.ticket[i] ? 'R$ '+d.ticket[i].toFixed(2).replace('.',',') : '—';
+    return `<tr>
+      <td class="td-month" style="${isParcial?'color:var(--amber)':''}">${mesNome}</td>
+      <td class="${recCor}">${fmtR(rec)}</td>
+      <td class="${custoCor}">${c?fmtR(c):'—'}</td>
+      <td class="${margemCor}">${margemTxt}</td>
+      <td class="td-num">${fmtN(d.vendas[i])||'—'}</td>
+      <td class="td-num">${ticketFmt}</td>
+      <td class="td-num">${d.hidrat[i]||'—'}</td>
+    </tr>`;
+  }).join('');
+
+  // Mobile cards — só até idxMesAtual
+  const tblMobile = document.getElementById('tbl-mobile-body');
+  if(tblMobile) tblMobile.innerHTML = d.receita.slice(0, idxMesAtual+1).map((rec,i)=>{
+    const c = d.custo[i];
+    const isParcial = !mesFechado && i === idxMesAtual;
+    const margem = (!isParcial && c) ? ((rec-c)/rec*100) : null;
+    const margemTxt = isParcial ? 'parcial' : margem !== null ? (margem>=0?'+':'')+margem.toFixed(1)+'%' : '—';
+    const margemCor = isParcial ? 'var(--amber)' : margem !== null ? (margem>=0?'var(--green)':'var(--red)') : 'var(--muted)';
+    const ticketFmt = d.ticket[i] ? 'R$ '+d.ticket[i].toFixed(2).replace('.',',') : '—';
+    return `<div class="mes-card">
+      <div class="mes-header">
+        <span class="mes-nome" style="${isParcial?'color:var(--amber)':''}">${mesesNomes[i]}${isParcial?' ●':''}</span>
+        <span class="mes-margem" style="color:${margemCor}">${margemTxt}</span>
+      </div>
+      <div class="mes-grid">
+        <div class="mes-item"><div class="mes-item-lbl">Receita</div><div class="mes-item-val" style="color:${isParcial?'var(--amber)':'var(--green)'}">${fmtR(rec)}</div></div>
+        <div class="mes-item"><div class="mes-item-lbl">Serviços</div><div class="mes-item-val">${fmtN(d.vendas[i])||'—'}</div></div>
+        <div class="mes-item"><div class="mes-item-lbl">Ticket</div><div class="mes-item-val">${ticketFmt}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Alerta Receita vs Custo
+  const alertBody = document.getElementById('alertBody');
+  if(alertBody) alertBody.innerHTML = d.receita.slice(0, idxMesAtual+1).map((rec,i)=>{
+    const c = d.custo[i]; if(!c) return '';
+    const isParcial = !mesFechado && i === idxMesAtual;
+    if(isParcial) return '';
+    const diff = rec - c;
+    const ok = diff >= 0;
+    const cls = ok ? 'custo-ok' : 'custo-bad';
+    const cor = ok ? 'var(--green)' : 'var(--red)';
+    const seta = ok ? '▲' : '▼';
+    const recCor = isParcial ? 'var(--amber)' : 'var(--green)';
+    return `<div class="custo-item ${cls}">
+      <span class="custo-mes" style="color:${cor}">${mesesNomes[i]}${isParcial?' ●':''}</span>
+      <div class="custo-vals">
+        <span style="color:${recCor}">${fmtR(rec)}</span>
+        <span style="color:var(--muted2)">custo ${fmtR(c)}</span>
+        <span style="color:${cor}">${seta} ${diff>=0?'+':''}${fmtR(diff)}</span>
+      </div>
+    </div>`;
+  }).join('');
+  const maxP=Math.max(...d.planos.qtd);
+  document.getElementById('planosBars').innerHTML=d.planos.meses.map((m,i)=>`
+    <div class="plano-row">
+      <span class="plano-mes">${m}</span>
+      <div class="plano-track"><div class="plano-fill" style="width:${(d.planos.qtd[i]/maxP*100)}%"></div></div>
+      <span class="plano-count">${d.planos.qtd[i]}</span>
+    </div>`).join('');
+
+  // Estatísticas dinâmicas de planos
+  const planos = d.planos;
+  if(planos && planos.meses.length){
+    const maxIdx = planos.qtd.indexOf(Math.max(...planos.qtd));
+    const crescimento = planos.qtd.length > 1
+      ? ((planos.qtd[planos.qtd.length-1] - planos.qtd[0]) / planos.qtd[0] * 100).toFixed(0)
+      : 0;
+    const primeiroMes = planos.meses[0];
+    const ultimoMes = planos.meses[planos.meses.length-1];
+    const crescCor = crescimento >= 0 ? 'var(--amber)' : 'var(--red)';
+    const nomeMaior = planos.meses[maxIdx].charAt(0).toUpperCase()+planos.meses[maxIdx].slice(1);
+
+    // Mês vigente = último com dados
+    const lastIdx = planos.meses.length - 1;
+    const ticketVigente = planos.qtd[lastIdx] > 0 ? planos.rec[lastIdx] / planos.qtd[lastIdx] : 0;
+    const recVigente = planos.rec[lastIdx] || 0;
+    const nomeVigente = planos.meses[lastIdx].charAt(0).toUpperCase()+planos.meses[lastIdx].slice(1);
+
+    const elMQ = document.getElementById('planos-maior-qtd'); if(elMQ) elMQ.textContent = planos.qtd[maxIdx];
+    const elMS = document.getElementById('planos-maior-sub'); if(elMS) elMS.textContent = `${nomeMaior} (${fmtR(planos.rec[maxIdx])})`;
+    const elRV = document.getElementById('planos-rec-vigente'); if(elRV) elRV.textContent = fmtR(recVigente);
+    const elRS = document.getElementById('planos-rec-vigente-sub'); if(elRS) elRS.textContent = `${nomeVigente} · ${planos.qtd[lastIdx]} planos`;
+    const elTK = document.getElementById('planos-ticket'); if(elTK) elTK.textContent = fmtR(ticketVigente);
+    const elTS = document.getElementById('planos-ticket-sub'); if(elTS) elTS.textContent = `${nomeVigente}`;
+    const elCR = document.getElementById('planos-cresc'); if(elCR){ elCR.textContent = (crescimento>=0?'+':'')+crescimento+'%'; elCR.style.color=crescCor; }
+    const elCS = document.getElementById('planos-cresc-sub'); if(elCS) elCS.textContent = `${primeiroMes}→${ultimoMes}`;
+  }
+
+  // ── Marketing ─────────────────────────────────────────
+  const META_CAC = 55;
+  const META_CLI = 35;
+  const ads = d.ads;
+  const n = ads.meses.length;
+  if(n > 0){
+    const ultimo   = n - 1;
+    const anterior = n > 1 ? n - 2 : 0;
+
+    // KPI Investimento mês atual
+    const inv = ads.invest[ultimo];
+    const invAnterior = ads.invest[anterior];
+    const invDelta = anterior !== ultimo ? ((inv - invAnterior)/invAnterior*100).toFixed(1) : null;
+    const elMktInvest = document.getElementById('mkt-invest');
+    if(elMktInvest) elMktInvest.textContent = fmtR(inv);
+    const elMktInvestSub = document.getElementById('mkt-invest-sub');
+    if(elMktInvestSub) elMktInvestSub.innerHTML = `<span style="color:var(--muted2)">${ads.meses[ultimo]}</span>` + (invDelta ? ` <span style="color:${invDelta>0?'var(--red)':'var(--green)'}">${invDelta>0?'↑':'↓'} ${Math.abs(invDelta)}% vs ${ads.meses[anterior]}</span>` : '');
+
+    // KPI Faturamento
+    const fat = ads.fat[ultimo];
+    const elMktFat = document.getElementById('mkt-fat');
+    if(elMktFat) elMktFat.textContent = fmtR(fat);
+    const roas = ads.roas[ultimo];
+    const elMktFatSub = document.getElementById('mkt-fat-sub');
+    if(elMktFatSub) elMktFatSub.innerHTML = `<span style="color:${roas>=3?'var(--green)':'var(--amber)'}">ROAS ${roas.toFixed(2)}x</span>`;
+
+    // KPI ROAS atual vs anterior
+    const roasAnterior = ads.roas[anterior];
+    const roasDelta = anterior !== ultimo ? (roas - roasAnterior).toFixed(2) : null;
+    const elMktRoas = document.getElementById('mkt-roas');
+    if(elMktRoas){ elMktRoas.textContent = roas.toFixed(2)+'x'; elMktRoas.style.color = roas>=3?'var(--green)':roas>=2.5?'var(--amber)':'var(--red)'; }
+    const elMktRoasSub = document.getElementById('mkt-roas-sub');
+    if(elMktRoasSub && roasDelta) elMktRoasSub.innerHTML = `<span style="color:${roasDelta>=0?'var(--green)':'var(--red)'}">${roasDelta>=0?'↑':'↓'} ${Math.abs(roasDelta)} vs ${ads.meses[anterior]}</span>`;
+
+    // KPI CAC
+    const cac = ads.cac[ultimo];
+    const cacOk = cac <= META_CAC;
+    const cacDelta = ((cac - META_CAC) / META_CAC * 100).toFixed(0);
+    const cacSinal = cac > META_CAC ? `+${cacDelta}% acima` : `${cacDelta}% abaixo`;
+    const elMktCac = document.getElementById('mkt-cac');
+    if(elMktCac){ elMktCac.textContent = fmtR(cac); elMktCac.style.color = cacOk?'var(--green)':'var(--red)'; }
+    const elMktCacSub = document.getElementById('mkt-cac-sub');
+    if(elMktCacSub) elMktCacSub.innerHTML =
+      `<span style="color:${cacOk?'var(--green)':'var(--red)'}">${cacOk?'🟢':'🔴'}</span>`+
+      `<span style="color:var(--muted2)"> Meta R$${META_CAC} · </span>`+
+      `<span style="color:${cacOk?'var(--green)':'var(--red)'}">${cacSinal}</span>`;
+
+    // KPI Clientes
+    const cli = ads.clientes[ultimo];
+    const cliPct = Math.round(cli / META_CLI * 100);
+    const cliOk = cli >= META_CLI;
+    const elMktCli = document.getElementById('mkt-cli');
+    if(elMktCli){ elMktCli.textContent = `${cli} / ${META_CLI}`; elMktCli.style.color = cliOk?'var(--green)':'var(--amber)'; }
+    const elMktCliSub = document.getElementById('mkt-cli-sub');
+    if(elMktCliSub) elMktCliSub.innerHTML =
+      `<span style="color:${cliOk?'var(--green)':'var(--amber)'}; font-weight:600; font-family:var(--mono)">${cliPct}%</span>`+
+      `<span style="color:var(--muted2)"> da meta</span>`;
+
+    // Badge de decisão — algoritmo decide sozinho, mostra os 3 com destaque
+    const badge = document.getElementById('mkt-badge');
+    const desc  = document.getElementById('mkt-badge-desc');
+    if(badge && desc){
+      let decisao, bg, cor;
+      if(roas > 3 && cac < META_CAC){ decisao='escalar'; bg='rgba(61,255,160,.12)'; cor='#3dffa0'; }
+      else if(roas >= 2.5)           { decisao='manter';  bg='rgba(255,184,77,.12)'; cor='#ffb84d'; }
+      else                           { decisao='revisar'; bg='rgba(255,95,95,.12)';  cor='#ff5f5f'; }
+
+      badge.style.background = 'transparent';
+      badge.style.border = 'none';
+      badge.style.padding = '0';
+      badge.innerHTML =
+        `<span style="opacity:${decisao==='escalar'?1:.25};font-size:13px;font-family:var(--font)">🟢 Escalar</span>`+
+        `<span style="margin:0 12px;color:var(--border)">·</span>`+
+        `<span style="opacity:${decisao==='manter'?1:.25};font-size:13px;font-family:var(--font)">🟡 Manter</span>`+
+        `<span style="margin:0 12px;color:var(--border)">·</span>`+
+        `<span style="opacity:${decisao==='revisar'?1:.25};font-size:13px;font-family:var(--font)">🔴 Revisar</span>`;
+      desc.textContent = decisao==='escalar'
+        ? `ROAS ${roas.toFixed(2)}x e CAC ${fmtR(cac)} — ótimo retorno, hora de escalar`
+        : decisao==='manter'
+        ? `ROAS ${roas.toFixed(2)}x — performance estável, monitorar`
+        : `ROAS ${roas.toFixed(2)}x — retorno baixo, revisar criativos`;
+    }
+
+    // Gráfico 1: ROAS + CAC eixos duplos
+    const ctxRC = document.getElementById('roasCacChart')?.getContext('2d');
+    if(ctxRC){
+      if(_charts['roasCacChart']) _charts['roasCacChart'].destroy();
+      _charts['roasCacChart'] = new Chart(ctxRC, {
+        type:'bar',
+        data:{
+          labels: ads.meses,
+          datasets:[
+            {
+              label:'ROAS',
+              data: ads.roas,
+              backgroundColor: ads.roas.map(v=>v>=3?'rgba(61,255,160,.7)':v>=2.5?'rgba(255,184,77,.7)':'rgba(255,95,95,.7)'),
+              borderRadius:4, yAxisID:'y'
+            },
+            {
+              type:'line',
+              label:'CAC (R$)',
+              data: ads.cac,
+              borderColor:'#ff6eb4',
+              backgroundColor:'transparent',
+              tension:.3, pointRadius:5,
+              pointBackgroundColor: ads.cac.map(v=>v<=META_CAC?'#3dffa0':'#ff5f5f'),
+              yAxisID:'y2'
+            }
+          ]
+        },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{
+            legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},
+            tooltip:{callbacks:{label:(ctx)=>{
+              const v=ctx.parsed.y;
+              if(v==null) return null;
+              return ctx.dataset.yAxisID==='y2' ? ` CAC: ${fmtR(v)}` : ` ROAS: ${v.toFixed(2)}x`;
+            }}}
+          },
+          scales:{
+            y:{ position:'left', grid:{color:'#1e2130'}, ticks:{color:'#5a6080',callback:v=>v+'x'}, title:{display:true,text:'ROAS',color:'#5a6080'} },
+            y2:{ position:'right', grid:{drawOnChartArea:false}, ticks:{color:'#ff6eb4',callback:v=>fmtR(v)}, title:{display:true,text:'CAC',color:'#ff6eb4'} },
+            x:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080'} }
+          }
+        }
+      });
+    }
+
+    // Gráfico 2: Clientes x Investimento
+    const ctxCI = document.getElementById('cliInvestChart')?.getContext('2d');
+    if(ctxCI){
+      if(_charts['cliInvestChart']) _charts['cliInvestChart'].destroy();
+      _charts['cliInvestChart'] = new Chart(ctxCI, {
+        type:'bar',
+        data:{
+          labels: ads.meses,
+          datasets:[
+            {label:'Clientes', data:ads.clientes, backgroundColor:'rgba(77,166,255,.7)', borderRadius:4, yAxisID:'y'},
+            {type:'line', label:'Investimento', data:ads.invest, borderColor:'#ffb84d', backgroundColor:'transparent', tension:.3, pointRadius:4, pointBackgroundColor:'#ffb84d', yAxisID:'y2'}
+          ]
+        },
+        options:{
+          responsive:true, maintainAspectRatio:false,
+          plugins:{
+            legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},
+            tooltip:{callbacks:{label:(ctx)=>{
+              const v=ctx.parsed.y;
+              if(v==null) return null;
+              return ctx.dataset.yAxisID==='y2' ? ` Invest.: ${fmtR(v)}` : ` Clientes: ${fmtN(v)}`;
+            }}}
+          },
+          scales:{
+            y:{ position:'left', grid:{color:'#1e2130'}, ticks:{color:'#5a6080'}, title:{display:true,text:'Clientes',color:'#5a6080'} },
+            y2:{ position:'right', grid:{drawOnChartArea:false}, ticks:{color:'#ffb84d',callback:v=>fmtR(v)}, title:{display:true,text:'Invest.',color:'#ffb84d'} },
+            x:{ grid:{color:'#1e2130'}, ticks:{color:'#5a6080'} }
+          }
+        }
+      });
+    }
+
+    // Badge de desatualização — compara último mês com dados vs mês atual
+    const mesesOrdem = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+    const mesAtualIdx = new Date().getMonth(); // 0=jan, 1=fev...
+    const ultimoMesAds = ads.meses[n-1]?.toLowerCase().trim();
+    const ultimoMesIdx = mesesOrdem.indexOf(ultimoMesAds);
+    const adsStatus = document.getElementById('mkt-ads-status');
+    if(adsStatus){
+      if(ultimoMesIdx < mesAtualIdx){
+        const nomeMes = ads.meses[n-1];
+        adsStatus.style.display = 'block';
+        adsStatus.textContent = `⚠️ Dados de ${nomeMes} — atualizar quando fechar ${mesesOrdem[mesAtualIdx].charAt(0).toUpperCase()+mesesOrdem[mesAtualIdx].slice(1)}`;
+      } else {
+        adsStatus.style.display = 'none';
+      }
+    }
+    const tbody = document.getElementById('mkt-tabela-body');
+    if(tbody){
+      const campanhas = ['GMB','GMB+Clínica','GMB','GMB+Search'];
+      tbody.innerHTML = ads.meses.map((m,i)=>{
+        const r = ads.roas[i]; const c = ads.cac[i];
+        const badgeTxt = r>3 && c<META_CAC ? '🟢 Escalar' : r>=2.5 ? '🟡 Manter' : '🔴 Revisar';
+        const cacCor = c<=META_CAC ? 'td-green' : 'td-red';
+        const roasCor = r>=3 ? 'td-green' : r>=2.5 ? 'td-amber' : 'td-red';
+        return `<tr>
+          <td class="td-month">${m}</td>
+          <td class="td-num">${campanhas[i]||'—'}</td>
+          <td class="td-amber">${fmtR(ads.invest[i])}</td>
+          <td class="td-num">${ads.clientes[i]}</td>
+          <td class="${cacCor}">${fmtR(c)}</td>
+          <td class="${roasCor}">${r.toFixed(2)}x</td>
+          <td style="font-size:12px">${badgeTxt}</td>
+        </tr>`;
+      }).join('');
+    }
+  }
+
+  // ── Semanal ───────────────────────────────────────────
+  const semLabels = ['S1','S2','S3','S4','S5'];
+  const semColors = ['#3dffa0','#2dd880','#1db860','#0d9840','#057830','#a8ffcc'];
+  // semMeses: meses com dados semanais (índice 0=Jan no array semanal)
+  const semMeses = MESES.slice(1, idxMesAtual+1); // Jan..Jun
+
+  // idxSemAtual: índice no array semanal (0=Jan, 1=Fev, ..., 5=Jun)
+  // semanal.fat[0]=Jan, semanal.fat[5]=Jun → offset de 1 por causa do dez/25
+  const idxSemAtual  = idxMesAtual - 1;
+  const nomeMesAtual = MESES[idxMesAtual] || 'Jun';
+  const fatMes  = d.receita[idxMesAtual] || 0;
+  const srvMes  = d.vendas[idxMesAtual]  || 0;
+  const tickMes = d.ticket[idxMesAtual]  || 0;
+
+  // Dados semanais do mês atual
+  const fatSemAtual  = d.semanal.fat[idxSemAtual]  || [];
+  const srvSemAtual  = d.semanal.srv[idxSemAtual]  || [];
+  const tickSemAtual = d.semanal.tick[idxSemAtual] || [];
+  const semAtualIdx  = fatSemAtual.filter(v=>v>0).length;
+  const semAtualFat  = fatSemAtual[semAtualIdx-1]  || 0;
+
+  // Acumulados das semanas preenchidas
+  const fatAcum  = fatSemAtual.filter(v=>v>0).reduce((a,b)=>a+b,0);
+  const srvAcum  = srvSemAtual.filter(v=>v>0).reduce((a,b)=>a+b,0);
+  const tickVals = tickSemAtual.filter(v=>v>0);
+  const tickMedio = tickVals.length > 0 ? tickVals.reduce((a,b)=>a+b,0) / tickVals.length : tickMes;
+
+  // Preenche KPIs
+  const setKpi = (id, val, sub) => {
+    const el = document.getElementById(id); if(el) el.textContent = val;
+    const es = document.getElementById(id+'-sub'); if(es) es.innerHTML = sub;
+  };
+
+  // Faturamento, Serviços, Ticket
+  setKpi('sem-fat',    fmtR(fatAcum),     `<span style="color:var(--muted2)">${nomeMesAtual} · S1–S${semAtualIdx}</span>`);
+  setKpi('sem-srv',    fmtN(srvAcum),     `<span style="color:var(--muted2)">${nomeMesAtual} · S1–S${semAtualIdx}</span>`);
+  setKpi('sem-ticket', fmtR(tickMedio),   `<span style="color:var(--muted2)">média S1–S${semAtualIdx}</span>`);
+
+  // Semana vs Anterior
+  const semAnterFat   = semAtualIdx > 1 ? (fatSemAtual[semAtualIdx-2] || 0) : 0;
+  const semVsAntDelta = semAnterFat > 0 ? ((semAtualFat - semAnterFat) / semAnterFat * 100) : 0;
+  const semVsAntCor   = semVsAntDelta >= 0 ? 'var(--green)' : 'var(--red)';
+  const semVsAntSeta  = semVsAntDelta >= 0 ? '↑' : '↓';
+  const elVsAnt = document.getElementById('sem-vsant');
+  if(elVsAnt){ elVsAnt.textContent = fmtR(semAtualFat); elVsAnt.style.color = semVsAntCor; }
+  const esVsAnt = document.getElementById('sem-vsant-sub');
+  if(esVsAnt) esVsAnt.innerHTML =
+    `<span style="color:${semVsAntCor}">${semVsAntSeta} ${Math.abs(semVsAntDelta).toFixed(1)}% vs S${semAtualIdx-1}</span>`+
+    `<span style="color:var(--muted2)"> · S${semAtualIdx}</span>`;
+
+  // Badge de semana atual
+  const semStatus = document.getElementById('sem-status');
+  if(semStatus && semAtualIdx > 0){
+    semStatus.style.display = 'block';
+    semStatus.textContent = `⚠️ Dados até S${semAtualIdx} de ${nomeMesAtual} — atualizar ao fechar S${semAtualIdx+1}`;
+  }
+
+  // Ritmo do mês — usa receita da TABELA (mesma fonte da Operação)
+  const recAtualSem  = d.receita[idxMesAtual] || fatAcum;
+  const diasTrabSem  = d.pace.diasTrabalhados || 1;
+  const diasUteisSem = d.pace.diasUteis || 25;
+  const ritmoProj    = (recAtualSem / diasTrabSem) * diasUteisSem;
+  const ritmoPct     = (ritmoProj / 68500 * 100).toFixed(1);
+  const ritmoCor     = ritmoProj >= 68500 ? 'var(--green)' : 'var(--amber)';
+  const elRitmo = document.getElementById('sem-ritmo');
+  if(elRitmo){ elRitmo.textContent = fmtR(ritmoProj); elRitmo.style.color = ritmoCor; }
+  setKpi('sem-ritmo', fmtR(ritmoProj),
+    `<span style="color:${ritmoCor}">${ritmoPct}% da meta</span>`+
+    `<span style="color:var(--muted2)"> · ${diasTrabSem}/${diasUteisSem} dias</span>`);
+
+  // ── Pace Semanal ──────────────────────────────────────
+  const semPaceGrid = document.getElementById('semPaceGrid');
+  const semHistGrid = document.getElementById('semHistGrid');
+  const semPaceTitle = document.getElementById('sem-pace-title');
+  const semPaceSub   = document.getElementById('sem-pace-sub');
+
+  if(semAtualIdx > 0 && semPaceGrid){
+    // Meta semanal = meta mensal ÷ 4 semanas (proporcional)
+    const metaSemFat  = (d.metaReceita || 68500) / 4;
+    const metaSemSrv  = (d.metaVendas  || 660)   / 4;
+    const metaSemTick = d.metaTicket   || 111.39;
+
+    const fatSem  = fatSemAtual[semAtualIdx-1]  || 0;
+    const srvSem  = srvSemAtual[semAtualIdx-1]  || 0;
+    const tickSem = tickSemAtual[semAtualIdx-1] || 0;
+
+    if(semPaceTitle) semPaceTitle.textContent = `Pace semanal — S${semAtualIdx} de ${nomeMesAtual}`;
+    if(semPaceSub)   semPaceSub.textContent   = `Semana atual vs meta proporcional (meta mensal ÷ 4) · histórico da S${semAtualIdx}`;
+
+    const mkPaceCard = (label, real, meta, fmt) => {
+      const pct = meta > 0 ? real / meta : 0;
+      const col = pct >= 1 ? '#3dffa0' : pct >= 0.8 ? '#ffb84d' : '#ff5f5f';
+      const bg  = pct >= 1 ? 'rgba(61,255,160,.08)' : pct >= 0.8 ? 'rgba(255,184,77,.08)' : 'rgba(255,95,95,.08)';
+      const diff = real - meta;
+      return `<div style="background:var(--s2);border:1px solid ${col}30;border-radius:10px;padding:14px;text-align:center;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:${col}"></div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px;font-weight:600">${label}</div>
+        <div style="font-size:22px;font-weight:700;font-family:var(--mono);color:${col};margin-bottom:4px">${(pct*100).toFixed(1)}%</div>
+        <div style="display:inline-block;font-size:9px;font-family:var(--mono);font-weight:600;padding:2px 8px;border-radius:4px;background:${bg};color:${col};margin-bottom:10px">${pct>=1?'▲ acima':'▼ abaixo'}</div>
+        <div style="display:flex;flex-direction:column;gap:4px;padding-top:8px;border-top:1px solid var(--border);font-size:10px">
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Real</span><span style="font-family:var(--mono);color:var(--txt)">${fmt(real)}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Meta sem.</span><span style="font-family:var(--mono);color:var(--muted2)">${fmt(meta)}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Diferença</span><span style="font-family:var(--mono);color:${col}">${diff>=0?'+':''}${fmt(diff)}</span></div>
+        </div>
+      </div>`;
+    };
+
+    semPaceGrid.innerHTML =
+      mkPaceCard('Faturamento', fatSem,  metaSemFat,  fmtR) +
+      mkPaceCard('Serviços',    srvSem,  metaSemSrv,  fmtN) +
+      mkPaceCard('Ticket médio',tickSem, metaSemTick, fmtR);
+
+    // Histórico da mesma semana nos meses anteriores
+    if(semHistGrid){
+      const mesesNomesHist = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      const siHist = semAtualIdx - 1; // índice da semana (0=S1, 1=S2...)
+      const histItems = d.semanal.fat.slice(0, idxSemAtual+1).map((mesFat, mi)=>{
+        const v = mesFat[siHist] || 0;
+        const isAtual = mi === idxSemAtual;
+        const cor = isAtual ? '#ffb84d' : v > 0 ? '#3dffa0' : 'var(--muted)';
+        return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:52px">
+          <div style="font-size:10px;font-weight:700;color:${cor};font-family:var(--mono);white-space:nowrap">${fmtR(v)}</div>
+          <div style="width:100%;height:4px;border-radius:2px;background:${cor}40;overflow:hidden">
+            <div style="height:100%;background:${cor};width:${v>0?(v/metaSemFat*100>100?100:v/metaSemFat*100).toFixed(0):0}%"></div>
+          </div>
+          <div style="font-size:9px;color:${cor};font-weight:${isAtual?700:400}">${mesesNomesHist[mi]}</div>
+          ${isAtual ? `<div style="font-size:8px;color:#ffb84d;text-transform:uppercase">atual</div>` : ''}
+        </div>`;
+      }).join('');
+      semHistGrid.innerHTML = histItems;
+    }
+  }
+
+  // ── Tabela semanal dinâmica ───────────────────────────
+  const tblSem = document.getElementById('tbl-semanal-body');
+  if(tblSem){
+    const semNames = ['S1','S2','S3','S4','S5'];
+    const fatSlice = d.semanal.fat.slice(0, idxSemAtual+1);
+    // Atualiza header dinamicamente
+    const tblSemHead = tblSem.closest('table')?.querySelector('thead tr');
+    if(tblSemHead) tblSemHead.innerHTML = `<th>Semana</th>` + semMeses.map(m=>`<th>${m}</th>`).join('');
+    tblSem.innerHTML = semNames.map((s,si)=>`<tr>
+      <td class="td-month">${s}</td>
+      ${fatSlice.map((mesFat,mi)=>{
+        const v = mesFat[si];
+        const isAtual = mi === idxSemAtual;
+        const cor = v > 0 ? (isAtual ? 'td-amber' : 'td-green') : 'td-num';
+        return `<td class="${cor}">${v > 0 ? fmtR(v) : '—'}</td>`;
+      }).join('')}
+    </tr>`).join('');
+  }
+  mkBar('semanalChart', semLabels,
+    semMeses.map((m,i)=>({
+      label: m,
+      data: d.semanal.fat[i].map(v=>v>0?v:null),
+      backgroundColor: semColors[i]+'b0',
+      borderRadius: 4
+    })),
+    {yTick:{callback:v=>fmtR(v)}});
+
+  // Gráfico 2: Serviços semanais
+  mkBar('servicosChart', semLabels,
+    semMeses.map((m,i)=>({
+      label: m,
+      data: d.semanal.srv[i].map(v=>v>0?v:null),
+      backgroundColor: semColors[i]+'b0',
+      borderRadius: 4
+    })),
+    {extra:{plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:10}}}}});
+
+  // Gráfico 3: Ticket semanal
+  mkLine('ticketSemChart', semLabels,
+    semMeses.map((m,i)=>({
+      label: m,
+      data: d.semanal.tick[i].map(v=>v>0?v:null),
+      borderColor: semColors[i],
+      tension: .3, pointRadius: 3, fill: false, spanGaps: false
+    })),
+    {yTick:{callback:v=>fmtR(v)}});
+
+  // % meta bars
+  const metaLabels=['Receita','Receita/dia','Ticket médio','Serviços','Serviços/dia','Hidratação','Prod./loja'];
+  document.getElementById('metaBars').innerHTML=d.metaPct.map((pct,i)=>`
+    <div class="meta-bar-item">
+      <span class="meta-bar-lbl">${metaLabels[i]}</span>
+      <div class="meta-bar-track"><div class="meta-bar-fill" style="width:0%;background:${metaColor(pct)}" data-pct="${Math.min(pct,100)}"></div></div>
+      <span class="meta-bar-pct" style="color:${metaColor(pct)}">${pct.toFixed(1)}%</span>
+    </div>`).join('');
+  setTimeout(()=>document.querySelectorAll('.meta-bar-fill').forEach(el=>{el.style.width=el.dataset.pct+'%';}),150);
+
+  // pace card
+  const {diasUteis:_dU,items}=d.pace;
+  const pctDias=Math.round(d.pace.diasTrabalhados/d.pace.diasUteis*100);
+
+
+  // ── Card de Metas — título, subtítulo e valores-alvo dinâmicos ────────────
+  const MESES_NOME = ['dez/25','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const idxUltimoReal = d.receita.reduce((last,v,i)=>v>0?i:last,-1);
+  const nomeMesCard = MESES_NOME[idxUltimoReal+1] || MESES_NOME[idxUltimoReal] || 'atual';
+  const mesesAntNomes = ['dez/25','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov'].slice(0, idxUltimoReal+1);
+  const subLbl = mesesAntNomes.length > 1
+    ? `Parcial acumulado ${mesesAntNomes[0]}–${mesesAntNomes[mesesAntNomes.length-1]} vs metas definidas`
+    : `Parcial acumulado vs metas definidas`;
+
+  const elMCT = document.getElementById('meta-card-title');
+  const elMCS = document.getElementById('meta-card-sub');
+  if(elMCT) elMCT.textContent = `Metas — ${nomeMesCard} (referência +8%)`;
+  if(elMCS) elMCS.textContent = subLbl;
+
+  // Valores-alvo
+  const fmtMeta = (v, isR) => isR ? fmtR(v) : fmtN(v);
+  const setMT = (id, val, isR=true) => { const el=document.getElementById(id); if(el) el.textContent=fmtMeta(val,isR); };
+  setMT('mt-receita',   d.metaReceita||68500,  true);
+  setMT('mt-recdia',    d.metaRecDia||2740,    true);
+  setMT('mt-ticket',    d.metaTicket||110.48,  true);
+  setMT('mt-vendas',    d.metaVendas||620,     false);
+  setMT('mt-vendasdia', d.metaVendasDia||24.8, false);
+  setMT('mt-hidrat',    d.metaHidrat||40,      false);
+  setMT('mt-produtos',  d.metaProdutos||4000,  true);
+
+  // Meta mensal no card projeção
+  const elProjMeta = document.getElementById('proj-meta-val');
+  if(elProjMeta) elProjMeta.textContent = fmtR(d.metaReceita||68500);
+
+  // Meta de serviços no card capacidade (label embaixo da barra)
+  const elCapMeta = document.getElementById('cap-bar-meta');
+  if(elCapMeta) elCapMeta.textContent = fmtN(d.metaVendas||620) + ' meta';
+
+  // Atualiza textos de dias no card de metas e PACE
+  const elDU   = document.getElementById('meta-dias-uteis');
+  const elDT   = document.getElementById('meta-dias-trab');
+  const elDF   = document.getElementById('meta-dias-falt');
+  const elML   = document.getElementById('meta-dias-label');
+  const elPS   = document.getElementById('pace-sub');
+  if(elDU) elDU.textContent = d.pace.diasUteis;
+  if(elDT) elDT.textContent = d.pace.diasTrabalhados;
+  if(elDF) elDF.textContent = d.pace.diasFaltantes;
+  if(elML) elML.textContent = `% da meta atingido — parcial ${nomeMesCard} (${d.pace.diasTrabalhados} de ${d.pace.diasUteis} dias)`;
+  if(elPS) elPS.textContent = `Comparativo entre o acumulado real e a meta esperada para ${d.pace.diasTrabalhados} de ${d.pace.diasUteis} dias trabalhados`;
+  document.getElementById('diasBar').style.width=pctDias+'%';
+  document.getElementById('diasLabel').innerHTML=`${d.pace.diasTrabalhados} de ${d.pace.diasUteis} dias úteis <span style="color:var(--muted)">· ${d.pace.diasFaltantes} faltantes</span>`;
+  document.getElementById('diasPct').textContent='← hoje ('+pctDias+'%)';
+  document.getElementById('paceGrid').innerHTML=items.map(p=>{
+    const pct=(p.pct*100).toFixed(1);const over=p.pct>=1;const diff=p.real-p.meta;const col=paceColor(p.pct);
+    return `<div class="pace-cell" style="border-color:${col}30">
+      <div class="pace-cell-accent" style="background:${col}"></div>
+      <div class="pace-label">${p.lbl}</div>
+      <div class="pace-indicator" style="color:${col}">${pct}%</div>
+      <div class="pace-badge" style="background:${paceBg(p.pct)};color:${col}">${over?'▲ acima':'▼ abaixo'}</div>
+      <div class="pace-sub">
+        <div class="pace-row"><span class="pace-row-lbl">Real</span><span class="pace-row-val" style="color:var(--txt)">${p.fmt(p.real)}</span></div>
+        <div class="pace-row"><span class="pace-row-lbl">Meta pro rata</span><span class="pace-row-val" style="color:var(--muted2)">${p.fmt(p.meta)}</span></div>
+        <div class="pace-row"><span class="pace-row-lbl">Diferença</span><span class="pace-row-val" style="color:${col}">${diff>=0?'+':''}${p.fmt(diff)}</span></div>
+      </div>
+    </div>`;
+  }).join('') + (() => {
+    const pReal  = d.produtos[idxMesAtual] || 0;
+    const pMeta  = d.metaProdutos || 4000;
+    // Meta pro rata mensal (igual aos outros cards do ritmo)
+    const pProp  = pMeta * (d.pace.diasTrabalhados / d.pace.diasUteis);
+    // Saldo = meta - realizado até hoje
+    const pSaldo = Math.max(0, pMeta - pReal);
+    // Meta semanal = saldo ÷ dias semanas restantes × dias da semana atual
+    const pMetaSem  = _diasSemsRestantes > 0 ? (pSaldo / _diasSemsRestantes) * _diasSemAtual : pMeta / 4;
+    const pMetaProp = pMetaSem * (_diasNaSem / _diasSemAtual);
+    const pPct  = pProp > 0 ? pReal / pProp : 0;
+    const pDiff = pReal - pProp;
+    const pCol  = pPct >= 1 ? '#3dffa0' : '#ff5f5f';
+    const over  = pPct >= 1;
+    return `<div class="pace-cell" style="border-color:${pCol}30">
+      <div class="pace-cell-accent" style="background:${pCol}"></div>
+      <div class="pace-label">PROD./LOJA</div>
+      <div class="pace-indicator" style="color:${pCol}">${fmtR(pReal)}</div>
+      <div class="pace-badge" style="background:${over?'rgba(61,255,160,.08)':'rgba(255,95,95,.08)'};color:${pCol}">${over?'▲ acima':'▼ abaixo'}</div>
+      <div class="pace-sub" style="gap:2px">
+        <div style="display:flex;justify-content:space-between;font-size:9px"><span style="color:var(--muted)">Meta p.r.</span><span style="font-family:var(--mono);color:var(--muted2)">${fmtR(pProp)}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:9px"><span style="color:var(--muted)">Meta sem.</span><span style="font-family:var(--mono);color:var(--muted2)">${fmtR(pMetaSem)}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:9px"><span style="color:var(--muted)">Difer.</span><span style="font-family:var(--mono);color:${pCol}">${pDiff>=0?'+':''}${fmtR(pDiff)}</span></div>
+      </div>
+    </div>`;
+  })();
+  // ── Mini tabela mínimo diário aceitável ──────────────
+  const minDiario = [
+    {dia:'Seg', min:25}, {dia:'Ter', min:20}, {dia:'Qua', min:20},
+    {dia:'Qui', min:25}, {dia:'Sex', min:30}, {dia:'Sáb', min:35}
+  ];
+  const hoje = new Date().getDay(); // 0=dom,1=seg...6=sab
+  const diaMap = [null,0,1,2,3,4,5]; // domingo não tem mínimo
+  const diaHoje = diaMap[hoje];
+  const elMinDiario = document.getElementById('min-diario');
+  if(elMinDiario) elMinDiario.innerHTML = minDiario.map((d,i)=>{
+    const isHoje = diaHoje === i;
+    const cor = isHoje ? '#ffb84d' : 'var(--muted2)';
+    const bg  = isHoje ? 'rgba(255,184,77,.12)' : 'var(--s2)';
+    const brd = isHoje ? '1px solid rgba(255,184,77,.4)' : '1px solid var(--border)';
+    return `<div style="text-align:center;padding:5px 2px;border-radius:6px;background:${bg};border:${brd}">
+      <div style="font-size:9px;color:${isHoje?'var(--amber)':'var(--muted)'};font-weight:${isHoje?700:400};margin-bottom:2px">${d.dia}</div>
+      <div style="font-size:12px;font-family:var(--mono);font-weight:700;color:${cor}">${d.min}</div>
+    </div>`;
+  }).join('');
+
+  // ── Linha do tempo — meta atingida por mês ───────────────
+  const tlEl = document.getElementById('timeline-meta');
+  if(tlEl){
+    const tlMeses = MESES.slice(1); // Jan..Jun
+    const tlReceita = d.receita.slice(1);
+    const tlMetaOk  = (d.metaOk || []).slice(1); // 'sim'|'não'|''|null
+    const tlNomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+    tlEl.innerHTML = tlMeses.map((m, i) => {
+      const rec  = tlReceita[i] || 0;
+      const idx  = i + 1;
+      const status = (tlMetaOk[i] || '').toLowerCase().trim(); // 'sim', 'não', ''
+      const temDados = rec > 0;
+      const isParcialMes = !mesFechado && idx === idxMesAtual;
+      const isFuturo = !temDados && !isParcialMes;
+
+      let cor, icone, bgCircle, label, pctTxt;
+
+      if(isFuturo){
+        cor = 'var(--muted)'; bgCircle = 'var(--border)'; icone = '·'; label = ''; pctTxt = '';
+      } else if(isParcialMes){
+        cor = '#ffb84d'; bgCircle = 'rgba(255,184,77,.15)'; icone = '…'; label = 'parcial';
+        pctTxt = fmtR(rec);
+      } else if(status === 'sim'){
+        cor = '#3dffa0'; bgCircle = 'rgba(61,255,160,.12)'; icone = '✓'; label = 'meta ✓';
+        pctTxt = fmtR(rec);
+      } else if(status === 'não' || status === 'nao'){
+        cor = '#ff5f5f'; bgCircle = 'rgba(255,95,95,.12)'; icone = '✗'; label = 'abaixo';
+        pctTxt = fmtR(rec);
+      } else {
+        cor = 'var(--muted)'; bgCircle = 'var(--border)'; icone = '·'; label = ''; pctTxt = '';
+      }
+
+      const isLast = i === tlMeses.length - 1;
+      return `
+        <div style="display:flex;align-items:center;flex:1;min-width:0">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0">
+            <div style="width:38px;height:38px;border-radius:50%;background:${bgCircle};border:2px solid ${cor}40;display:flex;align-items:center;justify-content:center;font-size:16px;color:${cor};font-weight:700;flex-shrink:0">${icone}</div>
+            <div style="font-size:10px;font-weight:700;color:${isFuturo?'var(--muted)':'var(--txt)'};font-family:var(--font)">${tlNomes[i]}</div>
+            ${pctTxt ? `<div style="font-size:9px;font-family:var(--mono);color:${cor};font-weight:600;white-space:nowrap">${pctTxt}</div>` : '<div style="font-size:9px;color:var(--muted)">—</div>'}
+            ${label ? `<div style="font-size:8px;color:${cor};text-transform:uppercase;letter-spacing:.3px;white-space:nowrap">${label}</div>` : '<div style="font-size:8px"> </div>'}
+          </div>
+          ${!isLast ? `<div style="flex:1;height:2px;background:linear-gradient(90deg,${cor}60,var(--border));max-width:32px;margin-bottom:28px"></div>` : ''}
+        </div>`;
+    }).join('');
+  }
+
+  // Atualiza banner de dados
+  updateDataBanner(d);
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── fetch e inicialização ────────────────────────────────
+// OPCIONAL: cole aqui a URL do Google Apps Script para iOS
+// Veja instruções em: script.google.com → novo projeto → cole o código abaixo → publicar como web app
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuS-aVKOUryyviMaXq5p1WhnnNTUZblK_2ClUdW7376b25yt95-EmX5h75HOELGiMJDg/exec';
+
+function bustCache(url){ return url + '&t=' + Date.now(); }
+
+async function fetchCSV(url, noCache=false){
+  const target = noCache ? bustCache(url) : url;
+
+  // Apps Script (melhor para iOS — funciona sempre)
+  if(APPS_SCRIPT_URL){
+    try {
+      const r = await fetch(APPS_SCRIPT_URL + '?url=' + encodeURIComponent(url), {
+        cache:'no-store',
+        mode:'cors'
+      });
+      if(r.ok){ const t=await r.text(); if(t.length>100) return t; }
+      console.warn('Apps Script retornou status:', r.status);
+    } catch(e){ console.warn('Apps Script erro:', e.message); }
+  }
+
+  // Direto
+  try {
+    const r = await fetch(target, {cache: noCache?'no-store':'default'});
+    if(r.ok){ const t=await r.text(); if(t.length>100) return t; }
+  } catch(e){}
+
+  // Proxies como fallback
+  const proxies = [
+    'https://corsproxy.io/?url=' + encodeURIComponent(target),
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(target),
+    'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(target),
+  ];
+  for(const proxy of proxies){
+    try {
+      const r = await fetch(proxy, {cache:'no-store'});
+      if(r.ok){ const t=await r.text(); if(t.length>100) return t; }
+    } catch(e){}
+  }
+
+  throw new Error('Load failed');
+}
+
+function setStatus(msg, color='var(--muted2)'){
+  const el = document.getElementById('sync-status');
+  if(el){ el.textContent = msg; el.style.color = color; }
+}
+
+function spinIcon(on){
+  const icon = document.getElementById('sync-icon');
+  if(icon) icon.style.animation = on ? 'spin .7s linear infinite' : '';
+}
+
+async function loadData(noCache=false){
+  try {
+    setStatus(noCache ? 'Buscando dados frescos...' : 'Carregando...', 'var(--amber)');
+    spinIcon(true);
+    const [csvTab, csvPlan, csvAds, csvSem] = await Promise.all([
+      fetchCSV(SHEET_TABELA,  noCache),
+      fetchCSV(SHEET_PLANOS,  noCache),
+      fetchCSV(SHEET_ADS,     noCache),
+      fetchCSV(SHEET_SEMANAL, noCache),
+    ]);
+
+    let d = parseTabela(csvTab);
+    d = parsePlanos(csvPlan, d);
+    d = parseAds(csvAds, d);
+    d = parseSemanal(csvSem, d);
+    renderAll(d);
+    const dataLabel = d.dataAtualizacao
+      || new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+    setStatus('✅ Atualizado até ' + dataLabel, 'var(--green)');
+  } catch(e){
+    const hoje = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+    setStatus('⚠️ Dados locais · ' + hoje, 'var(--amber)');
+    console.warn('⚠️ Erro ao carregar Sheets:', e.message);
+    renderAll(defaults);
+  } finally {
+    spinIcon(false);
+  }
+}
+
+async function forceRefresh(){
+  const btn = document.getElementById('sync-btn');
+  if(btn) btn.disabled = true;
+  await loadData(true);
+  if(btn) btn.disabled = false;
+}
+
+async function init(){
+  // Mostra loading sem renderizar dados estáticos
+  setStatus('Carregando...', 'var(--amber)');
+  spinIcon(true);
+  await loadData(false);
+}
+
+init();
+</script>
+</body>
+</html>
