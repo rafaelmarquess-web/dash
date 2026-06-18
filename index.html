@@ -1630,7 +1630,7 @@ function renderAll(d){
   if(elPSDelta) elPSDelta.innerHTML =
     `<span style="color:${_paceSemCor};font-weight:600;font-size:12px">${_paceSemSeta} ${fmtR(Math.abs(_paceSemDiff))}</span>`+
     `<span style="color:var(--muted);font-size:11px"> · </span>`+
-    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${fmtR(_metaSemProp)}</span>`;
+    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta sem. ${fmtR(_metaSemAtual)}</span>`;
   if(elPSAcc) elPSAcc.style.background = _paceSemCor;
   if(kpiPS) kpiPS.style.setProperty('--acc', _paceSemCor);
 
