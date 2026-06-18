@@ -1659,11 +1659,14 @@ function renderAll(d){
     `PACE SEMANA — S${_semAtualN+1} (${_diasNaSem} de ${_diasSemAtual}d) · meta sem.`;
 
   if(metaPaceSemGrid){
-    // Serviços parcial S atual
+    // Serviços parcial S atual — mesma lógica do faturamento
     const _srvSemOp       = (d.semanal?.srv[_idxSemOp]) || [];
     const _srvSemFechadas = _srvSemOp.slice(0, _semFechadasN).reduce((a,b)=>a+b, 0);
     const _srvParcSem     = Math.max(0, (d.vendas[idxMesAtual]||0) - _srvSemFechadas);
-    const _metaSemSrv     = (_metaDiaSaldo / ((d.metaReceita||68500) / (d.metaVendas||660))) * _diasSemAtual;
+    // Saldo meta serviços = meta - semanas fechadas
+    const _metaSaldoSrv   = Math.max(0, (d.metaVendas||660) - _srvSemFechadas);
+    // Meta S atual = saldo ÷ dias semanas restantes × dias da semana
+    const _metaSemSrv     = (_metaSaldoSrv / _diasSemsRestantes) * _diasSemAtual;
     // Ticket parcial S atual
     const _tickSemOp      = (d.semanal?.tick[_idxSemOp]) || [];
     const _tickParcSem    = _tickSemOp[_semAtualN] || (d.ticket[idxMesAtual]||0);
@@ -1687,7 +1690,7 @@ function renderAll(d){
 
     metaPaceSemGrid.innerHTML =
       mkMetaPaceCard('Faturamento', _recParcSem, _metaSemAtual, fmtR) +
-      mkMetaPaceCard('Serviços',    _srvParcSem, Math.round((d.metaVendas||660)/4), fmtN) +
+      mkMetaPaceCard('Serviços',    _srvParcSem, _metaSemSrv, fmtN) +
       mkMetaPaceCard('Ticket',      _tickParcSem, _metaSemTick, fmtR, true);
   }
 
