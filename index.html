@@ -706,6 +706,24 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     <div id="sem-status" style="display:none;font-size:11px;font-family:var(--mono);padding:5px 12px;border-radius:6px;background:rgba(255,184,77,.1);border:1px solid rgba(255,184,77,.3);color:#ffb84d"></div>
   </div>
 
+  <!-- Pace Semanal -->
+  <div class="card" style="margin-bottom:14px" id="card-pace-semanal">
+    <div class="card-head">
+      <div>
+        <div class="card-title" id="sem-pace-title">Pace semanal — S1 de Jun</div>
+        <div class="card-sub" id="sem-pace-sub">Semana atual vs meta proporcional · comparativo histórico</div>
+      </div>
+      <span class="badge badge-green">PACE</span>
+    </div>
+    <!-- 3 cards de pace -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px" id="semPaceGrid"></div>
+    <!-- Contexto histórico -->
+    <div style="padding:12px;background:var(--s2);border:1px solid var(--border);border-radius:8px">
+      <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;font-weight:600">Comparativo histórico — mesma semana</div>
+      <div style="display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch" id="semHistGrid"></div>
+    </div>
+  </div>
+
   <!-- Gráfico principal: Faturamento semanal por mês -->
   <div class="card" style="margin-bottom:14px">
     <div class="card-head">
@@ -2008,6 +2026,69 @@ function renderAll(d){
   setKpi('sem-ritmo', fmtR(ritmoProj),
     `<span style="color:${ritmoCor}">${ritmoPct}% da meta</span>`+
     `<span style="color:var(--muted2)"> · ${diasTrabSem}/${diasUteisSem} dias</span>`);
+
+  // ── Pace Semanal ──────────────────────────────────────
+  const semPaceGrid = document.getElementById('semPaceGrid');
+  const semHistGrid = document.getElementById('semHistGrid');
+  const semPaceTitle = document.getElementById('sem-pace-title');
+  const semPaceSub   = document.getElementById('sem-pace-sub');
+
+  if(semAtualIdx > 0 && semPaceGrid){
+    // Meta semanal = meta mensal ÷ 4 semanas (proporcional)
+    const metaSemFat  = (d.metaReceita || 68500) / 4;
+    const metaSemSrv  = (d.metaVendas  || 660)   / 4;
+    const metaSemTick = d.metaTicket   || 111.39;
+
+    const fatSem  = fatSemAtual[semAtualIdx-1]  || 0;
+    const srvSem  = srvSemAtual[semAtualIdx-1]  || 0;
+    const tickSem = tickSemAtual[semAtualIdx-1] || 0;
+
+    if(semPaceTitle) semPaceTitle.textContent = `Pace semanal — S${semAtualIdx} de ${nomeMesAtual}`;
+    if(semPaceSub)   semPaceSub.textContent   = `Semana atual vs meta proporcional (meta mensal ÷ 4) · histórico da S${semAtualIdx}`;
+
+    const mkPaceCard = (label, real, meta, fmt) => {
+      const pct = meta > 0 ? real / meta : 0;
+      const col = pct >= 1 ? '#3dffa0' : pct >= 0.8 ? '#ffb84d' : '#ff5f5f';
+      const bg  = pct >= 1 ? 'rgba(61,255,160,.08)' : pct >= 0.8 ? 'rgba(255,184,77,.08)' : 'rgba(255,95,95,.08)';
+      const diff = real - meta;
+      return `<div style="background:var(--s2);border:1px solid ${col}30;border-radius:10px;padding:14px;text-align:center;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:${col}"></div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px;font-weight:600">${label}</div>
+        <div style="font-size:22px;font-weight:700;font-family:var(--mono);color:${col};margin-bottom:4px">${(pct*100).toFixed(1)}%</div>
+        <div style="display:inline-block;font-size:9px;font-family:var(--mono);font-weight:600;padding:2px 8px;border-radius:4px;background:${bg};color:${col};margin-bottom:10px">${pct>=1?'▲ acima':'▼ abaixo'}</div>
+        <div style="display:flex;flex-direction:column;gap:4px;padding-top:8px;border-top:1px solid var(--border);font-size:10px">
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Real</span><span style="font-family:var(--mono);color:var(--txt)">${fmt(real)}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Meta sem.</span><span style="font-family:var(--mono);color:var(--muted2)">${fmt(meta)}</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Diferença</span><span style="font-family:var(--mono);color:${col}">${diff>=0?'+':''}${fmt(diff)}</span></div>
+        </div>
+      </div>`;
+    };
+
+    semPaceGrid.innerHTML =
+      mkPaceCard('Faturamento', fatSem,  metaSemFat,  fmtR) +
+      mkPaceCard('Serviços',    srvSem,  metaSemSrv,  fmtN) +
+      mkPaceCard('Ticket médio',tickSem, metaSemTick, fmtR);
+
+    // Histórico da mesma semana nos meses anteriores
+    if(semHistGrid){
+      const mesesNomesHist = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      const siHist = semAtualIdx - 1; // índice da semana (0=S1, 1=S2...)
+      const histItems = d.semanal.fat.slice(0, idxSemAtual+1).map((mesFat, mi)=>{
+        const v = mesFat[siHist] || 0;
+        const isAtual = mi === idxSemAtual;
+        const cor = isAtual ? '#ffb84d' : v > 0 ? '#3dffa0' : 'var(--muted)';
+        return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:52px">
+          <div style="font-size:10px;font-weight:700;color:${cor};font-family:var(--mono);white-space:nowrap">${fmtR(v)}</div>
+          <div style="width:100%;height:4px;border-radius:2px;background:${cor}40;overflow:hidden">
+            <div style="height:100%;background:${cor};width:${v>0?(v/metaSemFat*100>100?100:v/metaSemFat*100).toFixed(0):0}%"></div>
+          </div>
+          <div style="font-size:9px;color:${cor};font-weight:${isAtual?700:400}">${mesesNomesHist[mi]}</div>
+          ${isAtual ? `<div style="font-size:8px;color:#ffb84d;text-transform:uppercase">atual</div>` : ''}
+        </div>`;
+      }).join('');
+      semHistGrid.innerHTML = histItems;
+    }
+  }
 
   // ── Tabela semanal dinâmica ───────────────────────────
   const tblSem = document.getElementById('tbl-semanal-body');
