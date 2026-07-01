@@ -798,8 +798,8 @@ const defaults = {
   produtos:  [2572.46, 1486.32, 3174.90, 3723.26, 2870.13, 7426.52, 696.89, null, null, null, null, null, null],
   taxiDog:   [51, 56, 50, 65, 67, 57, 6, null, null, null, null, null, null],
   escovacao: [121, 184, 170, 163, 223, 231, 4, null, null, null, null, null, null],
-  metaProdutos: 8000, metaReceita: 73515, metaRecDia: 2940.60, metaTicket: 111.39,
-  metaVendas: 660, metaVendasDia: 26, metaHidrat: 70,
+  metaProdutos: 7000, metaReceita: 72099.73, metaRecDia: 2773.07, metaTicket: 110.92,
+  metaVendas: 650, metaVendasDia: 25, metaHidrat: 70,
   metaOk: [null,'não','sim','não','sim','sim',null,null,null,null,null,null,null],
   dataAtualizacao: '02/06/2026',
   planos:    {meses:['dez/25','jan','fev','mar','abr','mai'],qtd:[26,36,30,38,49,50],rec:[8748.30,12412.00,10679.40,12604.60,16764.69,16925.40]},
@@ -1052,13 +1052,13 @@ function parseTabela(csv){
       }
     }
   });
-  const paceItems = lineMeta && lineReal ? [
-    {lbl:'Receita×Dias',meta:gp(lineMeta,4), real:gp(lineReal,4), fmt:v=>fmtR(v)},
-    {lbl:'Receita/dia', meta:gp(lineMeta,5), real:gp(lineReal,5), fmt:v=>fmtR(v)},
-    {lbl:'Ticket médio',meta:gp(lineMeta,6), real:gp(lineReal,6), fmt:v=>fmtR(v)},
-    {lbl:'Serviços×Dias', meta:gp(lineMeta,7), real:gp(lineReal,7), fmt:v=>fmtN(v)},
-    {lbl:'Serviços/dia',  meta:gp(lineMeta,8), real:gp(lineReal,8), fmt:v=>fmtN(v)},
-  ].map(p=>({...p,pct:p.meta&&p.real?p.real/p.meta:1})) : defaults.pace.items;
+  const paceItems = [
+    {lbl:'Receita×Dias', meta: metaReceita   * (diasTrabalhados/diasUteis), real:gp(lineReal,4)||0, fmt:v=>fmtR(v)},
+    {lbl:'Receita/dia',  meta: metaRecDia,                                  real:gp(lineReal,5)||0, fmt:v=>fmtR(v)},
+    {lbl:'Ticket médio', meta: metaTicket,                                  real:gp(lineReal,6)||0, fmt:v=>fmtR(v)},
+    {lbl:'Serviços×Dias',meta: metaVendas    * (diasTrabalhados/diasUteis), real:gp(lineReal,7)||0, fmt:v=>fmtN(v)},
+    {lbl:'Serviços/dia', meta: metaVendasDia,                               real:gp(lineReal,8)||0, fmt:v=>fmtN(v)},
+  ].map(p=>({...p,pct:p.meta&&p.real?p.real/p.meta:0}));
 
   return {receita,ticket,vendas,vendasDia,hidrat,produtos,taxiDog,escovacao,
     metaProdutos,metaReceita,metaRecDia,metaTicket,metaVendas,metaVendasDia,metaHidrat,
@@ -1613,12 +1613,6 @@ function renderAll(d){
     ? _diasSemPorMes[_idxSemOp].slice(_semAtualN).reduce((a,b)=>a+(b||5), 0)
     : (5 - _semAtualN) * 5;
 
-  console.log('DEBUG pace sem:', {
-    _semAtualN, _semFechadasN, _diasSemAtual, _diasNaSem,
-    _fatSemFechadas, _recParcSem, _metaSaldo,
-    _diasSemsRestantes,
-    diasSemRestantes_raw: _diasSemPorMes ? _diasSemPorMes[_idxSemOp] : 'null'
-  });
 
   // Meta diária do saldo = saldo ÷ dias das semanas restantes
   const _diasFalt = Math.max(1, _diasSemsRestantes);
