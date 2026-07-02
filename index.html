@@ -530,6 +530,20 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       </div>
   </div>
 
+  <!-- Detalhamento mensal — largura total, após planos -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div><div class="card-title">Detalhamento mensal</div><div class="card-sub">Todos os indicadores de operação</div></div>
+    </div>
+    <div class="tbl-mobile" id="tbl-mobile-body"></div>
+    <div class="tbl-desktop tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <table style="min-width:900px;width:100%">
+        <thead><tr><th>Mês</th><th>Receita</th><th>Custo</th><th>Margem</th><th>Serviços</th><th>Ticket</th><th>Hidr.</th><th>Táxi Dog</th><th>Produtos</th><th>Escovação</th></tr></thead>
+        <tbody id="tbl-desktop-body"></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Ticket + Serviços/dia -->
   <div class="row2b" style="margin-bottom:14px">
     <div class="card">
@@ -542,26 +556,12 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     </div>
   </div>
 
-  <!-- Detalhamento mensal + Alerta Receita vs Custo -->
-  <div class="row2b" style="margin-bottom:14px">
-    <div class="card">
-      <div class="card-head">
-        <div><div class="card-title">Detalhamento mensal</div><div class="card-sub">Todos os indicadores de operação</div></div>
-      </div>
-      <div class="tbl-mobile" id="tbl-mobile-body"></div>
-      <div class="tbl-desktop tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch">
-        <table style="min-width:600px;width:100%">
-          <thead><tr><th>Mês</th><th>Receita</th><th>Custo</th><th>Margem</th><th>Serviços</th><th>Ticket</th><th>Hidr.</th><th>Táxi Dog</th><th>Produtos</th><th>Escovação</th></tr></thead>
-          <tbody id="tbl-desktop-body"></tbody>
-        </table>
-      </div>
+  <!-- Alerta Receita vs Custo -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div><div class="card-title">Alerta: Receita vs Custo</div><div class="card-sub">Meses com margem negativa precisam de atenção</div></div>
     </div>
-    <div class="card">
-      <div class="card-head">
-        <div><div class="card-title">Alerta: Receita vs Custo</div><div class="card-sub">Meses com margem negativa precisam de atenção</div></div>
-      </div>
-      <div class="custo-row" id="alertBody"></div>
-    </div>
+    <div class="custo-row" id="alertBody"></div>
   </div>
 
   <!-- Receita vs Custo (largura total) -->
