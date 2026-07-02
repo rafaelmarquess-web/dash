@@ -659,10 +659,10 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <table>
         <thead><tr><th>Mês</th><th>Campanha</th><th>Investimento</th><th>Clientes</th><th>CAC</th><th>ROAS</th><th>Status</th></tr></thead>
         <tbody id="mkt-tabela-body">
-          <tr><td class="td-month">Jan</td><td class="td-num">GMB</td><td class="td-amber">R$ 900,00</td><td class="td-num">25</td><td class="td-green">R$ 36,00</td><td class="td-green">3.94x</td><td>🟢 Escalar</td></tr>
-          <tr><td class="td-month">Fev</td><td class="td-num">GMB+Clínica</td><td class="td-amber">R$ 1,0K</td><td class="td-num">23</td><td class="td-green">R$ 43,48</td><td class="td-green">3.43x</td><td>🟢 Escalar</td></tr>
-          <tr><td class="td-month">Mar</td><td class="td-num">GMB</td><td class="td-amber">R$ 1,2K</td><td class="td-num">15</td><td class="td-red">R$ 80,00</td><td class="td-amber">2.02x</td><td>🔴 Revisar</td></tr>
-          <tr><td class="td-month">Abr</td><td class="td-num">GMB+Search</td><td class="td-amber">R$ 2,0K</td><td class="td-num">31</td><td class="td-red">R$ 64,52</td><td class="td-amber">2.87x</td><td>🟡 Manter</td></tr>
+          <tr><td class="td-month">Jan</td><td class="td-num">GMB</td><td class="td-amber">R$ 900,00</td><td class="td-num">25</td><td class="td-green">R$ 36,00</td><td class="td-blue">3.94x</td><td>🔵 Excelente</td></tr>
+          <tr><td class="td-month">Fev</td><td class="td-num">GMB+Clínica</td><td class="td-amber">R$ 1,0K</td><td class="td-num">23</td><td class="td-green">R$ 43,48</td><td class="td-green">3.43x</td><td>🟢 Muito bom</td></tr>
+          <tr><td class="td-month">Mar</td><td class="td-num">GMB</td><td class="td-amber">R$ 1,2K</td><td class="td-num">15</td><td class="td-red">R$ 80,00</td><td class="td-amber">2.02x</td><td>🟡 Aceitável</td></tr>
+          <tr><td class="td-month">Abr</td><td class="td-num">GMB+Search</td><td class="td-amber">R$ 2,0K</td><td class="td-num">31</td><td class="td-red">R$ 64,52</td><td class="td-green">2.87x</td><td>🟢 Muito bom</td></tr>
         </tbody>
       </table>
     </div>
@@ -1956,29 +1956,34 @@ function renderAll(d){
       `<span style="color:${cliOk?'var(--green)':'var(--amber)'}; font-weight:600; font-family:var(--mono)">${cliPct}%</span>`+
       `<span style="color:var(--muted2)"> da meta</span>`;
 
-    // Badge de decisão — algoritmo decide sozinho, mostra os 3 com destaque
+    // Badge de decisão — algoritmo decide sozinho, mostra os 4 com destaque
     const badge = document.getElementById('mkt-badge');
     const desc  = document.getElementById('mkt-badge-desc');
     if(badge && desc){
       let decisao, bg, cor;
-      if(roas > 3 && cac < META_CAC){ decisao='escalar'; bg='rgba(61,255,160,.12)'; cor='#3dffa0'; }
-      else if(roas >= 2.5)           { decisao='manter';  bg='rgba(255,184,77,.12)'; cor='#ffb84d'; }
-      else                           { decisao='revisar'; bg='rgba(255,95,95,.12)';  cor='#ff5f5f'; }
+      if(roas >= 3.5)       { decisao='excelente'; bg='rgba(77,166,255,.12)'; cor='#4da6ff'; }
+      else if(roas >= 2.5)  { decisao='muitobom';  bg='rgba(61,255,160,.12)'; cor='#3dffa0'; }
+      else if(roas >= 2.0)  { decisao='aceitavel'; bg='rgba(255,184,77,.12)'; cor='#ffb84d'; }
+      else                  { decisao='alerta';    bg='rgba(255,95,95,.12)';  cor='#ff5f5f'; }
 
       badge.style.background = 'transparent';
       badge.style.border = 'none';
       badge.style.padding = '0';
       badge.innerHTML =
-        `<span style="opacity:${decisao==='escalar'?1:.25};font-size:13px;font-family:var(--font)">🟢 Escalar</span>`+
-        `<span style="margin:0 12px;color:var(--border)">·</span>`+
-        `<span style="opacity:${decisao==='manter'?1:.25};font-size:13px;font-family:var(--font)">🟡 Manter</span>`+
-        `<span style="margin:0 12px;color:var(--border)">·</span>`+
-        `<span style="opacity:${decisao==='revisar'?1:.25};font-size:13px;font-family:var(--font)">🔴 Revisar</span>`;
-      desc.textContent = decisao==='escalar'
-        ? `ROAS ${roas.toFixed(2)}x e CAC ${fmtR(cac)} — ótimo retorno, hora de escalar`
-        : decisao==='manter'
-        ? `ROAS ${roas.toFixed(2)}x — performance estável, monitorar`
-        : `ROAS ${roas.toFixed(2)}x — retorno baixo, revisar criativos`;
+        `<span style="opacity:${decisao==='excelente'?1:.25};font-size:13px;font-family:var(--font)">🔵 Excelente</span>`+
+        `<span style="margin:0 10px;color:var(--border)">·</span>`+
+        `<span style="opacity:${decisao==='muitobom'?1:.25};font-size:13px;font-family:var(--font)">🟢 Muito bom</span>`+
+        `<span style="margin:0 10px;color:var(--border)">·</span>`+
+        `<span style="opacity:${decisao==='aceitavel'?1:.25};font-size:13px;font-family:var(--font)">🟡 Aceitável</span>`+
+        `<span style="margin:0 10px;color:var(--border)">·</span>`+
+        `<span style="opacity:${decisao==='alerta'?1:.25};font-size:13px;font-family:var(--font)">🔴 Alerta</span>`;
+      desc.textContent = decisao==='excelente'
+        ? `ROAS ${roas.toFixed(2)}x — performance excepcional, escalar com agressividade`
+        : decisao==='muitobom'
+        ? `ROAS ${roas.toFixed(2)}x — ótimo retorno, manter e otimizar`
+        : decisao==='aceitavel'
+        ? `ROAS ${roas.toFixed(2)}x — performance aceitável, monitorar de perto`
+        : `ROAS ${roas.toFixed(2)}x — retorno abaixo do mínimo, revisar criativos`;
     }
 
     // Gráfico 1: ROAS + CAC eixos duplos
@@ -2079,9 +2084,9 @@ function renderAll(d){
       const campanhas = ['GMB','GMB+Clínica','GMB','GMB+Search'];
       tbody.innerHTML = ads.meses.map((m,i)=>{
         const r = ads.roas[i]; const c = ads.cac[i];
-        const badgeTxt = r>3 && c<META_CAC ? '🟢 Escalar' : r>=2.5 ? '🟡 Manter' : '🔴 Revisar';
+        const badgeTxt = r>=3.5 ? '🔵 Excelente' : r>=2.5 ? '🟢 Muito bom' : r>=2.0 ? '🟡 Aceitável' : '🔴 Alerta';
         const cacCor = c<=META_CAC ? 'td-green' : 'td-red';
-        const roasCor = r>=3 ? 'td-green' : r>=2.5 ? 'td-amber' : 'td-red';
+        const roasCor = r>=3.5 ? 'td-blue' : r>=2.5 ? 'td-green' : r>=2.0 ? 'td-amber' : 'td-red';
         return `<tr>
           <td class="td-month">${m}</td>
           <td class="td-num">${campanhas[i]||'—'}</td>
