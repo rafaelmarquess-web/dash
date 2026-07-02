@@ -551,7 +551,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <div class="tbl-mobile" id="tbl-mobile-body"></div>
       <div class="tbl-desktop tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch">
         <table style="min-width:600px;width:100%">
-          <thead><tr><th>Mês</th><th>Receita</th><th>Custo</th><th>Margem</th><th>Serviços</th><th>Ticket</th><th>Hidr.</th></tr></thead>
+          <thead><tr><th>Mês</th><th>Receita</th><th>Custo</th><th>Margem</th><th>Serviços</th><th>Ticket</th><th>Hidr.</th><th>Táxi Dog</th><th>Produtos</th><th>Escovação</th></tr></thead>
           <tbody id="tbl-desktop-body"></tbody>
         </table>
       </div>
@@ -1813,6 +1813,9 @@ function renderAll(d){
       <td class="td-num">${fmtN(d.vendas[i])||'—'}</td>
       <td class="td-num">${ticketFmt}</td>
       <td class="td-num">${d.hidrat[i]||'—'}</td>
+      <td class="td-num">${d.taxiDog[i]||'—'}</td>
+      <td class="td-num">${d.produtos[i]?fmtR(d.produtos[i]):'—'}</td>
+      <td class="td-num">${d.escovacao[i]||'—'}</td>
     </tr>`;
   }).join('');
 
