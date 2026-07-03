@@ -1577,6 +1577,7 @@ function renderAll(d){
   const _idxSemOp      = idxMesAtual - 1;
   const _fatSemOp      = (d.semanal?.fat[_idxSemOp]) || [];
   const _diasSemPorMes = (d.semanal?.diasSemPorMes)  || null;
+  console.log('DEBUG pace KPI:', {idxMesAtual, _idxSemOp, recAtual, diasTrab, _fatSemOp});
 
   // Semanas fechadas = com faturamento > 0 na planilha
   const _semFechadasN  = _fatSemOp.filter(v=>v>0).length;
