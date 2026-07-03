@@ -168,7 +168,7 @@ tbody td{padding:10px 10px;font-size:12px}
   .tab{padding:6px 16px;font-size:13px}
   .meta-pill{font-size:12px;padding:5px 14px}
   .wrap{padding:28px 32px}
-  .kpi-grid{grid-template-columns:repeat(7,1fr);gap:16px;margin-bottom:20px}
+  .kpi-grid{grid-template-columns:repeat(9,1fr);gap:16px;margin-bottom:20px}
   .kpi{padding:22px 20px}
   .kpi-val{font-size:26px}
   .kpi-label{font-size:11px}
@@ -308,10 +308,16 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <div class="kpi-accent"></div>
     </div>
     <div class="kpi" id="kpi-pace-sem" style="--acc:#a78bfa">
-      <div class="kpi-label" id="kpi-pace-sem-label">PACE SEMANA</div>
+      <div class="kpi-label" id="kpi-pace-sem-label">PACE FAT. SEMANA</div>
       <div class="kpi-val" id="kp-pace-sem-val">—</div>
       <div class="kpi-footer" id="kp-pace-sem-delta"><span class="delta">carregando...</span></div>
       <div class="kpi-accent" id="kpi-pace-sem-accent"></div>
+    </div>
+    <div class="kpi" id="kpi-pace-srv" style="--acc:#a78bfa">
+      <div class="kpi-label" id="kpi-pace-srv-label">PACE SRV. SEMANA</div>
+      <div class="kpi-val" id="kp-pace-srv-val">—</div>
+      <div class="kpi-footer" id="kp-pace-srv-delta"><span class="delta">carregando...</span></div>
+      <div class="kpi-accent" id="kpi-pace-srv-accent"></div>
     </div>
   </div>
 
@@ -1615,17 +1621,48 @@ function renderAll(d){
   const elPSAcc   = document.getElementById('kpi-pace-sem-accent');
   const kpiPS     = elPSVal?.closest('.kpi');
 
-  if(elPSLabel) elPSLabel.textContent = `PACE SEMANA (S${_semAtualN+1} · ${_diasNaSem} DE ${_diasSemAtual}D)`;
+  if(elPSLabel) elPSLabel.textContent = `PACE FAT. (S${_semAtualN+1} · ${_diasNaSem}/${_diasSemAtual}D)`;
   if(elPSVal){
     elPSVal.textContent = fmtR(_recParcSem);
     elPSVal.style.color = _paceSemCor;
   }
   if(elPSDelta) elPSDelta.innerHTML =
-    `<span style="color:${_paceSemCor};font-weight:600;font-size:12px">${_paceSemSeta} ${fmtR(Math.abs(_paceSemDiff))}</span>`+
+    `<span style="color:${_paceSemCor};font-weight:600;font-size:12px">${_paceSemSeta} ${(_paceSemPct*100).toFixed(1)}%</span>`+
     `<span style="color:var(--muted);font-size:11px"> · </span>`+
-    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta sem. ${fmtR(_metaSemAtual)}</span>`;
+    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${fmtR(_metaSemAtual)}</span>`;
   if(elPSAcc) elPSAcc.style.background = _paceSemCor;
   if(kpiPS) kpiPS.style.setProperty('--acc', _paceSemCor);
+
+  // ── KPI Pace Semana — Serviços ───────────────────────
+  const _srvSemOp2      = (d.semanal?.srv[_idxSemOp]) || [];
+  const _srvSemFech2    = _srvSemOp2.slice(0, _semFechadasN).reduce((a,b)=>a+b, 0);
+  const _srvRealMes2    = d.pace.items[3]?.real || d.vendas[idxMesAtual] || 0;
+  const _srvParcSem2    = Math.max(0, _srvRealMes2 - _srvSemFech2);
+  // Meta serviços: saldo ÷ dias semanas restantes × dias semana atual
+  const _metaSaldoSrv2  = Math.max(0, (d.metaVendas||650) - _srvSemFech2);
+  const _metaSemSrv2    = _diasSemsRestantes > 0 ? (_metaSaldoSrv2 / _diasSemsRestantes) * _diasSemAtual : (d.metaVendas||650) / 5;
+  const _metaSemSrvProp = _metaSemSrv2 * (_diasNaSem / _diasSemAtual);
+  const _paceSrvPct     = _metaSemSrvProp > 0 ? _srvParcSem2 / _metaSemSrvProp : 0;
+  const _paceSrvCor     = _paceSrvPct >= 1 ? '#3dffa0' : _paceSrvPct >= 0.8 ? '#ffb84d' : '#ff5f5f';
+  const _paceSrvSeta    = _paceSrvPct >= 1 ? '↑' : '↓';
+
+  const elSRVVal   = document.getElementById('kp-pace-srv-val');
+  const elSRVDelta = document.getElementById('kp-pace-srv-delta');
+  const elSRVLabel = document.getElementById('kpi-pace-srv-label');
+  const elSRVAcc   = document.getElementById('kpi-pace-srv-accent');
+  const kpiSRV     = elSRVVal?.closest('.kpi');
+
+  if(elSRVLabel) elSRVLabel.textContent = `PACE SRV. (S${_semAtualN+1} · ${_diasNaSem}/${_diasSemAtual}D)`;
+  if(elSRVVal){
+    elSRVVal.textContent = fmtN(_srvParcSem2);
+    elSRVVal.style.color = _paceSrvCor;
+  }
+  if(elSRVDelta) elSRVDelta.innerHTML =
+    `<span style="color:${_paceSrvCor};font-weight:600;font-size:12px">${_paceSrvSeta} ${(_paceSrvPct*100).toFixed(1)}%</span>`+
+    `<span style="color:var(--muted);font-size:11px"> · </span>`+
+    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${Math.round(_metaSemSrv2)}</span>`;
+  if(elSRVAcc) elSRVAcc.style.background = _paceSrvCor;
+  if(kpiSRV) kpiSRV.style.setProperty('--acc', _paceSrvCor);
 
   // ── Pace semanal no card de Metas ────────────────────
   const metaPaceSemGrid  = document.getElementById('metaPaceSemGrid');
