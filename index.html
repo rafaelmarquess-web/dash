@@ -2298,9 +2298,8 @@ function renderAll(d){
 
   // ── Card de Metas — título, subtítulo e valores-alvo dinâmicos ────────────
   const MESES_NOME = ['dez/25','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const idxUltimoReal = d.receita.reduce((last,v,i)=>v>0?i:last,-1);
-  const nomeMesCard = MESES_NOME[idxUltimoReal+1] || MESES_NOME[idxUltimoReal] || 'atual';
-  const mesesAntNomes = ['dez/25','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov'].slice(0, idxUltimoReal+1);
+  const nomeMesCard = MESES_NOME[idxMesAtual] || 'atual';
+  const mesesAntNomes = ['dez/25','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov'].slice(0, idxMesAtual);
   const subLbl = mesesAntNomes.length > 1
     ? `Parcial acumulado ${mesesAntNomes[0]}–${mesesAntNomes[mesesAntNomes.length-1]} vs metas definidas`
     : `Parcial acumulado vs metas definidas`;
