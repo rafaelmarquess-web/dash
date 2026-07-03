@@ -45,7 +45,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);min-height:10
 #sync-btn svg{width:11px;height:11px}
 
 /* ── LAYOUT ── */
-.wrap{padding:14px 14px;max-width:1920px;margin:0 auto;box-sizing:border-box;overflow-x:hidden}
+.wrap{padding:14px 14px;max-width:1920px;margin:0 auto;box-sizing:border-box}
 
 /* ── KPI GRID ── */
 .kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;width:100%}
@@ -170,10 +170,10 @@ tbody td{padding:10px 10px;font-size:12px}
   .meta-pill{font-size:12px;padding:5px 14px}
   .wrap{padding:28px 32px}
   .kpi-grid{grid-template-columns:repeat(9,1fr);gap:6px;margin-bottom:20px}
-  .kpi{padding:18px 10px}
-  .kpi-val{font-size:clamp(12px,1.1vw,18px);letter-spacing:-0.5px}
-  .kpi-label{font-size:clamp(7px,.6vw,9px);letter-spacing:.6px}
-  .kpi-footer{font-size:clamp(8px,.65vw,10px)}
+  .kpi{padding:18px 12px}
+  .kpi-val{font-size:clamp(16px,1.5vw,24px);letter-spacing:-0.5px}
+  .kpi-label{font-size:clamp(8px,.72vw,10px);letter-spacing:.6px}
+  .kpi-footer{font-size:clamp(9px,.75vw,11px)}
   .row2{grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px}
   .row3{grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
   .row2b{grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
@@ -270,7 +270,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 <!-- ===== ABA OPERAÇÃO ===== -->
 <div id="tab-operacao" class="tab-content active">
 
-  <div class="kpi-grid" id="kpi-pace-top" style="align-items:stretch">
+  <div class="kpi-grid" id="kpi-pace-top">
     <div class="kpi" style="--acc:var(--green)">
       <div class="kpi-label">Receita × dias</div>
       <div class="kpi-val" id="kp-receita-val">—</div>
