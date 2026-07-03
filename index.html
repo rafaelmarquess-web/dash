@@ -914,11 +914,6 @@ function parseTabela(csv){
 
   const byMes = findMesRows(lines, mesesKey);
   // Log das linhas brutas com "jun" para diagnóstico
-  const junLines = lines.filter(l => l.toLowerCase().includes('jun'));
-  console.log('DEBUG linhas com jun:', junLines.length);
-  junLines.forEach((l,i) => console.log(`  jun[${i}] cols:`, splitLine(l).slice(0,12)));
-  console.log('DEBUG byMes keys:', Object.keys(byMes));
-  console.log('DEBUG receita raw:', mesesKey.map(m=>{ const r=byMes[m]; return m+':'+(r?parseBR(r.cols[r.mesIdx+1]):'null'); }));
 
   // Primeira tabela (cols relativas ao mês): RECEITA, RECEITA/DIA, col4, TICKET, VENDAS, VENDAS/DIA, HIDRAT, LOJA
   // Na planilha: B=mês, C=receita, D=rec/dia, E=vazio, F=ticket, G=vendas, H=vendas/dia, I=hidrat, J=loja
@@ -970,7 +965,6 @@ function parseTabela(csv){
     else if(lbl.includes('hidrat'))                            { metaHidrat    = val; metasLidas++; }
     else if(lbl === 'loja'  && val >= 100)                     { metaProdutos  = val; metasLidas++; }
   });
-  console.log('DEBUG metas lidas:', {metaReceita,metaRecDia,metaTicket,metaVendas,metaVendasDia,metaHidrat,metaProdutos});
 
   // Segunda tabela CUSTO X RECEITA: col B=mês, col C=receita, col D=custo
   // No CSV: col0=vazio, col1=mês, col2=receita, col3=custo
@@ -1302,7 +1296,6 @@ function renderCapacidade(d, idxMesAtual){
 function renderProjecao(d, idxMesAtual){
   const {diasTrabalhados, diasUteis, diasFaltantes} = d.pace;
   const receitaAtual = d.receita[idxMesAtual] || 0;
-  console.log('DEBUG renderProjecao — idxMesAtual:', idxMesAtual, 'receitaAtual:', receitaAtual, 'receita array:', d.receita);
   const ritmoDia = diasTrabalhados > 0 ? receitaAtual / diasTrabalhados : 0;
   const projecao = receitaAtual + (ritmoDia * diasFaltantes);
   const META_MENSAL = d.metaReceita || 68500;
@@ -1341,7 +1334,6 @@ function renderAll(d){
       if(idxData > 0 && idxData <= 12) idxMesAtual = idxData;
     }
   }
-  console.log('DEBUG idxMesAtual por data:', idxMesAtual, 'dataAtualizacao:', d.dataAtualizacao);
 
   const idxParcial = mesFechado ? -1 : idxMesAtual;
 
@@ -1388,13 +1380,6 @@ function renderAll(d){
     return null;
   });
 
-  console.log('DEBUG idxUltimoComDados:', idxUltimoComDados);
-  console.log('DEBUG idxMesAtual:', idxMesAtual);
-  console.log('DEBUG mesFechado:', mesFechado);
-  console.log('DEBUG diasTrabalhados:', diasTrabalhados, 'diasFaltantes:', diasFaltantes);
-  console.log('DEBUG receita:', d.receita);
-  console.log('DEBUG metaProdutos:', d.metaProdutos);
-  console.log('DEBUG pace items:', d.pace.items?.map(p=>p.real));
   const ctxR = document.getElementById('receitaChart')?.getContext('2d');
   if(ctxR){
     if(_charts['receitaChart']) _charts['receitaChart'].destroy();
@@ -1577,7 +1562,6 @@ function renderAll(d){
   const _idxSemOp      = idxMesAtual - 1;
   const _fatSemOp      = (d.semanal?.fat[_idxSemOp]) || [];
   const _diasSemPorMes = (d.semanal?.diasSemPorMes)  || null;
-  console.log('DEBUG pace KPI:', {idxMesAtual, _idxSemOp, recAtual, diasTrab, _fatSemOp});
 
   // Semanas fechadas = com faturamento > 0 na planilha
   const _semFechadasN  = _fatSemOp.filter(v=>v>0).length;
