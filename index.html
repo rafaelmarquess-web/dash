@@ -1639,9 +1639,10 @@ function renderAll(d){
     elPSVal.style.color = _paceSemCor;
   }
   if(elPSDelta) elPSDelta.innerHTML =
-    `<span style="color:${_paceSemCor};font-weight:600;font-size:12px">${_paceSemSeta} ${fmtR(_mediaDiaFat)}/dia</span>`+
-    `<span style="color:var(--muted);font-size:11px"> · </span>`+
-    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta sem. ${fmtR(_metaSemAtual)}</span>`;
+    `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">`+
+    `<span style="color:${_paceSemCor};font-weight:700;font-size:14px">${_paceSemSeta} ${fmtR(_mediaDiaFat)}/dia</span>`+
+    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta sem. ${fmtR(_metaSemAtual)}</span>`+
+    `</div>`;
   if(elPSAcc) elPSAcc.style.background = _paceSemCor;
   if(kpiPS) kpiPS.style.setProperty('--acc', _paceSemCor);
 
@@ -1673,9 +1674,10 @@ function renderAll(d){
     elSRVVal.style.color = _paceSrvCor;
   }
   if(elSRVDelta) elSRVDelta.innerHTML =
-    `<span style="color:${_paceSrvCor};font-weight:600;font-size:12px">${_paceSrvSeta} ${_mediaDiaSrv.toFixed(1)}/dia</span>`+
-    `<span style="color:var(--muted);font-size:11px"> · </span>`+
-    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta sem. ${Math.round(_metaSemSrv2)}</span>`;
+    `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">`+
+    `<span style="color:${_paceSrvCor};font-weight:700;font-size:14px">${_paceSrvSeta} ${_mediaDiaSrv.toFixed(1)}/dia</span>`+
+    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta sem. ${Math.round(_metaSemSrv2)}</span>`+
+    `</div>`;
   if(elSRVAcc) elSRVAcc.style.background = _paceSrvCor;
   if(kpiSRV) kpiSRV.style.setProperty('--acc', _paceSrvCor);
 
