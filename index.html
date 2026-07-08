@@ -1642,7 +1642,7 @@ function renderAll(d){
   }
   if(elPSDelta) elPSDelta.innerHTML =
     `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">`+
-    `<span style="color:${_paceSemCor};font-weight:700;font-size:14px">${_diffDiaFatSeta} ${fmtR(Math.abs(_diffDiaFat))}/dia ${_diffDiaFat>=0?'acima':'abaixo'}</span>`+
+    `<span style="color:${_paceSemCor};font-weight:700;font-size:14px">${_diffDiaFatSeta} ${fmtR(Math.abs(_diffDiaFat))}/dia</span>`+
     `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta sem. ${fmtR(_metaSemAtual)}</span>`+
     `</div>`;
   if(elPSAcc) elPSAcc.style.background = _paceSemCor;
@@ -1680,7 +1680,7 @@ function renderAll(d){
   }
   if(elSRVDelta) elSRVDelta.innerHTML =
     `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">`+
-    `<span style="color:${_paceSrvCor};font-weight:700;font-size:14px">${_diffDiaSrvSeta} ${Math.abs(_diffDiaSrv).toFixed(1)}/dia ${_diffDiaSrv>=0?'acima':'abaixo'}</span>`+
+    `<span style="color:${_paceSrvCor};font-weight:700;font-size:14px">${_diffDiaSrvSeta} ${Math.abs(_diffDiaSrv).toFixed(1)}/dia</span>`+
     `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta sem. ${Math.round(_metaSemSrv2)}</span>`+
     `</div>`;
   if(elSRVAcc) elSRVAcc.style.background = _paceSrvCor;
