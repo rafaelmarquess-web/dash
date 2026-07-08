@@ -1624,11 +1624,6 @@ function renderAll(d){
   const _paceSemDiff = _recParcSem - _metaSemProp;
   const _paceSemSeta = _paceSemPct >= 1 ? '↑' : '↓';
 
-  // Média realizada por dia (até agora) vs ritmo diário necessário
-  const _mediaDiaFat = _diasNaSem > 0 ? _recParcSem / _diasNaSem : 0;
-  const _diffDiaFat  = _mediaDiaFat - _metaDiaSaldo;
-  const _diffDiaFatSeta = _diffDiaFat >= 0 ? '↑' : '↓';
-
   const elPSVal   = document.getElementById('kp-pace-sem-val');
   const elPSDelta = document.getElementById('kp-pace-sem-delta');
   const elPSLabel = document.getElementById('kpi-pace-sem-label');
@@ -1642,8 +1637,8 @@ function renderAll(d){
   }
   if(elPSDelta) elPSDelta.innerHTML =
     `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">`+
-    `<span style="color:${_paceSemCor};font-weight:700;font-size:14px">${_diffDiaFatSeta} ${fmtR(Math.abs(_diffDiaFat))}/dia</span>`+
-    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta sem. ${fmtR(_metaSemAtual)}</span>`+
+    `<span style="color:${_paceSemCor};font-weight:700;font-size:14px">${_paceSemSeta} ${fmtR(Math.abs(_paceSemDiff))}</span>`+
+    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${fmtR(_metaSemAtual)}</span>`+
     `</div>`;
   if(elPSAcc) elPSAcc.style.background = _paceSemCor;
   if(kpiPS) kpiPS.style.setProperty('--acc', _paceSemCor);
@@ -1661,11 +1656,7 @@ function renderAll(d){
   const _paceSrvCor     = _paceSrvPct >= 1 ? '#3dffa0' : _paceSrvPct >= 0.8 ? '#ffb84d' : '#ff5f5f';
   const _paceSrvSeta    = _paceSrvPct >= 1 ? '↑' : '↓';
 
-  // Média realizada por dia (até agora) vs ritmo diário necessário
-  const _metaDiaSrvRef = _diasSemsRestantes > 0 ? (_metaSaldoSrv2 / _diasSemsRestantes) : (d.metaVendas||650)/5;
-  const _mediaDiaSrv   = _diasNaSem > 0 ? _srvParcSem2 / _diasNaSem : 0;
-  const _diffDiaSrv    = _mediaDiaSrv - _metaDiaSrvRef;
-  const _diffDiaSrvSeta = _diffDiaSrv >= 0 ? '↑' : '↓';
+  const _paceSrvDiff = _srvParcSem2 - _metaSemSrvProp;
 
   const elSRVVal   = document.getElementById('kp-pace-srv-val');
   const elSRVDelta = document.getElementById('kp-pace-srv-delta');
@@ -1680,8 +1671,8 @@ function renderAll(d){
   }
   if(elSRVDelta) elSRVDelta.innerHTML =
     `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">`+
-    `<span style="color:${_paceSrvCor};font-weight:700;font-size:14px">${_diffDiaSrvSeta} ${Math.abs(_diffDiaSrv).toFixed(1)}/dia</span>`+
-    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta sem. ${Math.round(_metaSemSrv2)}</span>`+
+    `<span style="color:${_paceSrvCor};font-weight:700;font-size:14px">${_paceSrvSeta} ${Math.round(Math.abs(_paceSrvDiff))}</span>`+
+    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${Math.round(_metaSemSrv2)}</span>`+
     `</div>`;
   if(elSRVAcc) elSRVAcc.style.background = _paceSrvCor;
   if(kpiSRV) kpiSRV.style.setProperty('--acc', _paceSrvCor);
