@@ -1638,7 +1638,7 @@ function renderAll(d){
   if(elPSDelta) elPSDelta.innerHTML =
     `<span style="color:${_paceSemCor};font-weight:600;font-size:12px">${_paceSemSeta} ${(_paceSemPct*100).toFixed(1)}%</span>`+
     `<span style="color:var(--muted);font-size:11px"> · </span>`+
-    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${fmtR(_metaSemAtual)}</span>`;
+    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${fmtR(_metaSemProp)}</span>`;
   if(elPSAcc) elPSAcc.style.background = _paceSemCor;
   if(kpiPS) kpiPS.style.setProperty('--acc', _paceSemCor);
 
@@ -1669,7 +1669,7 @@ function renderAll(d){
   if(elSRVDelta) elSRVDelta.innerHTML =
     `<span style="color:${_paceSrvCor};font-weight:600;font-size:12px">${_paceSrvSeta} ${(_paceSrvPct*100).toFixed(1)}%</span>`+
     `<span style="color:var(--muted);font-size:11px"> · </span>`+
-    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${Math.round(_metaSemSrv2)}</span>`;
+    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta ${Math.round(_metaSemSrvProp)}</span>`;
   if(elSRVAcc) elSRVAcc.style.background = _paceSrvCor;
   if(kpiSRV) kpiSRV.style.setProperty('--acc', _paceSrvCor);
 
