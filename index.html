@@ -1565,7 +1565,7 @@ function renderAll(d){
   const prodDiff = prodAtual - metaProdProp;
   const elProdVal   = document.getElementById('kp-produtos-val');
   const elProdDelta = document.getElementById('kp-produtos-delta');
-  if(elProdVal){ elProdVal.textContent = fmtR(prodAtual); elProdVal.style.color = prodCor; }
+  if(elProdVal){ elProdVal.textContent = fmtR(prodAtual); elProdVal.style.color = ''; }
   if(elProdDelta) elProdDelta.innerHTML =
     `<span style="color:${prodCor};font-weight:600;font-size:12px">${prodDiff>=0?'↑':'↓'} ${fmtR(Math.abs(prodDiff))}</span>`+
     `<span style="color:var(--muted);font-size:11px"> · </span>`+
@@ -1941,7 +1941,7 @@ function renderAll(d){
     const planosSeta  = planosDiff >= 0 ? '↑' : '↓';
     const elPlanosVal   = document.getElementById('kp-planos-val');
     const elPlanosDelta = document.getElementById('kp-planos-delta');
-    if(elPlanosVal){ elPlanosVal.textContent = qtdAtual; elPlanosVal.style.color = planosCor; }
+    if(elPlanosVal){ elPlanosVal.textContent = qtdAtual; elPlanosVal.style.color = ''; }
     if(elPlanosDelta) elPlanosDelta.innerHTML = qtdAnterior !== null
       ? `<span style="color:${planosCor};font-weight:600;font-size:12px">${planosSeta} ${Math.abs(planosDiff)} vs ant.</span>`+
         `<span style="color:var(--muted);font-size:11px"> · </span>`+
