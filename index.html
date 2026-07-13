@@ -1633,7 +1633,7 @@ function renderAll(d){
   if(elPSLabel) elPSLabel.textContent = `PACE FAT. (S${_semAtualN+1} · ${_diasNaSem}/${_diasSemAtual}D)`;
   if(elPSVal){
     elPSVal.textContent = fmtR(_recParcSem);
-    elPSVal.style.color = _paceSemCor;
+    elPSVal.style.color = '';
   }
   if(elPSDelta) elPSDelta.innerHTML =
     `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">`+
@@ -1668,7 +1668,7 @@ function renderAll(d){
   if(elSRVLabel) elSRVLabel.textContent = `PACE SRV. (S${_semAtualN+1} · ${_diasNaSem}/${_diasSemAtual}D)`;
   if(elSRVVal){
     elSRVVal.textContent = fmtN(_srvParcSem2);
-    elSRVVal.style.color = _paceSrvCor;
+    elSRVVal.style.color = '';
   }
   if(elSRVDelta) elSRVDelta.innerHTML =
     `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px">`+
