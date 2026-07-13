@@ -1596,8 +1596,8 @@ function renderAll(d){
   // Faturado semanas fechadas (S1 + S2 + ...)
   const _fatSemFechadas = _fatSemOp.slice(0, _semFechadasN).reduce((a,b)=>a+b, 0);
 
-  // Realizado S atual = receita acumulada do mês - faturado semanas fechadas
-  const _recParcSem = Math.max(0, recAtual - _fatSemFechadas);
+  // Realizado S atual = valor lançado na própria célula da semana vigente (aba de planos)
+  const _recParcSem = Math.max(0, _fatSemOp[_semAtualN] || 0);
 
   // Saldo de meta = meta mensal - semanas JÁ FECHADAS (S1+S2)
   // S3 parcial ainda está dentro das semanas restantes, não deduz do saldo
@@ -1647,7 +1647,8 @@ function renderAll(d){
   const _srvSemOp2      = (d.semanal?.srv[_idxSemOp]) || [];
   const _srvSemFech2    = _srvSemOp2.slice(0, _semFechadasN).reduce((a,b)=>a+b, 0);
   const _srvRealMes2    = d.pace.items[3]?.real || d.vendas[idxMesAtual] || 0;
-  const _srvParcSem2    = Math.max(0, _srvRealMes2 - _srvSemFech2);
+  // Realizado S atual = valor lançado na própria célula da semana vigente (aba de planos)
+  const _srvParcSem2    = Math.max(0, _srvSemOp2[_semAtualN] || 0);
   // Meta serviços: saldo ÷ dias semanas restantes × dias semana atual
   const _metaSaldoSrv2  = Math.max(0, (d.metaVendas||650) - _srvSemFech2);
   const _metaSemSrv2    = _diasSemsRestantes > 0 ? (_metaSaldoSrv2 / _diasSemsRestantes) * _diasSemAtual : (d.metaVendas||650) / 5;
