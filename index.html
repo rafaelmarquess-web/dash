@@ -242,8 +242,19 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     margin-left:2px;
   }
 }
+
+/* ── Impressão / Exportar PDF ── */
+@media print{
+  @page{ size:A4 portrait; margin:10mm; }
+  html,body{ background:var(--bg) !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; color-adjust:exact; }
+  .topbar, #sync-btn, #pdf-btn, .tab-row{ display:none !important; }
+  .wrap{ padding:0 !important; }
+  .tab-content{ display:none !important; }
+  .tab-content.active{ display:block !important; }
+  .kpi, .card, .kpi-grid > *{ break-inside:avoid; page-break-inside:avoid; }
+  * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -2516,35 +2527,15 @@ function switchTab(name,btn){
   btn.classList.add('active');
 }
 
-// ── exportar aba atual como PDF ─────────────────────────
+// ── exportar aba atual como PDF (impressão nativa do navegador) ──
 function exportarPDF(){
   const ativa = document.querySelector('.tab-content.active');
-  if(!ativa){ return; }
   const nomes = {'tab-operacao':'Operacao','tab-marketing':'Marketing','tab-semanal':'Semanal'};
-  const nomeArquivo = `Dashboard-${nomes[ativa.id]||'Relatorio'}-${new Date().toISOString().slice(0,10)}.pdf`;
-
-  const btn = document.getElementById('pdf-btn');
-  const label = document.getElementById('pdf-btn-label');
-  const labelOriginal = label.textContent;
-  label.textContent = 'Gerando...';
-  btn.style.pointerEvents = 'none';
-
-  const opt = {
-    margin: 6,
-    filename: nomeArquivo,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, backgroundColor: '#08090c', useCORS: true, scrollY: 0 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['css', 'legacy'] }
-  };
-
-  html2pdf().set(opt).from(ativa).save().then(()=>{
-    label.textContent = labelOriginal;
-    btn.style.pointerEvents = 'auto';
-  }).catch(()=>{
-    label.textContent = labelOriginal;
-    btn.style.pointerEvents = 'auto';
-  });
+  const nomeAba = ativa ? (nomes[ativa.id] || 'Relatorio') : 'Relatorio';
+  const tituloOriginal = document.title;
+  document.title = `Dashboard-${nomeAba}-${new Date().toISOString().slice(0,10)}`;
+  window.print();
+  setTimeout(()=>{ document.title = tituloOriginal; }, 1000);
 }
 
 // ── fetch e inicialização ────────────────────────────────
