@@ -245,10 +245,10 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 
 /* ── Impressão / Exportar PDF ── */
 @media print{
-  @page{ size:A4 portrait; margin:10mm; }
+  @page{ size:A4 landscape; margin:8mm; }
   html,body{ background:var(--bg) !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; color-adjust:exact; }
   .topbar, #sync-btn, #pdf-btn, .tab-row{ display:none !important; }
-  .wrap{ padding:0 !important; }
+  .wrap{ padding:0 !important; max-width:none !important; transform-origin:top left; }
   .tab-content{ display:none !important; }
   .tab-content.active{ display:block !important; }
   .kpi, .card, .kpi-grid > *{ break-inside:avoid; page-break-inside:avoid; }
@@ -2526,6 +2526,24 @@ function switchTab(name,btn){
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
 }
+
+// ── ajustar escala do conteúdo pra caber na página impressa ──
+function ajustarZoomImpressao(){
+  const wrap = document.querySelector('.wrap');
+  if(!wrap) return;
+  wrap.style.zoom = '';
+  const larguraNatural = wrap.scrollWidth;
+  const larguraAlvoMM = 297 - 16; // A4 paisagem menos margens (8mm cada lado)
+  const larguraAlvoPx = larguraAlvoMM * (96/25.4);
+  const escala = Math.min(1, larguraAlvoPx / larguraNatural);
+  wrap.style.zoom = escala;
+}
+function resetarZoomImpressao(){
+  const wrap = document.querySelector('.wrap');
+  if(wrap) wrap.style.zoom = '';
+}
+window.addEventListener('beforeprint', ajustarZoomImpressao);
+window.addEventListener('afterprint', resetarZoomImpressao);
 
 // ── exportar aba atual como PDF (impressão nativa do navegador) ──
 function exportarPDF(){
