@@ -243,6 +243,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
   }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -264,6 +265,10 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     <button id="sync-btn" onclick="forceRefresh()" style="display:flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--border);color:var(--muted2);border-radius:8px;padding:5px 12px;font-size:12px;font-family:var(--font);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--green)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted2)'">
       <svg id="sync-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       Atualizar
+    </button>
+    <button id="pdf-btn" onclick="exportarPDF()" style="display:flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--border);color:var(--muted2);border-radius:8px;padding:5px 12px;font-size:12px;font-family:var(--font);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='#4da6ff';this.style.color='#4da6ff'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted2)'">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span id="pdf-btn-label">Exportar PDF</span>
     </button>
   </div>
 </div>
@@ -2509,6 +2514,37 @@ function switchTab(name,btn){
   document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
+}
+
+// ── exportar aba atual como PDF ─────────────────────────
+function exportarPDF(){
+  const ativa = document.querySelector('.tab-content.active');
+  if(!ativa){ return; }
+  const nomes = {'tab-operacao':'Operacao','tab-marketing':'Marketing','tab-semanal':'Semanal'};
+  const nomeArquivo = `Dashboard-${nomes[ativa.id]||'Relatorio'}-${new Date().toISOString().slice(0,10)}.pdf`;
+
+  const btn = document.getElementById('pdf-btn');
+  const label = document.getElementById('pdf-btn-label');
+  const labelOriginal = label.textContent;
+  label.textContent = 'Gerando...';
+  btn.style.pointerEvents = 'none';
+
+  const opt = {
+    margin: 6,
+    filename: nomeArquivo,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, backgroundColor: '#08090c', useCORS: true, scrollY: 0 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['css', 'legacy'] }
+  };
+
+  html2pdf().set(opt).from(ativa).save().then(()=>{
+    label.textContent = labelOriginal;
+    btn.style.pointerEvents = 'auto';
+  }).catch(()=>{
+    label.textContent = labelOriginal;
+    btn.style.pointerEvents = 'auto';
+  });
 }
 
 // ── fetch e inicialização ────────────────────────────────
