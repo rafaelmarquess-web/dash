@@ -190,7 +190,7 @@ tbody td{padding:10px 10px;font-size:12px}
   #timeline-meta > div > div > div:nth-child(3) { font-size:10px !important; }
   #timeline-meta > div > div > div:nth-child(4) { font-size:9px !important; }
   #timeline-meta > div > div { width:60px !important; gap:5px !important; }
-  #paceGrid{grid-template-columns:repeat(6,1fr)}
+  #paceGrid{grid-template-columns:repeat(4,1fr)}
   .pace-cell{padding:14px 12px}
   .pace-indicator{font-size:24px}
   .pace-label{font-size:9px}
@@ -440,6 +440,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
             <div class="meta-row"><span class="meta-lbl">Serviços</span><span class="meta-target" id="mt-vendas">620</span></div>
             <div class="meta-row"><span class="meta-lbl">Serviços / dia</span><span class="meta-target" id="mt-vendasdia">24,8</span></div>
             <div class="meta-row"><span class="meta-lbl">Hidratação</span><span class="meta-target" id="mt-hidrat">40</span></div>
+            <div class="meta-row"><span class="meta-lbl">Planos ativos</span><span class="meta-target" id="mt-planos">50</span></div>
             <div class="meta-row"><span class="meta-lbl">Produtos / loja</span><span class="meta-target" id="mt-produtos">R$ 4,0K</span></div>
           </div>
         </div>
@@ -824,7 +825,7 @@ const defaults = {
   produtos:  [2572.46, 1486.32, 3174.90, 3723.26, 2870.13, 7426.52, 696.89, null, null, null, null, null, null],
   taxiDog:   [51, 56, 50, 65, 67, 57, 6, null, null, null, null, null, null],
   escovacao: [121, 184, 170, 163, 223, 231, 4, null, null, null, null, null, null],
-  metaProdutos: 7000, metaReceita: 72099.73, metaRecDia: 2773.07, metaTicket: 110.92,
+  metaProdutos: 7000, metaReceita: 72099.73, metaRecDia: 2773.07, metaTicket: 110.92, metaPlanos: 50,
   metaVendas: 650, metaVendasDia: 25, metaHidrat: 70,
   metaOk: [null,'não','sim','não','sim','sim',null,null,null,null,null,null,null],
   dataAtualizacao: '02/06/2026',
@@ -957,6 +958,7 @@ function parseTabela(csv){
   const produtos  = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+8]):null; });
   const taxiDog   = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+9]):null; });
   const escovacao = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+10]):null; });
+  const planosMes = mesesKey.map(m=>{ const r=byMes[m]; return r?parseBR(r.cols[r.mesIdx+11]):null; });
   // col A (índice 0): "sim" = bateu a meta, "não" = não bateu, "" = sem dados
   const metaOk    = mesesKey.map(m=>{ const r=byMes[m]; return r ? r.metaOk : null; }); // 'sim'|'não'|''|null
 
@@ -969,10 +971,11 @@ function parseTabela(csv){
   let metaVendasDia = 24.8;
   let metaHidrat    = 40;
   let metaProdutos  = 4000;
+  let metaPlanos    = 50;
 
   let emQuadroMeta = false;
   let metasLidas = 0;
-  const TOTAL_METAS = 7;
+  const TOTAL_METAS = 8;
   lines.forEach(line=>{
     if(metasLidas >= TOTAL_METAS) return;
     const cols = splitLine(line);
@@ -995,6 +998,7 @@ function parseTabela(csv){
     else if(lbl.includes('vendas') && lbl.includes('dia'))     { metaVendasDia = val; metasLidas++; }
     else if(lbl.includes('hidrat'))                            { metaHidrat    = val; metasLidas++; }
     else if(lbl === 'loja'  && val >= 100)                     { metaProdutos  = val; metasLidas++; }
+    else if(lbl.includes('plano'))                             { metaPlanos    = val; metasLidas++; }
   });
 
   // Segunda tabela CUSTO X RECEITA: col B=mês, col C=receita, col D=custo
@@ -1080,8 +1084,8 @@ function parseTabela(csv){
     {lbl:'Serviços/dia', meta: metaVendasDia,                               real:gp(lineReal,8)||0, fmt:v=>fmtN(v)},
   ].map(p=>({...p,pct:p.meta&&p.real?p.real/p.meta:0}));
 
-  return {receita,ticket,vendas,vendasDia,hidrat,produtos,taxiDog,escovacao,
-    metaProdutos,metaReceita,metaRecDia,metaTicket,metaVendas,metaVendasDia,metaHidrat,
+  return {receita,ticket,vendas,vendasDia,hidrat,produtos,taxiDog,escovacao,planosMes,
+    metaProdutos,metaReceita,metaRecDia,metaTicket,metaVendas,metaVendasDia,metaHidrat,metaPlanos,
     metaOk,
     custo,dataAtualizacao,
     pace:{diasUteis,diasTrabalhados,diasFaltantes,items:paceItems},
@@ -1375,6 +1379,7 @@ function renderAll(d){
   const _srvDM  = d.vendasDia[idxMesAtual] || 0;
   const _hidM   = d.hidrat[idxMesAtual]    || 0;
   const _prodM  = d.produtos[idxMesAtual]  || 0;
+  const _planosM = d.planosMes?.[idxMesAtual] || 0;
   const _recDM  = diasTrabalhados > 0 ? _recM / diasTrabalhados : 0;
   const _cp     = (r,m) => m > 0 ? parseFloat((r/m*100).toFixed(1)) : 0;
   d.metaPct = [
@@ -1384,6 +1389,7 @@ function renderAll(d){
     _cp(_srvM,  d.metaVendas    || 620),
     _cp(_srvDM, d.metaVendasDia || 24.8),
     _cp(_hidM,  d.metaHidrat    || 40),
+    _cp(_planosM, d.metaPlanos  || 50),
     _cp(_prodM, d.metaProdutos  || 4000),
   ];
 
@@ -1948,21 +1954,24 @@ function renderAll(d){
     const elTS = document.getElementById('planos-ticket-sub'); if(elTS) elTS.textContent = `${nomeVigente}`;
     const elCR = document.getElementById('planos-cresc'); if(elCR){ elCR.textContent = (crescimento>=0?'+':'')+crescimento+'%'; elCR.style.color=crescCor; }
     const elCS = document.getElementById('planos-cresc-sub'); if(elCS) elCS.textContent = `${primeiroMes}→${ultimoMes}`;
+  }
 
-    // ── KPI Planos do mês vigente (grid principal) ──
-    const qtdAtual    = planos.qtd[lastIdx] || 0;
-    const qtdAnterior = lastIdx > 0 ? planos.qtd[lastIdx-1] : null;
+  // ── KPI Planos do mês vigente (grid principal) — coluna PLANOS da aba OPERAÇÃO ──
+  {
+    const qtdAtual    = d.planosMes?.[idxMesAtual] || 0;
+    const qtdAnterior = idxMesAtual > 0 ? (d.planosMes?.[idxMesAtual-1] ?? null) : null;
     const planosDiff  = qtdAnterior !== null ? qtdAtual - qtdAnterior : 0;
     const planosCor   = qtdAnterior === null ? '#22d3ee' : (planosDiff >= 0 ? 'var(--green)' : 'var(--red)');
     const planosSeta  = planosDiff >= 0 ? '↑' : '↓';
+    const nomeMesAtualLbl = MESES[idxMesAtual] || '';
     const elPlanosVal   = document.getElementById('kp-planos-val');
     const elPlanosDelta = document.getElementById('kp-planos-delta');
     if(elPlanosVal){ elPlanosVal.textContent = qtdAtual; elPlanosVal.style.color = ''; }
     if(elPlanosDelta) elPlanosDelta.innerHTML = qtdAnterior !== null
       ? `<span style="color:${planosCor};font-weight:600;font-size:12px">${planosSeta} ${Math.abs(planosDiff)} vs ant.</span>`+
         `<span style="color:var(--muted);font-size:11px"> · </span>`+
-        `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">${nomeVigente}</span>`
-      : `<span style="color:var(--muted);font-size:11px">${nomeVigente}</span>`;
+        `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">${nomeMesAtualLbl}</span>`
+      : `<span style="color:var(--muted);font-size:11px">${nomeMesAtualLbl}</span>`;
     const kpiPlanos = elPlanosVal?.closest('.kpi');
     if(kpiPlanos) kpiPlanos.style.setProperty('--acc', planosCor);
   }
@@ -2350,7 +2359,7 @@ function renderAll(d){
     {yTick:{callback:v=>fmtR(v)}});
 
   // % meta bars
-  const metaLabels=['Receita','Receita/dia','Ticket médio','Serviços','Serviços/dia','Hidratação','Prod./loja'];
+  const metaLabels=['Receita','Receita/dia','Ticket médio','Serviços','Serviços/dia','Hidratação','Planos','Prod./loja'];
   document.getElementById('metaBars').innerHTML=d.metaPct.map((pct,i)=>`
     <div class="meta-bar-item">
       <span class="meta-bar-lbl">${metaLabels[i]}</span>
@@ -2387,6 +2396,7 @@ function renderAll(d){
   setMT('mt-vendasdia', d.metaVendasDia||24.8, false);
   setMT('mt-hidrat',    d.metaHidrat||40,      false);
   setMT('mt-produtos',  d.metaProdutos||4000,  true);
+  setMT('mt-planos',    d.metaPlanos||50,      false);
 
   // Meta mensal no card projeção
   const elProjMeta = document.getElementById('proj-meta-val');
@@ -2446,6 +2456,28 @@ function renderAll(d){
         <div style="display:flex;justify-content:space-between;font-size:9px"><span style="color:var(--muted)">Meta p.r.</span><span style="font-family:var(--mono);color:var(--muted2)">${fmtR(pProp)}</span></div>
         <div style="display:flex;justify-content:space-between;font-size:9px"><span style="color:var(--muted)">Meta sem.</span><span style="font-family:var(--mono);color:var(--muted2)">${fmtR(pMetaSem)}</span></div>
         <div style="display:flex;justify-content:space-between;font-size:9px"><span style="color:var(--muted)">Difer.</span><span style="font-family:var(--mono);color:${pCol}">${pDiff>=0?'+':''}${fmtR(pDiff)}</span></div>
+      </div>
+    </div>`;
+  })() + (() => {
+    const plReal  = d.planosMes?.[idxMesAtual] || 0;
+    const plMeta  = d.metaPlanos || 50;
+    const plProp  = plMeta * (d.pace.diasTrabalhados / d.pace.diasUteis);
+    const plSaldo = Math.max(0, plMeta - plReal);
+    const plMetaSem  = _diasSemsRestantes > 0 ? (plSaldo / _diasSemsRestantes) * _diasSemAtual : plMeta / 4;
+    const plMetaProp = plMetaSem * (_diasNaSem / _diasSemAtual);
+    const plPct  = plProp > 0 ? plReal / plProp : 0;
+    const plDiff = plReal - plProp;
+    const plCol  = plPct >= 1 ? '#3dffa0' : '#ff5f5f';
+    const over   = plPct >= 1;
+    return `<div class="pace-cell" style="border-color:${plCol}30">
+      <div class="pace-cell-accent" style="background:${plCol}"></div>
+      <div class="pace-label">PLANOS</div>
+      <div class="pace-indicator" style="color:${plCol}">${fmtN(plReal)}</div>
+      <div class="pace-badge" style="background:${over?'rgba(61,255,160,.08)':'rgba(255,95,95,.08)'};color:${plCol}">${over?'▲ acima':'▼ abaixo'}</div>
+      <div class="pace-sub" style="gap:2px">
+        <div style="display:flex;justify-content:space-between;font-size:9px"><span style="color:var(--muted)">Meta p.r.</span><span style="font-family:var(--mono);color:var(--muted2)">${fmtN(plProp)}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:9px"><span style="color:var(--muted)">Meta sem.</span><span style="font-family:var(--mono);color:var(--muted2)">${fmtN(plMetaSem)}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:9px"><span style="color:var(--muted)">Difer.</span><span style="font-family:var(--mono);color:${plCol}">${plDiff>=0?'+':''}${fmtN(plDiff)}</span></div>
       </div>
     </div>`;
   })();
