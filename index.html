@@ -1925,36 +1925,51 @@ function renderAll(d){
       </div>
     </div>`;
   }).join('');
-  const maxP=Math.max(...d.planos.qtd);
-  document.getElementById('planosBars').innerHTML=d.planos.meses.map((m,i)=>`
+
+  // ── Gráfico "Planos mensais" — agora lê da coluna PLANOS da aba OPERAÇÃO ──
+  const plMeses = [], plQtd = [];
+  for(let i=0; i<=idxMesAtual; i++){
+    const v = d.planosMes?.[i];
+    if(v === null || v === undefined) continue;
+    plMeses.push(MESES[i].toLowerCase());
+    plQtd.push(v);
+  }
+  const maxP = plQtd.length ? Math.max(...plQtd) : 1;
+  document.getElementById('planosBars').innerHTML = plMeses.map((m,i)=>`
     <div class="plano-row">
       <span class="plano-mes">${m}</span>
-      <div class="plano-track"><div class="plano-fill" style="width:${(d.planos.qtd[i]/maxP*100)}%"></div></div>
-      <span class="plano-count">${d.planos.qtd[i]}</span>
+      <div class="plano-track"><div class="plano-fill" style="width:${(plQtd[i]/maxP*100)}%"></div></div>
+      <span class="plano-count">${plQtd[i]}</span>
     </div>`).join('');
 
-  // Estatísticas dinâmicas de planos
+  // Estatísticas dinâmicas de planos (quantidade via planosMes; receita via aba de planos quando disponível)
   const planos = d.planos;
-  if(planos && planos.meses.length){
-    const maxIdx = planos.qtd.indexOf(Math.max(...planos.qtd));
-    const crescimento = planos.qtd.length > 1
-      ? ((planos.qtd[planos.qtd.length-1] - planos.qtd[0]) / planos.qtd[0] * 100).toFixed(0)
+  if(plMeses.length){
+    const maxIdx = plQtd.indexOf(Math.max(...plQtd));
+    const crescimento = plQtd.length > 1 && plQtd[0] > 0
+      ? ((plQtd[plQtd.length-1] - plQtd[0]) / plQtd[0] * 100).toFixed(0)
       : 0;
-    const primeiroMes = planos.meses[0];
-    const ultimoMes = planos.meses[planos.meses.length-1];
+    const primeiroMes = plMeses[0];
+    const ultimoMes = plMeses[plMeses.length-1];
     const crescCor = crescimento >= 0 ? 'var(--amber)' : 'var(--red)';
-    const nomeMaior = planos.meses[maxIdx].charAt(0).toUpperCase()+planos.meses[maxIdx].slice(1);
+    const nomeMaior = plMeses[maxIdx].charAt(0).toUpperCase()+plMeses[maxIdx].slice(1);
 
-    // Mês vigente = último com dados
-    const lastIdx = planos.meses.length - 1;
-    const ticketVigente = planos.qtd[lastIdx] > 0 ? planos.rec[lastIdx] / planos.qtd[lastIdx] : 0;
-    const recVigente = planos.rec[lastIdx] || 0;
-    const nomeVigente = planos.meses[lastIdx].charAt(0).toUpperCase()+planos.meses[lastIdx].slice(1);
+    // Mês vigente = último com dado de quantidade (planosMes)
+    const lastIdx = plQtd.length - 1;
+    const qtdVigente = plQtd[lastIdx];
+    const nomeVigente = plMeses[lastIdx].charAt(0).toUpperCase()+plMeses[lastIdx].slice(1);
 
-    const elMQ = document.getElementById('planos-maior-qtd'); if(elMQ) elMQ.textContent = planos.qtd[maxIdx];
-    const elMS = document.getElementById('planos-maior-sub'); if(elMS) elMS.textContent = `${nomeMaior} (${fmtR(planos.rec[maxIdx])})`;
+    // Receita/ticket de planos — vem da aba de planos (única fonte com receita por plano); casa pelo mês vigente
+    const recIdx = planos?.meses?.indexOf(plMeses[lastIdx]) ?? -1;
+    const recVigente = recIdx >= 0 ? (planos.rec[recIdx] || 0) : 0;
+    const ticketVigente = recIdx >= 0 && qtdVigente > 0 ? recVigente / qtdVigente : 0;
+    const recMaiorIdx = planos?.meses?.indexOf(plMeses[maxIdx]) ?? -1;
+    const recMaior = recMaiorIdx >= 0 ? (planos.rec[recMaiorIdx] || 0) : 0;
+
+    const elMQ = document.getElementById('planos-maior-qtd'); if(elMQ) elMQ.textContent = plQtd[maxIdx];
+    const elMS = document.getElementById('planos-maior-sub'); if(elMS) elMS.textContent = `${nomeMaior} (${fmtR(recMaior)})`;
     const elRV = document.getElementById('planos-rec-vigente'); if(elRV) elRV.textContent = fmtR(recVigente);
-    const elRS = document.getElementById('planos-rec-vigente-sub'); if(elRS) elRS.textContent = `${nomeVigente} · ${planos.qtd[lastIdx]} planos`;
+    const elRS = document.getElementById('planos-rec-vigente-sub'); if(elRS) elRS.textContent = `${nomeVigente} · ${qtdVigente} planos`;
     const elTK = document.getElementById('planos-ticket'); if(elTK) elTK.textContent = fmtR(ticketVigente);
     const elTS = document.getElementById('planos-ticket-sub'); if(elTS) elTS.textContent = `${nomeVigente}`;
     const elCR = document.getElementById('planos-cresc'); if(elCR){ elCR.textContent = (crescimento>=0?'+':'')+crescimento+'%'; elCR.style.color=crescCor; }
