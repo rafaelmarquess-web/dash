@@ -1130,7 +1130,7 @@ function parseSemanal(csv, d){
   // Índices no CSV: 0=vazio, 1=label, 2=Jan(m=0), 3=Fev(m=1), ..., 7=Jun(m=5)
   const lines = csv.trim().split('\n');
   const NUM_MESES = 12;
-  const NUM_SEMS  = 5;
+  const NUM_SEMS  = 6; // alguns meses têm 6 semanas (ex: mês começa perto do fim de semana)
 
   const fat  = Array.from({length:NUM_MESES}, ()=>Array(NUM_SEMS).fill(0));
   const srv  = Array.from({length:NUM_MESES}, ()=>Array(NUM_SEMS).fill(0));
@@ -1138,9 +1138,9 @@ function parseSemanal(csv, d){
 
   let semIdx = -1;
 
-  const diasSem = [5, 5, 5, 5, 5]; // default 5 dias úteis por semana
+  const diasSem = [5, 5, 5, 5, 5, 5]; // default 5 dias úteis por semana
   // diasSemPorMes[mes][semana] — cada mês pode ter dias diferentes por semana
-  const diasSemPorMes = Array.from({length:NUM_MESES}, ()=>[5,5,5,5,5]);
+  const diasSemPorMes = Array.from({length:NUM_MESES}, ()=>[5,5,5,5,5,5]);
 
   lines.forEach(line=>{
     const cols = splitLine(line);
@@ -1604,7 +1604,7 @@ function renderAll(d){
   const _idxSemOp      = idxMesAtual - 1;
   const _fatSemOp      = (d.semanal?.fat[_idxSemOp]) || [];
   const _diasSemPorMes = (d.semanal?.diasSemPorMes)  || null;
-  const _diasPorSemanaArr = (_diasSemPorMes && _diasSemPorMes[_idxSemOp]) || [5,5,5,5,5];
+  const _diasPorSemanaArr = (_diasSemPorMes && _diasSemPorMes[_idxSemOp]) || [5,5,5,5,5,5];
 
   // Semana atual = pelo calendário (dias trabalhados acumulados vs dias por semana),
   // não depende de a célula da semana já ter sido preenchida na planilha
@@ -1643,7 +1643,7 @@ function renderAll(d){
   // Dias das semanas restantes (S atual + próximas) = base para distribuir o saldo
   const _diasSemsRestantes = _diasSemPorMes
     ? _diasSemPorMes[_idxSemOp].slice(_semAtualN).reduce((a,b)=>a+(b||5), 0)
-    : (5 - _semAtualN) * 5;
+    : Math.max(0, 6 - _semAtualN) * 5;
 
 
   // Meta diária do saldo = saldo ÷ dias das semanas restantes
