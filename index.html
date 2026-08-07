@@ -1604,20 +1604,30 @@ function renderAll(d){
   const _idxSemOp      = idxMesAtual - 1;
   const _fatSemOp      = (d.semanal?.fat[_idxSemOp]) || [];
   const _diasSemPorMes = (d.semanal?.diasSemPorMes)  || null;
+  const _diasPorSemanaArr = (_diasSemPorMes && _diasSemPorMes[_idxSemOp]) || [5,5,5,5,5];
 
-  // Semanas fechadas = com faturamento > 0 na planilha
+  // Semana atual = pelo calendário (dias trabalhados acumulados vs dias por semana),
+  // não depende de a célula da semana já ter sido preenchida na planilha
+  let _acumCalendario = 0;
+  let _semAtualN = 0;
+  for(let i=0; i<_diasPorSemanaArr.length; i++){
+    const dw = _diasPorSemanaArr[i] || 5;
+    if(diasTrab <= _acumCalendario + dw || i === _diasPorSemanaArr.length-1){
+      _semAtualN = i;
+      break;
+    }
+    _acumCalendario += dw;
+  }
+  const _diasSemFechadasCal = _acumCalendario; // dias já vividos em semanas anteriores à atual
+
+  // Semanas com faturamento > 0 na planilha = usado só para o saldo de receita já contabilizado
   const _semFechadasN  = _fatSemOp.filter(v=>v>0).length;
-  const _semAtualN     = _semFechadasN; // 0-based: 0=S1, 1=S2, 2=S3...
 
   // Dias totais da semana atual (lido da planilha, ex: S3 = 6 dias)
-  const _diasSemAtual = _diasSemPorMes
-    ? (_diasSemPorMes[_idxSemOp]?.[_semAtualN] || 5)
-    : 5;
+  const _diasSemAtual = _diasPorSemanaArr[_semAtualN] || 5;
 
-  // Dias das semanas fechadas → para calcular dias vividos na semana atual
-  const _diasSemFechadas = _semFechadasN > 0 && _diasSemPorMes
-    ? _diasSemPorMes[_idxSemOp].slice(0, _semFechadasN).reduce((a,b)=>a+(b||5), 0)
-    : _semFechadasN * 5;
+  // Dias das semanas fechadas → para calcular dias vividos na semana atual (pelo calendário)
+  const _diasSemFechadas = _diasSemFechadasCal;
   const _diasNaSem = Math.max(1, Math.min(diasTrab - _diasSemFechadas, _diasSemAtual));
 
   // Faturado semanas fechadas (S1 + S2 + ...)
