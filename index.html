@@ -1606,28 +1606,31 @@ function renderAll(d){
   const _diasSemPorMes = (d.semanal?.diasSemPorMes)  || null;
   const _diasPorSemanaArr = (_diasSemPorMes && _diasSemPorMes[_idxSemOp]) || [5,5,5,5,5,5];
 
-  // Semana atual = pelo calendário (dias trabalhados acumulados vs dias por semana),
-  // não depende de a célula da semana já ter sido preenchida na planilha
+  // Semana atual pelo calendário (dias trabalhados acumulados vs dias por semana)
   let _acumCalendario = 0;
-  let _semAtualN = 0;
+  let _semAtualCalendario = 0;
   for(let i=0; i<_diasPorSemanaArr.length; i++){
     const dw = _diasPorSemanaArr[i] || 5;
     if(diasTrab <= _acumCalendario + dw || i === _diasPorSemanaArr.length-1){
-      _semAtualN = i;
+      _semAtualCalendario = i;
       break;
     }
     _acumCalendario += dw;
   }
-  const _diasSemFechadasCal = _acumCalendario; // dias já vividos em semanas anteriores à atual
 
-  // Semanas com faturamento > 0 na planilha = usado só para o saldo de receita já contabilizado
+  // Semanas com faturamento > 0 na planilha = semanas já fechadas manualmente
   const _semFechadasN  = _fatSemOp.filter(v=>v>0).length;
+
+  // Semana atual = a mais avançada entre calendário e o que já foi fechado na planilha.
+  // Isso evita ficar "preso" numa semana não fechada (calendário avança sozinho) E evita
+  // zerar o pace quando a semana é fechada no próprio último dia dela (fechada > calendário).
+  const _semAtualN = Math.max(_semAtualCalendario, _semFechadasN);
 
   // Dias totais da semana atual (lido da planilha, ex: S3 = 6 dias)
   const _diasSemAtual = _diasPorSemanaArr[_semAtualN] || 5;
 
-  // Dias das semanas fechadas → para calcular dias vividos na semana atual (pelo calendário)
-  const _diasSemFechadas = _diasSemFechadasCal;
+  // Dias das semanas ANTES da semana atual (soma real por semana, não a caminhada de calendário)
+  const _diasSemFechadas = _diasPorSemanaArr.slice(0, _semAtualN).reduce((a,b)=>a+(b||5), 0);
   const _diasNaSem = Math.max(1, Math.min(diasTrab - _diasSemFechadas, _diasSemAtual));
 
   // Faturado semanas fechadas (S1 + S2 + ...)
