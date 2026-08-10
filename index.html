@@ -1596,7 +1596,7 @@ function renderAll(d){
   if(elProdDelta) elProdDelta.innerHTML =
     `<span style="color:${prodCor};font-weight:600;font-size:12px">${prodDiff>=0?'↑':'↓'} ${fmtR(Math.abs(prodDiff))}</span>`+
     `<span style="color:var(--muted);font-size:11px"> · </span>`+
-    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta/dia ${fmtR(metaProdDia)}</span>`;
+    `<span style="color:#4da6ff;font-size:11px;font-family:var(--mono)">meta p.r. ${fmtR(metaProdProp)}</span>`;
   const kpiProd = elProdVal?.closest('.kpi');
   if(kpiProd) kpiProd.style.setProperty('--acc', prodCor);
 
