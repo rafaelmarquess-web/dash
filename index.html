@@ -509,7 +509,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <div class="chart-h180"><canvas id="servicosEvolChart"></canvas></div>
       <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:12px;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px">
         <table style="min-width:520px;width:100%">
-          <thead><tr><th>Indicador</th><th>dez/25</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th></tr></thead>
+          <thead><tr id="tbl-adicionais-head"><th>Indicador</th></tr></thead>
           <tbody id="tbl-adicionais"></tbody>
         </table>
       </div>
@@ -522,7 +522,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <div class="chart-h180"><canvas id="produtosChart"></canvas></div>
       <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:12px;margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px">
         <table style="min-width:520px;width:100%">
-          <thead><tr><th>Indicador</th><th>dez/25</th><th>Jan</th><th>Fev</th><th>Mar</th><th>Abr</th><th>Mai</th><th>Jun</th></tr></thead>
+          <thead><tr id="tbl-produtos-head"><th>Indicador</th></tr></thead>
           <tbody id="tbl-produtos"></tbody>
         </table>
       </div>
@@ -1841,6 +1841,12 @@ function renderAll(d){
 
   // ── Tabelas de adicionais e produtos ─────────────────
   const mesesTab = MESES.slice(0, idxMesAtual+1);
+
+  const theadAdic = document.getElementById('tbl-adicionais-head');
+  if(theadAdic) theadAdic.innerHTML = `<th>Indicador</th>` + mesesTab.map(m=>`<th>${m}</th>`).join('');
+  const theadProd = document.getElementById('tbl-produtos-head');
+  if(theadProd) theadProd.innerHTML = `<th>Indicador</th>` + mesesTab.map(m=>`<th>${m}</th>`).join('');
+
   const tblAdic = document.getElementById('tbl-adicionais');
   if(tblAdic){
     const rows = [
