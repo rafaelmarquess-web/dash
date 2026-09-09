@@ -1643,12 +1643,10 @@ function renderAll(d){
   // S3 parcial ainda está dentro das semanas restantes, não deduz do saldo
   const _metaSaldo = Math.max(0, (d.metaReceita || 68500) - _fatSemFechadas);
 
-  // Dias das semanas restantes (S atual + próximas) = base para distribuir o saldo
-  const _diasSemsRestantes = _diasSemPorMes
-    ? _diasSemPorMes[_idxSemOp].slice(_semAtualN).reduce((a,b)=>a+(b||5), 0)
-    : Math.max(0, 6 - _semAtualN) * 5;
-
-
+  // Dias das semanas restantes (S atual + próximas) = dias úteis reais do mês − dias já em semanas fechadas.
+  // Usa o dado real do mês (diasUteis) em vez de assumir 5 dias/semana quando a planilha
+  // ainda não tem o "(X dias)" anotado em cada semana — evita desvio no saldo/semana.
+  const _diasSemsRestantes = Math.max(0, diasUteis - _diasSemFechadas);
   // Meta diária do saldo = saldo ÷ dias das semanas restantes
   const _diasFalt = Math.max(1, _diasSemsRestantes);
   const _metaDiaSaldo = _metaSaldo / _diasFalt;
