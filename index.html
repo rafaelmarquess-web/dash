@@ -1141,6 +1141,8 @@ function parseSemanal(csv, d){
   const diasSem = [5, 5, 5, 5, 5, 5]; // default 5 dias úteis por semana
   // diasSemPorMes[mes][semana] — cada mês pode ter dias diferentes por semana
   const diasSemPorMes = Array.from({length:NUM_MESES}, ()=>[5,5,5,5,5,5]);
+  // Novembro/2026: operação passa a funcionar todos os 7 dias da semana (sem dias de folga)
+  diasSemPorMes[10] = [7,7,7,7,7,7];
 
   lines.forEach(line=>{
     const cols = splitLine(line);
