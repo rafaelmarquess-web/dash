@@ -272,10 +272,12 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 .pl-details summary::before{content:'▸';color:var(--muted2);font-size:12px}
 .pl-details[open] summary::before{content:'▾'}
 #pl-canc-body td{white-space:normal}
-@media(min-width:600px){ .pl-resumo{grid-template-columns:repeat(4,1fr)} }
+.pl-rv-wrap{position:relative;height:260px}
+@media(min-width:600px){ .pl-resumo{grid-template-columns:repeat(4,1fr)} .pl-rv-wrap{height:300px} }
 @media(min-width:1024px){
   .kpi-grid.pl-kpis{grid-template-columns:repeat(6,1fr)}
   .pl-resumo{grid-template-columns:repeat(7,1fr)}
+  .pl-rv-wrap{height:340px}
 }
 </style>
 </head>
@@ -874,6 +876,15 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     </div>
   </div>
 
+  <!-- Receita x vigentes (destaque) -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div><div class="card-title">Receita x planos vigentes</div><div class="card-sub">Receita dos planos (barras) e total de vigentes (linha), mês a mês</div></div>
+      <span class="badge badge-blue">DESTAQUE</span>
+    </div>
+    <div class="pl-rv-wrap"><canvas id="plRecChart"></canvas></div>
+  </div>
+
   <!-- Resumo do ano -->
   <div class="card" style="margin-bottom:14px">
     <div class="card-head">
@@ -913,22 +924,13 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     </div>
   </div>
 
-  <div class="row2b">
+  <div class="row3">
     <div class="card">
       <div class="card-head">
         <div><div class="card-title">Motivos de cancelamento</div><div class="card-sub">Agrupados pela observação da planilha · ano</div></div>
       </div>
       <div class="pl-bars" id="pl-motivos"></div>
     </div>
-    <div class="card">
-      <div class="card-head">
-        <div><div class="card-title">Receita de planos por mês</div><div class="card-sub">Soma do valor dos planos vigentes</div></div>
-      </div>
-      <div class="chart-h180"><canvas id="plRecChart"></canvas></div>
-    </div>
-  </div>
-
-  <div class="row2b">
     <div class="card">
       <div class="card-head">
         <div><div class="card-title">O que aconteceu com os congelados</div><div class="card-sub">Cada cliente que congelou, pelo que fez nos meses seguintes</div></div>
@@ -3077,14 +3079,27 @@ function renderPlanos(P){
       plugins:{legend:legenda,tooltip:{callbacks:{label:c=>c.parsed.y==null?null:` ${c.dataset.label}: ${c.parsed.y.toFixed(1).replace('.',',')}%`}}},
       scales:{x:{grid,ticks:tick},y:{grid,beginAtZero:true,ticks:{...tick,callback:v=>v+'%'}}}}});
 
+  const maxRec=Math.max(...M.map(m=>m.receita)), maxVig=Math.max(...M.map(m=>m.base));
+  const mono="'DM Mono', monospace";
   plChart('plRecChart',{type:'bar',data:{labels,datasets:[
-      {label:'Receita de planos',data:M.map(m=>+m.receita.toFixed(2)),
+      {type:'line',label:'Planos vigentes',data:M.map(m=>m.base),yAxisID:'y1',order:0,
+        borderColor:'#ffb84d',backgroundColor:'#ffb84d',borderWidth:2,tension:0,pointRadius:4,pointHoverRadius:6,
+        datalabels:{display:true,align:'top',offset:4,color:'#ffb84d',backgroundColor:'#1a1d27',borderRadius:4,padding:{top:1,bottom:1,left:4,right:4},font:{family:mono,size:11,weight:'600'},formatter:v=>v}},
+      {label:'Receita de planos',data:M.map(m=>+m.receita.toFixed(2)),yAxisID:'y',order:1,borderRadius:4,
         backgroundColor:M.map(m=>(atualParcial&&m===atual)?'#3a3f55':'#4da6ff'),
-        datalabels:{display:c=>c.chart.width>560,anchor:'end',align:'end',color:'#e6e8f0',font:{family:"'DM Mono', monospace",size:10},formatter:v=>fmtR(v).replace('R$ ','')}}
+        datalabels:{display:c=>c.chart.width>560,anchor:'end',align:'start',offset:6,color:'#08090c',font:{family:mono,size:10,weight:'600'},formatter:v=>fmtR(v).replace('R$ ','')}}
     ]},
-    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const m=M[c.dataIndex];return [` ${fmtR(m.receita)}`,` ${m.ativos} planos · ticket ${fmtR(m.ticket)}`];}}}},
-      scales:{x:{grid,ticks:tick},y:{grid,beginAtZero:true,ticks:{...tick,callback:v=>fmtR(v)}}}}});
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{labels:{color:'#5a6080',boxWidth:10,padding:12}},
+        tooltip:{callbacks:{
+          title:items=>M[items[0].dataIndex].nome+((atualParcial&&M[items[0].dataIndex]===atual)?' (parcial)':''),
+          label:c=>c.dataset.yAxisID==='y1'?` Vigentes: ${c.parsed.y}`:` Receita: ${fmtR(c.parsed.y)}`,
+          footer:items=>{const m=M[items[0].dataIndex];return `Ticket por plano: ${fmtR(m.ticket)}`;}}}},
+      scales:{
+        x:{grid,ticks:tick},
+        y:{grid,beginAtZero:true,max:Math.ceil(maxRec*1.7/5000)*5000,ticks:{...tick,callback:v=>fmtR(v)}},
+        y1:{position:'right',beginAtZero:true,max:Math.ceil(maxVig*1.1/10)*10,grid:{display:false},ticks:{...tick,precision:0},
+          title:{display:true,text:'vigentes',color:'#5a6080',font:{size:10}}}}}});
 
   // ── Barras de motivos / congelados / modalidade ──
   const cont=(arr,f)=>arr.reduce((o,x)=>{const k=f(x);o[k]=(o[k]||0)+1;return o;},{});
