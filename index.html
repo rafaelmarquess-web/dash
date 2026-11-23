@@ -255,6 +255,13 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
   * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
 }
 
+/* ── Topbar no celular: com 5 abas, quebra a linha e as abas rolam de lado ── */
+@media(max-width:700px){
+  .topbar{flex-wrap:wrap}
+  .topbar-meta{width:100%;min-width:0}
+  .tab-row{overflow-x:auto;scrollbar-width:none;flex:1 1 auto;min-width:0}
+  .tab-row::-webkit-scrollbar{display:none}
+}
 /* ── ABA PLANOS ── */
 .pl-status{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-bottom:12px}
 .pl-resumo{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;text-align:center}
@@ -263,10 +270,10 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 .pl-r-sub{font-size:10px;color:var(--muted2);margin-top:2px}
 .pl-bars{display:flex;flex-direction:column;gap:10px}
 .pl-bar{display:flex;align-items:center;gap:10px}
-.pl-bar-lbl{font-size:11px;color:var(--muted2);width:150px;flex-shrink:0}
+.pl-bar-lbl{font-size:11px;color:var(--muted2);width:120px;flex-shrink:0}
 .pl-bar-track{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
 .pl-bar-fill{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.4,0,.2,1)}
-.pl-bar-val{font-size:11px;font-family:var(--mono);color:var(--txt);width:56px;text-align:right;flex-shrink:0}
+.pl-bar-val{font-size:11px;font-family:var(--mono);color:var(--txt);min-width:56px;text-align:right;flex-shrink:0;white-space:nowrap}
 .pl-details summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:8px}
 .pl-details summary::-webkit-details-marker{display:none}
 .pl-details summary::before{content:'▸';color:var(--muted2);font-size:12px}
@@ -294,6 +301,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <button class="tab" onclick="switchTab('marketing',this)">Marketing</button>
       <button class="tab" onclick="switchTab('semanal',this)">Semanal</button>
       <button class="tab" onclick="switchTab('planos',this)">Planos</button>
+      <button class="tab" onclick="switchTab('clientes',this)">Clientes</button>
     </div>
     <div class="meta-pill" id="sync-status" style="display:flex;align-items:center;gap:6px;cursor:default">
       <span id="data-banner-dot" style="width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;display:inline-block"></span>
@@ -967,6 +975,104 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
         </table>
       </div>
     </details>
+  </div>
+
+</div>
+
+
+<!-- ===== ABA CLIENTES (lê ao vivo "Mapeamento geral dos clientes-2026") ===== -->
+<div id="tab-clientes" class="tab-content">
+
+  <div id="cl-status" class="pl-status">Carregando mapeamento de clientes...</div>
+
+  <div class="kpi-grid pl-kpis">
+    <div class="kpi" style="--acc:#4da6ff">
+      <div class="kpi-label" id="cl-k-mes-lbl">Clientes novos</div>
+      <div class="kpi-val" id="cl-k-mes">—</div>
+      <div class="kpi-footer" id="cl-k-mes-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#22d3ee">
+      <div class="kpi-label">Novos no ano</div>
+      <div class="kpi-val" id="cl-k-ano">—</div>
+      <div class="kpi-footer" id="cl-k-ano-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#a78bfa">
+      <div class="kpi-label">Média por mês</div>
+      <div class="kpi-val" id="cl-k-media">—</div>
+      <div class="kpi-footer" id="cl-k-media-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#4da6ff">
+      <div class="kpi-label">Google no mês</div>
+      <div class="kpi-val" id="cl-k-google">—</div>
+      <div class="kpi-footer" id="cl-k-google-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--amber)">
+      <div class="kpi-label">Indicação no ano</div>
+      <div class="kpi-val" id="cl-k-ind">—</div>
+      <div class="kpi-footer" id="cl-k-ind-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#ff6eb4">
+      <div class="kpi-label">Voltaram mais de 1x</div>
+      <div class="kpi-val" id="cl-k-rec">—</div>
+      <div class="kpi-footer" id="cl-k-rec-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div><div class="card-title">Clientes novos por origem</div><div class="card-sub">Quantidade de clientes cadastrados no mês, por canal de origem</div></div>
+      <span class="badge badge-blue">DESTAQUE</span>
+    </div>
+    <div class="pl-rv-wrap"><canvas id="clOrigemChart"></canvas></div>
+  </div>
+
+  <div class="row2b">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Origem no ano</div><div class="card-sub" id="cl-ano-sub">Acumulado 2026</div></div>
+      </div>
+      <div class="pl-bars" id="cl-origem-ano"></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Participação por canal</div><div class="card-sub">% dos clientes novos de cada mês</div></div>
+      </div>
+      <div class="chart-h180"><canvas id="clShareChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="row2b">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Voltaram mais de 1x</div><div class="card-sub">% dos clientes novos de cada mês que retornaram (coluna "Voltou mais de 1x")</div></div>
+      </div>
+      <div class="chart-h180"><canvas id="clRecChart"></canvas></div>
+      <div class="card-sub" id="cl-rec-nota" style="margin-top:8px"></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Retorno por origem</div><div class="card-sub">% que voltou mais de 1x, nos meses já preenchidos</div></div>
+      </div>
+      <div class="pl-bars" id="cl-rec-origem"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div><div class="card-title">Origem mês a mês</div><div class="card-sub" id="cl-tbl-sub">Tabela da aba GRÁFICOS do mapeamento</div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead id="cl-tbl-head"></thead>
+        <tbody id="cl-tbl-body"></tbody>
+      </table>
+    </div>
   </div>
 
 </div>
@@ -2783,7 +2889,7 @@ window.addEventListener('afterprint', resetarZoomImpressao);
 // ── exportar aba atual como PDF (impressão nativa do navegador) ──
 function exportarPDF(){
   const ativa = document.querySelector('.tab-content.active');
-  const nomes = {'tab-operacao':'Operacao','tab-marketing':'Marketing','tab-semanal':'Semanal','tab-planos':'Planos'};
+  const nomes = {'tab-operacao':'Operacao','tab-marketing':'Marketing','tab-semanal':'Semanal','tab-planos':'Planos','tab-clientes':'Clientes'};
   const nomeAba = ativa ? (nomes[ativa.id] || 'Relatorio') : 'Relatorio';
   const tituloOriginal = document.title;
   document.title = `Dashboard-${nomeAba}-${new Date().toISOString().slice(0,10)}`;
@@ -3149,6 +3255,240 @@ function renderPlanos(P){
   }
 }
 
+
+// ══════════════════════════════════════════════════════════
+// ── ABA CLIENTES — lê ao vivo "Mapeamento geral dos clientes-2026" ──
+// GRÁFICOS (B2:J14): origem dos clientes novos por mês (tabela oficial)
+// GRÁFICOS (L2:S4):  Nov/Dez 2025, para comparar com o mesmo mês
+// TABELA:            um cliente por linha (origem, mês, voltou mais de 1x)
+// Mês com a linha da GRÁFICOS ainda zerada → conta direto na TABELA (parcial)
+// A planilha precisa estar como "qualquer pessoa com o link pode ver".
+// ══════════════════════════════════════════════════════════
+const MAPA_SHEET_ID = '1T-b1qAtxmovXlBGi1M8IIqKA5ijcCZJ3IgkCAlkG0mI';
+const CL_ORIGEM_COR = {'GOOGLE':'#4da6ff','FACHADA':'#a78bfa','META':'#22d3ee','INDICAÇÃO':'#ffb84d','FOLHETO':'#ff6eb4','EVENTO/PARCERIA':'#e879f9','SEM ORIGEM':'#3a3f55'};
+
+function clURL(aba, range){
+  return `https://docs.google.com/spreadsheets/d/${MAPA_SHEET_ID}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(aba)}`+(range?`&range=${range}`:'');
+}
+
+// Agrupa as origens digitadas na TABELA nas categorias da GRÁFICOS
+function clOrigem(o){
+  const s=plNorm(o).toUpperCase();
+  if(!s||s==='-'||s==='NONE') return 'SEM ORIGEM';
+  if(s.startsWith('INDICACAO')) return 'INDICAÇÃO';
+  if(s.startsWith('GOOGLE')) return 'GOOGLE';
+  if(s.startsWith('FACHADA')) return 'FACHADA';
+  if(s.startsWith('FOLHETO')||s.startsWith('PANFLETO')) return 'FOLHETO';
+  if(s.startsWith('META')||s.startsWith('INSTAGRAM')||s.startsWith('FACEBOOK')) return 'META';
+  if(/EVENTO|PARCERIA|PIZZARIA/.test(s)) return 'EVENTO/PARCERIA';
+  return 'SEM ORIGEM';
+}
+function clMesIdx(txt){
+  const s=plNorm(txt);
+  const i=PL_ABAS.findIndex(m=>plNorm(m)===s);
+  return i;
+}
+
+function clParseGraficos(csv){
+  const rows=plParseCSV(csv).filter(r=>r.some(c=>c));
+  if(!rows.length) return null;
+  const head=rows[0].map(c=>c.toUpperCase());
+  const iMes=head.findIndex(h=>plNorm(h)==='mes');
+  const origens=head.map((h,i)=>({h,i})).filter(x=>x.h && x.i!==iMes && plNorm(x.h)!=='total');
+  const meses={};
+  rows.slice(1).forEach(r=>{
+    const idx=clMesIdx(r[iMes]); if(idx<0) return;
+    const por={}; let tot=0;
+    origens.forEach(({h,i})=>{ const v=plNum(r[i])||0; por[h]=v; tot+=v; });
+    meses[idx]={por,total:tot};
+  });
+  return {origens:origens.map(o=>o.h), meses};
+}
+
+function clParse2025(csv){
+  const rows=plParseCSV(csv).filter(r=>r.some(c=>c));
+  if(rows.length<2) return {};
+  const head=rows[0].map(c=>plNorm(c));
+  const iTot=head.findIndex(h=>h==='total');
+  const out={};
+  rows.slice(1).forEach((r,j)=>{
+    const d=r[0]||'';
+    let m=null;
+    let mm=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/); if(mm) m=+mm[2]-1;
+    if(m==null){ mm=d.match(/^(\d{4})-(\d{2})/); if(mm) m=+mm[2]-1; }
+    if(m==null){ const k=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'].findIndex(x=>plNorm(d).startsWith(x)); if(k>=0) m=k; }
+    if(m==null) m=10+j;
+    const tot=iTot>=0?plNum(r[iTot]):null;
+    if(tot!=null) out[m]=tot;
+  });
+  return out;
+}
+
+function clParseTabela(csv){
+  const rows=plParseCSV(csv).filter(r=>r.some(c=>c));
+  if(!rows.length) return [];
+  const head=rows[0].map(c=>plNorm(c));
+  const col=k=>head.findIndex(h=>h.startsWith(k));
+  const iO=col('origem'), iM=col('mes'), iV=col('voltou');
+  return rows.slice(1).map(r=>({
+    origem:clOrigem(r[iO]), mes:clMesIdx(r[iM]),
+    voltou:(()=>{const v=plNorm(r[iV]); return v==='sim'?true:v==='nao'?false:null;})()
+  })).filter(r=>r.mes>=0);
+}
+
+async function loadClientes(noCache=false){
+  const st=document.getElementById('cl-status');
+  if(st) st.textContent='Carregando mapeamento de clientes...';
+  const [g,g25,t]=await Promise.all([
+    fetchCSV(clURL('GRÁFICOS','B2:J14'),noCache).catch(()=>null),
+    fetchCSV(clURL('GRÁFICOS','L2:S4'),noCache).catch(()=>null),
+    fetchCSV(clURL('TABELA','A1:H3000'),noCache).catch(()=>null),
+  ]);
+  const graf=g?clParseGraficos(g):null;
+  const tab=t?clParseTabela(t):[];
+  if(!graf && !tab.length){
+    if(st){ st.textContent='⚠️ Não foi possível ler a planilha "Mapeamento geral dos clientes-2026". Confira se ela está compartilhada como "qualquer pessoa com o link".'; st.style.color='var(--amber)'; }
+    return;
+  }
+  const d=clMontar(graf, g25?clParse2025(g25):{}, tab);
+  renderClientes(d);
+  if(st){
+    const hoje=new Date();
+    st.textContent=`✅ Mapeamento de clientes 2026 · ${PL_MESES[d.meses[0].idx]}–${PL_MESES[d.meses[d.meses.length-1].idx]} · lido em ${hoje.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}`;
+    st.style.color='var(--muted2)';
+  }
+}
+
+function clMontar(graf, ano25, tab){
+  const origens = graf?.origens?.length ? graf.origens.slice() : Object.keys(CL_ORIGEM_COR);
+  if(!origens.includes('SEM ORIGEM')) origens.push('SEM ORIGEM');
+  const hoje=new Date();
+  const ultimo = hoje.getFullYear()>PLANOS_ANO ? 11 : hoje.getMonth();
+  const meses=[];
+  for(let i=0;i<=ultimo;i++){
+    const gm=graf?.meses?.[i];
+    const linhas=tab.filter(r=>r.mes===i);
+    let por, total, fonte;
+    if(gm && gm.total>0){ por=gm.por; total=gm.total; fonte='graficos'; }
+    else if(linhas.length){
+      por={}; origens.forEach(o=>por[o]=0);
+      linhas.forEach(r=>{ por[r.origem]=(por[r.origem]||0)+1; });
+      total=linhas.length; fonte='tabela';
+    } else continue;
+    const preenchidos=linhas.filter(r=>r.voltou!=null);
+    const voltaram=preenchidos.filter(r=>r.voltou).length;
+    meses.push({idx:i, mes:PL_MESES[i], nome:PL_NOMES[i], por, total, fonte,
+      recPreench:linhas.length?preenchidos.length/linhas.length:0,
+      recPct:preenchidos.length?voltaram/preenchidos.length*100:null, voltaram, preenchidos:preenchidos.length,
+      ano25:ano25[i]??null});
+  }
+  // Retorno por origem (só meses com a coluna "voltou" bem preenchida)
+  const okMeses=new Set(meses.filter(m=>m.recPreench>=0.8).map(m=>m.idx));
+  const recOrigem={};
+  tab.filter(r=>okMeses.has(r.mes) && r.voltou!=null).forEach(r=>{
+    const o=recOrigem[r.origem]||(recOrigem[r.origem]={sim:0,tot:0}); o.tot++; if(r.voltou) o.sim++;
+  });
+  return {origens, meses, recOrigem, okMeses};
+}
+
+function renderClientes(D){
+  chartDefaults();
+  const M=D.meses; if(!M.length) return;
+  const atual=M[M.length-1], ant=M.length>1?M[M.length-2]:null;
+  const hoje=new Date();
+  const parcial = atual.idx===hoje.getMonth() && hoje.getFullYear()===PLANOS_ANO;
+  const grid={color:'#1e2130'}, tick={color:'#5a6080'};
+  const legenda={labels:{color:'#5a6080',boxWidth:10,padding:12}};
+  const mono="'DM Mono', monospace";
+  const cor=o=>CL_ORIGEM_COR[o]||'#5a6080';
+  const pct=(a,b)=>b?Math.round(a/b*100):0;
+
+  // ── KPIs ──
+  plSet('cl-k-mes-lbl','Clientes novos · '+atual.mes+(parcial?' (parcial)':''));
+  plSet('cl-k-mes', String(atual.total));
+  const refAno = atual.ano25!=null ? ` · ${atual.mes}/25: ${atual.ano25}` : '';
+  plDelta('cl-k-mes-sub', atual.total, ant?.total, ` vs ${ant?.mes||''}${refAno}`, true);
+  const totAno=M.reduce((a,m)=>a+m.total,0);
+  plSet('cl-k-ano', String(totAno));
+  plSet('cl-k-ano-sub', `${M[0].mes}–${atual.mes}`); document.getElementById('cl-k-ano-sub').style.color='var(--muted2)';
+  const fechados = parcial && M.length>1 ? M.slice(0,-1) : M;
+  const media = fechados.reduce((a,m)=>a+m.total,0)/fechados.length;
+  plSet('cl-k-media', media.toFixed(0));
+  const melhor=fechados.reduce((a,m)=>m.total>a.total?m:a,fechados[0]);
+  plSet('cl-k-media-sub', `melhor: ${melhor.nome} (${melhor.total})`); document.getElementById('cl-k-media-sub').style.color='var(--muted2)';
+  const gAt=atual.por['GOOGLE']||0, gAnt=ant?.por['GOOGLE']||0;
+  plSet('cl-k-google', String(gAt));
+  plDelta('cl-k-google-sub', gAt, ant?gAnt:null, ` vs ${ant?.mes||''} · ${pct(gAt,atual.total)}% do mês`, true);
+  const indAno=M.reduce((a,m)=>a+(m.por['INDICAÇÃO']||0),0);
+  plSet('cl-k-ind', String(indAno));
+  plSet('cl-k-ind-sub', `${pct(indAno,totAno)}% dos novos do ano`); document.getElementById('cl-k-ind-sub').style.color='var(--muted2)';
+  const recM=M.filter(m=>D.okMeses.has(m.idx));
+  const recSim=recM.reduce((a,m)=>a+m.voltaram,0), recTot=recM.reduce((a,m)=>a+m.preenchidos,0);
+  plSet('cl-k-rec', recTot?pct(recSim,recTot)+'%':'—');
+  plSet('cl-k-rec-sub', recTot?`${recSim} de ${recTot} · ${recM[0].mes}–${recM[recM.length-1].mes}`:'coluna ainda não preenchida'); document.getElementById('cl-k-rec-sub').style.color='var(--muted2)';
+
+  // ── Gráfico principal: barras empilhadas por origem + total ──
+  const labels=M.map(m=>m.mes+(m.fonte==='tabela'?'*':''));
+  const origensUsadas=D.origens.filter(o=>M.some(m=>(m.por[o]||0)>0));
+  const dsOrig=origensUsadas.map(o=>({label:o.charAt(0)+o.slice(1).toLowerCase(),data:M.map(m=>m.por[o]||0),backgroundColor:cor(o),stack:'o'}));
+  dsOrig.push({label:'Total',data:M.map(()=>0),backgroundColor:'transparent',stack:'o',
+    datalabels:{display:true,anchor:'end',align:'end',color:'#e6e8f0',font:{family:mono,size:11,weight:'600'},formatter:(v,c)=>M[c.dataIndex].total}});
+  const tem25=M.some(m=>m.ano25!=null);
+  plChart('clOrigemChart',{type:'bar',data:{labels,datasets:dsOrig},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},interaction:{mode:'index',intersect:false},
+      plugins:{legend:{...legenda,labels:{...legenda.labels,filter:i=>i.text!=='Total'}},
+        tooltip:{filter:i=>i.dataset.label!=='Total'&&!(i.parsed.y===0&&i.dataset.type!=='line'),
+          callbacks:{title:it=>{const m=M[it[0].dataIndex];return m.nome+(m.fonte==='tabela'?' (parcial, tabela de clientes)':'');},
+            label:c=>c.dataset.type==='line'?` 2025: ${c.parsed.y}`:` ${c.dataset.label}: ${c.parsed.y} (${pct(c.parsed.y,M[c.dataIndex].total)}%)`,
+            footer:it=>`Total: ${M[it[0].dataIndex].total}`}}},
+      scales:{x:{stacked:true,grid,ticks:tick},y:{stacked:true,grid,beginAtZero:true,ticks:{...tick,precision:0}}}}});
+
+  // ── Origem no ano ──
+  const anoPor=D.origens.map(o=>({o,v:M.reduce((a,m)=>a+(m.por[o]||0),0)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
+  plSet('cl-ano-sub', `${M[0].nome} a ${atual.nome}${parcial?' (parcial)':''} · ${totAno} clientes`);
+  plBarras('cl-origem-ano', anoPor.map(x=>({l:x.o.charAt(0)+x.o.slice(1).toLowerCase(),v:x.v,c:cor(x.o),txt:`${x.v} · ${pct(x.v,totAno)}%`})));
+
+  // ── Participação % por canal (linhas) ──
+  const principais=anoPor.slice(0,4).map(x=>x.o);
+  plChart('clShareChart',{type:'line',data:{labels,datasets:principais.map(o=>({
+      label:o.charAt(0)+o.slice(1).toLowerCase(),data:M.map(m=>m.total?+(100*(m.por[o]||0)/m.total).toFixed(1):null),
+      borderColor:cor(o),backgroundColor:cor(o),tension:0,pointRadius:3,borderWidth:2}))},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:legenda,tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${String(c.parsed.y).replace('.',',')}%`}}},
+      scales:{x:{grid,ticks:tick},y:{grid,beginAtZero:true,max:100,ticks:{...tick,callback:v=>v+'%'}}}}});
+
+  // ── Voltaram mais de 1x por mês ──
+  plChart('clRecChart',{type:'bar',data:{labels,datasets:[{label:'% voltou',
+      data:M.map(m=>D.okMeses.has(m.idx)&&m.recPct!=null?+m.recPct.toFixed(0):null),backgroundColor:'#ff6eb4',borderRadius:4,
+      datalabels:{display:true,anchor:'end',align:'end',color:'#e6e8f0',font:{family:mono,size:10},formatter:v=>v==null?'':v+'%'}}]},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const m=M[c.dataIndex];return ` ${m.voltaram} de ${m.preenchidos} voltaram (${c.parsed.y}%)`;}}}},
+      scales:{x:{grid,ticks:tick},y:{grid,beginAtZero:true,ticks:{...tick,callback:v=>v+'%'}}}}});
+  const semRec=M.filter(m=>!D.okMeses.has(m.idx)).map(m=>m.mes);
+  plSet('cl-rec-nota', semRec.length?`Sem dado de retorno em ${semRec.join(', ')}: coluna "Voltou mais de 1x" ainda não preenchida.`:'');
+
+  const ro=Object.entries(D.recOrigem).filter(([,v])=>v.tot>=5).map(([o,v])=>({o,p:v.sim/v.tot*100,v})).sort((a,b)=>b.p-a.p);
+  plBarras('cl-rec-origem', ro.map(x=>({l:x.o.charAt(0)+x.o.slice(1).toLowerCase(),v:x.p,c:cor(x.o),txt:`${Math.round(x.p)}% · ${x.v.sim}/${x.v.tot}`})));
+
+  // ── Tabela mês × origem ──
+  const th=document.getElementById('cl-tbl-head');
+  if(th){
+    th.innerHTML=''; const tr=document.createElement('tr');
+    ['Mês',...D.origens.map(o=>o.charAt(0)+o.slice(1).toLowerCase()),'Total'].concat(tem25?['2025']:[]).forEach(t=>{const e=document.createElement('th');e.textContent=t;tr.appendChild(e);});
+    th.appendChild(tr);
+  }
+  const tb=document.getElementById('cl-tbl-body');
+  if(tb){
+    tb.innerHTML='';
+    const linha=(cels)=>{const tr=document.createElement('tr');cels.forEach(([v,c])=>{const td=document.createElement('td');td.className=c;td.textContent=String(v);tr.appendChild(td);});tb.appendChild(tr);};
+    M.forEach(m=>linha([[m.nome+(m.fonte==='tabela'?'*':''),'td-month'],...D.origens.map(o=>[m.por[o]||0,'td-num']),[m.total,'td-month']].concat(tem25?[[m.ano25??'—','td-num']]:[])));
+    linha([['Total','td-month'],...D.origens.map(o=>[M.reduce((a,m)=>a+(m.por[o]||0),0),'td-month']),[totAno,'td-month']].concat(tem25?[['','td-num']]:[]));
+  }
+  plSet('cl-tbl-sub', M.some(m=>m.fonte==='tabela')
+    ? '* mês ainda não lançado na aba GRÁFICOS: contado direto na aba TABELA (parcial)'
+    : 'Tabela da aba GRÁFICOS do mapeamento');
+}
+
 // ── fetch e inicialização ────────────────────────────────
 // OPCIONAL: cole aqui a URL do Google Apps Script para iOS
 // Veja instruções em: script.google.com → novo projeto → cole o código abaixo → publicar como web app
@@ -3206,6 +3546,7 @@ function spinIcon(on){
 async function loadData(noCache=false){
   // Planos vem de outra planilha: carrega em paralelo e não trava o resto do dash se falhar
   const planosJob = loadPlanos(noCache).catch(e=>console.warn('⚠️ Erro ao carregar planilha de planos:', e.message));
+  const clientesJob = loadClientes(noCache).catch(e=>console.warn('⚠️ Erro ao carregar mapeamento de clientes:', e.message));
   try {
     setStatus(noCache ? 'Buscando dados frescos...' : 'Carregando...', 'var(--amber)');
     spinIcon(true);
@@ -3230,7 +3571,7 @@ async function loadData(noCache=false){
     console.warn('⚠️ Erro ao carregar Sheets:', e.message);
     renderAll(defaults);
   } finally {
-    await planosJob;
+    await Promise.all([planosJob, clientesJob]);
     spinIcon(false);
   }
 }
