@@ -2838,9 +2838,11 @@ function plNum(s){
 
 function plNorm(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim(); }
 
-function plCategoria(status){
+// Vigente = status VIGENTE OK/CONFIRMADO com valor pago no mês.
+// "VIGENTE OK" com valor 0 ("VOLTA EM ...") = pacote já pago, renova no mês seguinte.
+function plCategoria(status, valor){
   const s=plNorm(status);
-  if(s==='vigente ok'||s==='confirmado') return 'ativo';
+  if(s==='vigente ok'||s==='confirmado') return (valor||0)>0 ? 'ativo' : 'renova';
   if(s==='cancelado') return 'cancelado';
   if(s==='congelado') return 'congelado';
   if(s.startsWith('volta proximo')) return 'renova';
@@ -2877,6 +2879,7 @@ function plParseMes(csv){
     if(!cliente) return;
     const stIdx=H['status'];
     const status=stIdx!=null?(cells[stIdx]||''):'';
+    if(!status) return; // ignora linhas sem status (ex.: bloco de totais no fim da aba)
     // valor = primeira célula numérica depois do STATUS (pula AGENDA, que existe só em alguns meses)
     let valor=null;
     if(stIdx!=null){
@@ -2884,7 +2887,8 @@ function plParseMes(csv){
       for(let i=stIdx+1;i<Math.min(obsIdx,cells.length);i++){ const n=plNum(cells[i]); if(n!=null){ valor=n; break; } }
     }
     const key=plNorm(cliente).split('/')[0].split(' ')[0]+'|'+plNorm(pet).split(/[ ,]/)[0];
-    out.push({secao:sec, pet, cliente, status, cat:plCategoria(status), valor, obs:g('observacao'), key});
+    const novo = H['pet']>0 && cells.slice(0,H['pet']).some(c=>plNorm(c)==='n'); // marcação "N" na coluna A
+    out.push({secao:sec, pet, cliente, status, cat:plCategoria(status, valor), valor, obs:g('observacao'), key, novo});
   });
   return out;
 }
@@ -2895,7 +2899,10 @@ function plCalcular(meses){ // meses: [{idx, linhas}]
   meses.forEach(({idx,linhas})=>{
     const ativos=linhas.filter(r=>r.cat==='ativo');
     const base=ativos.length; // base = total vigente do mês
-    const novos=idx>0 ? [...new Set(ativos.map(r=>r.key))].filter(k=>!vistos.has(k)).length : null;
+    // Novos: usa a marcação "N" da planilha; nos meses sem marcação, 1ª aparição do cliente no ano
+    const temN=linhas.some(r=>r.novo);
+    const novos=temN ? linhas.filter(r=>r.novo).length
+      : (vistos.size ? [...new Set(ativos.map(r=>r.key))].filter(k=>!vistos.has(k)).length : null);
     const canc=linhas.filter(r=>r.cat==='cancelado');
     const novosCanc=canc.filter(r=>!prevCanc.has(r.key));
     novosCanc.forEach(r=>cancelados.push({...r, mesIdx:idx}));
