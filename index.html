@@ -264,6 +264,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 }
 /* ── ABA PLANOS ── */
 .pl-status{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-bottom:12px}
+.rt-sec-title{font-size:13px;font-weight:600;color:var(--text,#e6e8f0);letter-spacing:.02em;margin:26px 0 6px;padding-top:18px;border-top:1px solid var(--border)}
 .pl-resumo{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;text-align:center}
 .pl-r-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
 .pl-r-val{font-size:18px;font-weight:700;font-family:var(--mono);color:var(--txt)}
@@ -1051,6 +1052,86 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
         <thead id="cl-tbl-head"></thead>
         <tbody id="cl-tbl-body"></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- ── Recorrência e retenção (lê ao vivo "RETENÇÃO E ORIGEM - 2026") ── -->
+  <div class="rt-sec-title">Recorrência e retenção</div>
+  <div id="rt-status" class="pl-status">Carregando retenção...</div>
+
+  <div class="kpi-grid pl-kpis cl-kpis">
+    <div class="kpi" style="--acc:#3dffa0">
+      <div class="kpi-label" id="rt-k-base-lbl">Base ativa (60 dias)</div>
+      <div class="kpi-val" id="rt-k-base">—</div>
+      <div class="kpi-footer" id="rt-k-base-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#4da6ff">
+      <div class="kpi-label" id="rt-k-rec-lbl">Recorrentes no mês</div>
+      <div class="kpi-val" id="rt-k-rec">—</div>
+      <div class="kpi-footer" id="rt-k-rec-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#a78bfa">
+      <div class="kpi-label">Voltaram do mês anterior</div>
+      <div class="kpi-val" id="rt-k-ret">—</div>
+      <div class="kpi-footer" id="rt-k-ret-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--amber)">
+      <div class="kpi-label" id="rt-k-30-lbl">Novos que voltam em 30 dias</div>
+      <div class="kpi-val" id="rt-k-30">—</div>
+      <div class="kpi-footer" id="rt-k-30-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#22d3ee">
+      <div class="kpi-label">Faturamento recorrente</div>
+      <div class="kpi-val" id="rt-k-fat">—</div>
+      <div class="kpi-footer" id="rt-k-fat-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div><div class="card-title">Aquisição × base ativa</div><div class="card-sub">Novos e recorrentes que compraram no mês (barras) e clientes com compra nos últimos 60 dias (linha)</div></div>
+      <span class="badge badge-green">RETENÇÃO</span>
+    </div>
+    <div class="pl-rv-wrap"><canvas id="rtBaseChart"></canvas></div>
+  </div>
+
+  <div class="row2b">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Voltaram do mês anterior</div><div class="card-sub">% dos clientes de um mês que compraram de novo no mês seguinte</div></div>
+      </div>
+      <div class="chart-h180"><canvas id="rtRetChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Retorno dos novos por safra</div><div class="card-sub">% dos clientes novos de cada mês que voltaram em 30, 60 e 90 dias</div></div>
+      </div>
+      <div class="chart-h180"><canvas id="rtSafraChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="row2b">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Quem volta, por origem</div><div class="card-sub" id="rt-orig-sub">% dos novos que voltaram em até 90 dias</div></div>
+      </div>
+      <div class="pl-bars" id="rt-orig-bars"></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Valor do cliente novo, por origem</div><div class="card-sub">Faturamento nos primeiros 90 dias</div></div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Origem</th><th>Novos</th><th>Voltaram</th><th>Fat. 90 dias</th><th>Por cliente</th></tr></thead>
+          <tbody id="rt-orig-body"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -3452,6 +3533,137 @@ function renderClientes(D){
     : 'Tabela da aba GRÁFICOS do mapeamento');
 }
 
+// ── RECORRÊNCIA E RETENÇÃO — lê ao vivo "RETENÇÃO E ORIGEM - 2026" ──
+// Abas: Retencao_Mensal, Safras, Origem_90d (uma tabela por aba, cabeçalho na linha 1).
+// Atualizada todo mês a partir dos relatórios do Pet Shop Control.
+// A planilha precisa estar como "qualquer pessoa com o link pode ver".
+const RET_SHEET_ID = '1WfZi8DFZofY2Ld9cs9lSfXfwZ7jgVqCYImDqLKJO7Wo';
+function rtURL(aba){
+  return `https://docs.google.com/spreadsheets/d/${RET_SHEET_ID}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(aba)}`;
+}
+// Converte CSV em lista de objetos pelo cabeçalho
+function rtObjs(csv){
+  const rows=plParseCSV(csv||'').filter(r=>r.some(c=>c));
+  if(rows.length<2) return [];
+  const head=rows[0].map(h=>plNorm(h));
+  return rows.slice(1).map(r=>{ const o={}; head.forEach((h,i)=>o[h]=r[i]); return o; });
+}
+// Aceita 0,608 / 0.608 / 60,8% e devolve fração (0.608)
+function rtFrac(s){
+  if(s==null||String(s).trim()==='') return null;
+  const pctTxt=String(s).includes('%');
+  const n=plNum(String(s).replace('%',''));
+  if(n==null) return null;
+  return pctTxt||n>1 ? n/100 : n;
+}
+
+async function loadRetencao(noCache=false){
+  const st=document.getElementById('rt-status');
+  if(st) st.textContent='Carregando retenção...';
+  const [m,s,o]=await Promise.all([
+    fetchCSV(rtURL('Retencao_Mensal'),noCache).catch(()=>null),
+    fetchCSV(rtURL('Safras'),noCache).catch(()=>null),
+    fetchCSV(rtURL('Origem_90d'),noCache).catch(()=>null),
+  ]);
+  const mensal=rtObjs(m).map(r=>({
+    mes:r.mes, idx:(plNum(r.mes_num)||0)-1,
+    fat:plNum(r.faturamento), clientes:plNum(r.clientes), novos:plNum(r.novos), rec:plNum(r.recorrentes),
+    fatRec:plNum(r.fat_recorrentes), pctRec:rtFrac(r.pct_fat_recorrente),
+    ret:rtFrac(r.retencao_mes_anterior), base:plNum(r.base_ativa_60d), visitas:plNum(r.visitas_por_cliente)
+  })).filter(r=>r.idx>=0&&r.clientes!=null);
+  if(!mensal.length){
+    if(st){ st.textContent='⚠️ Não foi possível ler a planilha "RETENÇÃO E ORIGEM - 2026". Confira se ela está compartilhada como "qualquer pessoa com o link".'; st.style.color='var(--amber)'; }
+    return;
+  }
+  const safras=rtObjs(s).map(r=>({mes:r.safra, novos:plNum(r.novos), r30:rtFrac(r.volta_30d), r60:rtFrac(r.volta_60d), r90:rtFrac(r.volta_90d), nunca:plNum(r.nunca_compraram)}));
+  const origens=rtObjs(o).map(r=>({o:String(r.origem||'').trim().toUpperCase(), novos:plNum(r.novos_jan_jul), volt:plNum(r.voltaram_90d), pct:rtFrac(r.pct_volta_90d), fat:plNum(r.fat_90d), porCli:plNum(r.fat_90d_por_cliente)})).filter(r=>r.o);
+  renderRetencao(mensal, safras, origens);
+  if(st){
+    st.textContent=`✅ Retenção 2026 · ${mensal[0].mes}–${mensal[mensal.length-1].mes} · fonte: relatórios do Pet Shop Control`;
+    st.style.color='var(--muted2)';
+  }
+}
+
+function renderRetencao(M, S, O){
+  chartDefaults();
+  const grid={color:'#1e2130'}, tick={color:'#5a6080'};
+  const legenda={labels:{color:'#5a6080',boxWidth:10,padding:12}};
+  const p0=v=>v==null?'—':Math.round(v*100)+'%';
+  const fmtR=v=>'R$ '+Math.round(v||0).toLocaleString('pt-BR');
+  const atual=M[M.length-1], ant=M.length>1?M[M.length-2]:null;
+
+  // ── KPIs ──
+  plSet('rt-k-base-lbl','Base ativa (60 dias) · '+atual.mes);
+  plSet('rt-k-base', atual.base!=null?String(atual.base):'—');
+  plDelta('rt-k-base-sub', atual.base, ant?.base, ` vs ${ant?.mes||''}`, true);
+  plSet('rt-k-rec-lbl','Recorrentes no mês · '+atual.mes);
+  plSet('rt-k-rec', String(atual.rec));
+  plDelta('rt-k-rec-sub', atual.rec, ant?.rec, ` vs ${ant?.mes||''} · ${atual.novos} novos`, true);
+  plSet('rt-k-ret', p0(atual.ret));
+  const retsAno=M.filter(m=>m.ret!=null).map(m=>m.ret);
+  const mediaRet=retsAno.length?retsAno.reduce((a,b)=>a+b,0)/retsAno.length:null;
+  plDelta('rt-k-ret-sub', atual.ret!=null?Math.round(atual.ret*100):null, mediaRet!=null?Math.round(mediaRet*100):null, ` p.p. vs média do ano (${p0(mediaRet)})`, true);
+  const s30=S.filter(x=>x.r30!=null); const u30=s30[s30.length-1], a30=s30.length>1?s30[s30.length-2]:null;
+  if(u30){
+    plSet('rt-k-30-lbl','Novos que voltam em 30 dias · safra '+u30.mes);
+    plSet('rt-k-30', p0(u30.r30));
+    plDelta('rt-k-30-sub', Math.round(u30.r30*100), a30?Math.round(a30.r30*100):null, ` p.p. vs ${a30?.mes||''}`, true);
+  }
+  plSet('rt-k-fat', p0(atual.pctRec));
+  plSet('rt-k-fat-sub', `${fmtR(atual.fatRec)} de ${fmtR(atual.fat)} em ${atual.mes}`); document.getElementById('rt-k-fat-sub').style.color='var(--muted2)';
+
+  // ── Aquisição × base ativa ──
+  const labels=M.map(m=>m.mes);
+  plChart('rtBaseChart',{type:'bar',data:{labels,datasets:[
+      {type:'line',label:'Base ativa (60 dias)',data:M.map(m=>m.base),borderColor:'#3dffa0',backgroundColor:'#3dffa0',tension:0,pointRadius:3,borderWidth:2,yAxisID:'y2',spanGaps:true},
+      {label:'Recorrentes no mês',data:M.map(m=>m.rec),backgroundColor:'rgba(77,166,255,.75)',borderRadius:4,stack:'c',yAxisID:'y'},
+      {label:'Novos no mês',data:M.map(m=>m.novos),backgroundColor:'rgba(255,184,77,.8)',borderRadius:4,stack:'c',yAxisID:'y'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:legenda,tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y??'—'}`,
+        footer:it=>{const m=M[it[0].dataIndex];return `Compraram no mês: ${m.clientes} · ${String(m.visitas).replace('.',',')} visitas/cliente`;}}}},
+      scales:{x:{stacked:true,grid,ticks:tick},
+        y:{stacked:true,position:'left',grid,beginAtZero:true,ticks:{...tick,precision:0},title:{display:true,text:'Compraram no mês',color:'#5a6080'}},
+        y2:{position:'right',grid:{display:false},beginAtZero:false,suggestedMin:250,ticks:{...tick,precision:0},title:{display:true,text:'Base ativa',color:'#5a6080'}}}}});
+
+  // ── Retenção mês a mês ──
+  const retLab=M.filter(m=>m.ret!=null);
+  plChart('rtRetChart',{type:'line',data:{labels:retLab.map(m=>m.mes),datasets:[
+      {label:'Voltaram do mês anterior',data:retLab.map(m=>+(m.ret*100).toFixed(1)),borderColor:'#a78bfa',backgroundColor:'#a78bfa',tension:0,pointRadius:3,borderWidth:2},
+      {label:'Média do ano',data:retLab.map(()=>mediaRet!=null?+(mediaRet*100).toFixed(1):null),borderColor:'#5a6080',borderDash:[4,4],pointRadius:0,borderWidth:1}]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:legenda,tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${String(c.parsed.y).replace('.',',')}%`}}},
+      scales:{x:{grid,ticks:tick},y:{grid,min:30,max:80,ticks:{...tick,callback:v=>v+'%'}}}}});
+
+  // ── Safras: volta em 30/60/90 dias ──
+  const sv=v=>v==null?null:+(v*100).toFixed(1);
+  plChart('rtSafraChart',{type:'bar',data:{labels:S.map(x=>x.mes),datasets:[
+      {label:'30 dias',data:S.map(x=>sv(x.r30)),backgroundColor:'rgba(255,184,77,.85)',borderRadius:3},
+      {label:'60 dias',data:S.map(x=>sv(x.r60)),backgroundColor:'rgba(77,166,255,.8)',borderRadius:3},
+      {label:'90 dias',data:S.map(x=>sv(x.r90)),backgroundColor:'rgba(61,255,160,.75)',borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:legenda,tooltip:{callbacks:{
+        title:it=>`Safra ${S[it[0].dataIndex].mes} · ${S[it[0].dataIndex].novos} novos`,
+        label:c=>c.parsed.y==null?` ${c.dataset.label}: em aberto`:` ${c.dataset.label}: ${String(c.parsed.y).replace('.',',')}%`}}},
+      scales:{x:{grid,ticks:tick},y:{grid,beginAtZero:true,max:100,ticks:{...tick,callback:v=>v+'%'}}}}});
+
+  // ── Origem: % que volta e valor em 90 dias ──
+  const corO=o=>(typeof CL_ORIGEM_COR!=='undefined'&&CL_ORIGEM_COR[o])||'#5a6080';
+  const nome=o=>o.charAt(0)+o.slice(1).toLowerCase();
+  const ord=O.slice().sort((a,b)=>(b.pct||0)-(a.pct||0));
+  plBarras('rt-orig-bars', ord.map(x=>({l:nome(x.o),v:Math.round((x.pct||0)*100),c:corO(x.o),txt:`${p0(x.pct)} · ${x.volt}/${x.novos}`})));
+  const tb=document.getElementById('rt-orig-body');
+  if(tb){
+    tb.innerHTML='';
+    O.slice().sort((a,b)=>(b.novos||0)-(a.novos||0)).forEach(x=>{
+      const tr=document.createElement('tr');
+      [[nome(x.o),'td-month'],[x.novos,'td-num'],[p0(x.pct),'td-num'],[fmtR(x.fat),'td-num'],[fmtR(x.porCli),'td-green']]
+        .forEach(([v,c])=>{const td=document.createElement('td');td.className=c;td.textContent=String(v);tr.appendChild(td);});
+      tb.appendChild(tr);
+    });
+  }
+}
+
 // ── fetch e inicialização ────────────────────────────────
 // OPCIONAL: cole aqui a URL do Google Apps Script para iOS
 // Veja instruções em: script.google.com → novo projeto → cole o código abaixo → publicar como web app
@@ -3510,6 +3722,7 @@ async function loadData(noCache=false){
   // Planos vem de outra planilha: carrega em paralelo e não trava o resto do dash se falhar
   const planosJob = loadPlanos(noCache).catch(e=>console.warn('⚠️ Erro ao carregar planilha de planos:', e.message));
   const clientesJob = loadClientes(noCache).catch(e=>console.warn('⚠️ Erro ao carregar mapeamento de clientes:', e.message));
+  const retencaoJob = loadRetencao(noCache).catch(e=>console.warn('⚠️ Erro ao carregar retenção:', e.message));
   try {
     setStatus(noCache ? 'Buscando dados frescos...' : 'Carregando...', 'var(--amber)');
     spinIcon(true);
@@ -3534,7 +3747,7 @@ async function loadData(noCache=false){
     console.warn('⚠️ Erro ao carregar Sheets:', e.message);
     renderAll(defaults);
   } finally {
-    await Promise.all([planosJob, clientesJob]);
+    await Promise.all([planosJob, clientesJob, retencaoJob]);
     spinIcon(false);
   }
 }
