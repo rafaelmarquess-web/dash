@@ -254,6 +254,29 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
   .kpi, .card, .kpi-grid > *{ break-inside:avoid; page-break-inside:avoid; }
   * { -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
 }
+
+/* ── ABA PLANOS ── */
+.pl-status{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-bottom:12px}
+.pl-resumo{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;text-align:center}
+.pl-r-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.pl-r-val{font-size:18px;font-weight:700;font-family:var(--mono);color:var(--txt)}
+.pl-r-sub{font-size:10px;color:var(--muted2);margin-top:2px}
+.pl-bars{display:flex;flex-direction:column;gap:10px}
+.pl-bar{display:flex;align-items:center;gap:10px}
+.pl-bar-lbl{font-size:11px;color:var(--muted2);width:150px;flex-shrink:0}
+.pl-bar-track{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.pl-bar-fill{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.pl-bar-val{font-size:11px;font-family:var(--mono);color:var(--txt);width:56px;text-align:right;flex-shrink:0}
+.pl-details summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:8px}
+.pl-details summary::-webkit-details-marker{display:none}
+.pl-details summary::before{content:'▸';color:var(--muted2);font-size:12px}
+.pl-details[open] summary::before{content:'▾'}
+#pl-canc-body td{white-space:normal}
+@media(min-width:600px){ .pl-resumo{grid-template-columns:repeat(4,1fr)} }
+@media(min-width:1024px){
+  .kpi-grid.pl-kpis{grid-template-columns:repeat(6,1fr)}
+  .pl-resumo{grid-template-columns:repeat(7,1fr)}
+}
 </style>
 </head>
 <body>
@@ -268,6 +291,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <button class="tab active" onclick="switchTab('operacao',this)">Operação</button>
       <button class="tab" onclick="switchTab('marketing',this)">Marketing</button>
       <button class="tab" onclick="switchTab('semanal',this)">Semanal</button>
+      <button class="tab" onclick="switchTab('planos',this)">Planos</button>
     </div>
     <div class="meta-pill" id="sync-status" style="display:flex;align-items:center;gap:6px;cursor:default">
       <span id="data-banner-dot" style="width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0;display:inline-block"></span>
@@ -801,6 +825,146 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
         <tbody id="tbl-semanal-body"></tbody>
       </table>
     </div>
+  </div>
+
+</div>
+
+
+<!-- ===== ABA PLANOS (lê ao vivo a planilha PLANOS - 2026) ===== -->
+<div id="tab-planos" class="tab-content">
+
+  <div id="pl-status" class="pl-status">Carregando planilha de planos...</div>
+
+  <div class="kpi-grid pl-kpis">
+    <div class="kpi" style="--acc:#4da6ff">
+      <div class="kpi-label" id="pl-k-base-lbl">Base de planos</div>
+      <div class="kpi-val" id="pl-k-base">—</div>
+      <div class="kpi-footer" id="pl-k-base-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#22d3ee">
+      <div class="kpi-label">Clientes novos</div>
+      <div class="kpi-val" id="pl-k-novos">—</div>
+      <div class="kpi-footer" id="pl-k-novos-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#ff6eb4">
+      <div class="kpi-label">Cancelados</div>
+      <div class="kpi-val" id="pl-k-canc">—</div>
+      <div class="kpi-footer" id="pl-k-canc-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#a78bfa">
+      <div class="kpi-label">Churn</div>
+      <div class="kpi-val" id="pl-k-churn">—</div>
+      <div class="kpi-footer" id="pl-k-churn-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:var(--amber)">
+      <div class="kpi-label">Congelados</div>
+      <div class="kpi-val" id="pl-k-cong">—</div>
+      <div class="kpi-footer" id="pl-k-cong-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+    <div class="kpi" style="--acc:#4da6ff">
+      <div class="kpi-label">Receita de planos</div>
+      <div class="kpi-val" id="pl-k-rec">—</div>
+      <div class="kpi-footer" id="pl-k-rec-sub"><span class="delta">—</span></div>
+      <div class="kpi-accent"></div>
+    </div>
+  </div>
+
+  <!-- Resumo do ano -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div><div class="card-title">Resumo do ano</div><div class="card-sub" id="pl-ano-sub">Acumulado 2026</div></div>
+      <span class="badge badge-blue">PLANOS 2026</span>
+    </div>
+    <div class="pl-resumo">
+      <div><div class="pl-r-lbl">Crescimento da base</div><div class="pl-r-val" id="pl-a-cresc">—</div><div class="pl-r-sub" id="pl-a-cresc-sub">—</div></div>
+      <div><div class="pl-r-lbl">Pico da base</div><div class="pl-r-val" id="pl-a-pico">—</div><div class="pl-r-sub" id="pl-a-pico-sub">—</div></div>
+      <div><div class="pl-r-lbl">Novos no ano</div><div class="pl-r-val" id="pl-a-novos">—</div><div class="pl-r-sub">1ª vez em um plano</div></div>
+      <div><div class="pl-r-lbl">Cancelados no ano</div><div class="pl-r-val" id="pl-a-canc">—</div><div class="pl-r-sub" id="pl-a-saldo">—</div></div>
+      <div><div class="pl-r-lbl">Churn médio</div><div class="pl-r-val" id="pl-a-churn">—</div><div class="pl-r-sub">por mês</div></div>
+      <div><div class="pl-r-lbl">Congelamentos</div><div class="pl-r-val" id="pl-a-cong">—</div><div class="pl-r-sub" id="pl-a-cong-sub">—</div></div>
+      <div><div class="pl-r-lbl">Receita no ano</div><div class="pl-r-val" id="pl-a-rec">—</div><div class="pl-r-sub" id="pl-a-rec-sub">—</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div><div class="card-title">Base de planos por modalidade</div><div class="card-sub">Vigentes por modalidade + quem já pagou e renova no mês seguinte</div></div>
+    </div>
+    <div class="chart-h220"><canvas id="plBaseChart"></canvas></div>
+  </div>
+
+  <div class="row2b">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Entradas x saídas</div><div class="card-sub">Novos, cancelados e congelados por mês</div></div>
+      </div>
+      <div class="chart-h180"><canvas id="plFluxoChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Churn mensal</div><div class="card-sub">Cancelados do mês ÷ base do mês anterior</div></div>
+      </div>
+      <div class="chart-h180"><canvas id="plChurnChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="row2b">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Motivos de cancelamento</div><div class="card-sub">Agrupados pela observação da planilha · ano</div></div>
+      </div>
+      <div class="pl-bars" id="pl-motivos"></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Receita de planos por mês</div><div class="card-sub">Soma do valor dos planos vigentes</div></div>
+      </div>
+      <div class="chart-h180"><canvas id="plRecChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="row2b">
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">O que aconteceu com os congelados</div><div class="card-sub">Cada cliente que congelou, pelo que fez nos meses seguintes</div></div>
+      </div>
+      <div class="pl-bars" id="pl-congelados"></div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div><div class="card-title">Cancelamentos por modalidade</div><div class="card-sub">Ano</div></div>
+      </div>
+      <div class="pl-bars" id="pl-canc-mod"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div><div class="card-title">Indicadores mês a mês</div><div class="card-sub">Base = vigentes + renova no mês seguinte</div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Mês</th><th>Vigentes</th><th>Renova próx.</th><th>À confirmar</th><th>Base</th><th>Novos</th><th>Cancelados</th><th>Congelados</th><th>Churn</th><th>Receita</th><th>Ticket</th></tr></thead>
+        <tbody id="pl-tbl-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <details class="pl-details">
+      <summary><span class="card-title">Lista de cancelamentos</span> <span class="card-sub" id="pl-lista-sub"></span></summary>
+      <div class="tbl-wrap" style="margin-top:12px">
+        <table>
+          <thead><tr><th>Mês</th><th>Pet</th><th>Cliente</th><th>Modalidade</th><th>Motivo</th><th>Observação</th></tr></thead>
+          <tbody id="pl-canc-body"></tbody>
+        </table>
+      </div>
+    </details>
   </div>
 
 </div>
@@ -2617,12 +2781,351 @@ window.addEventListener('afterprint', resetarZoomImpressao);
 // ── exportar aba atual como PDF (impressão nativa do navegador) ──
 function exportarPDF(){
   const ativa = document.querySelector('.tab-content.active');
-  const nomes = {'tab-operacao':'Operacao','tab-marketing':'Marketing','tab-semanal':'Semanal'};
+  const nomes = {'tab-operacao':'Operacao','tab-marketing':'Marketing','tab-semanal':'Semanal','tab-planos':'Planos'};
   const nomeAba = ativa ? (nomes[ativa.id] || 'Relatorio') : 'Relatorio';
   const tituloOriginal = document.title;
   document.title = `Dashboard-${nomeAba}-${new Date().toISOString().slice(0,10)}`;
   window.print();
   setTimeout(()=>{ document.title = tituloOriginal; }, 1000);
+}
+
+
+// ══════════════════════════════════════════════════════════
+// ── ABA PLANOS — lê ao vivo a planilha "PLANOS - 2026" ──
+// Uma aba por mês (JANEIRO, FEVEREIRO, ...), com blocos MENSAL /
+// QUINZENAL / PERSONALIZADO. Precisa estar compartilhada como
+// "qualquer pessoa com o link pode ver".
+// ══════════════════════════════════════════════════════════
+const PLANOS_SHEET_ID = '1oHIG6T1KxnEpDradTrWymS3VPfRmj3EF44nIFu5_OOA';
+const PLANOS_ANO = 2026;
+const PL_ABAS  = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+const PL_MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const PL_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function plSheetURL(aba){
+  return `https://docs.google.com/spreadsheets/d/${PLANOS_SHEET_ID}/gviz/tq?tqx=out:csv&headers=0&sheet=${encodeURIComponent(aba)}`;
+}
+
+// CSV completo (aspas, vírgulas e quebras de linha dentro de células)
+function plParseCSV(txt){
+  const rows=[]; let row=[], cur='', q=false;
+  for(let i=0;i<txt.length;i++){
+    const c=txt[i];
+    if(q){
+      if(c==='"'){ if(txt[i+1]==='"'){cur+='"';i++;} else q=false; }
+      else cur+=c;
+    } else if(c==='"') q=true;
+    else if(c===','){ row.push(cur); cur=''; }
+    else if(c==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
+    else if(c!=='\r') cur+=c;
+  }
+  if(cur!==''||row.length){ row.push(cur); rows.push(row); }
+  return rows.map(r=>r.map(c=>c.trim()));
+}
+
+// Número em "R$ 1.053,50", "1053,5" ou "1053.5"
+function plNum(s){
+  if(s==null) return null;
+  let v=String(s).replace(/R\$\s*/,'').replace(/\s/g,'');
+  if(!v) return null;
+  if(v.includes(',')) v=v.replace(/\./g,'').replace(',','.');
+  else if(!/^-?\d+(\.\d+)?$/.test(v)) v=v.replace(/\./g,'');
+  const n=parseFloat(v);
+  return isNaN(n)?null:n;
+}
+
+function plNorm(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim(); }
+
+function plCategoria(status){
+  const s=plNorm(status);
+  if(s==='vigente ok'||s==='confirmado') return 'ativo';
+  if(s==='cancelado') return 'cancelado';
+  if(s==='congelado') return 'congelado';
+  if(s.startsWith('volta proximo')) return 'renova';
+  return 'pendente';
+}
+
+function plMotivo(obs){
+  const o=plNorm(obs);
+  if(/avulso|creche/.test(o)) return 'Virou avulso';
+  if(/mudou/.test(o)) return 'Mudou-se';
+  if(/sem retorno|sem resposta|nao confirmou|sumiu|nao justificou|tentar renovar/.test(o)) return 'Sem retorno / não renovou';
+  if(/preco|caro|gastos/.test(o)) return 'Preço';
+  if(/reclam|desgaste|chata|horario|prazo|organiz|enrolado|taxi/.test(o)) return 'Atrito / insatisfação';
+  return 'Outros (óbito, idade, viagem, concorrente...)';
+}
+
+// Lê uma aba de mês → linhas {secao, pet, cliente, status, cat, valor, obs, key}
+function plParseMes(csv){
+  const rows=plParseCSV(csv);
+  const out=[]; let sec=null, H=null;
+  rows.forEach(cells=>{
+    const ne=cells.filter(c=>c);
+    if(!ne.length) return;
+    const up=cells.map(c=>plNorm(c));
+    if(up.includes('pet') && up.includes('cliente')){
+      H={};
+      up.forEach((c,i)=>{ if(c && !(c.split(' ')[0] in H)) H[c.split(' ')[0]]=i; });
+      return;
+    }
+    if(ne.length===1 && ne[0]===ne[0].toUpperCase() && ne[0].length<20 && !/\d/.test(ne[0])){ sec=ne[0]; H=null; return; }
+    if(!H) return;
+    const g=k=>H[k]!=null?(cells[H[k]]||''):'';
+    const pet=g('pet'), cliente=g('cliente');
+    if(!cliente) return;
+    const stIdx=H['status'];
+    const status=stIdx!=null?(cells[stIdx]||''):'';
+    // valor = primeira célula numérica depois do STATUS (pula AGENDA, que existe só em alguns meses)
+    let valor=null;
+    if(stIdx!=null){
+      const obsIdx=H['observacao']!=null?H['observacao']:cells.length;
+      for(let i=stIdx+1;i<Math.min(obsIdx,cells.length);i++){ const n=plNum(cells[i]); if(n!=null){ valor=n; break; } }
+    }
+    const key=plNorm(cliente).split('/')[0].split(' ')[0]+'|'+plNorm(pet).split(/[ ,]/)[0];
+    out.push({secao:sec, pet, cliente, status, cat:plCategoria(status), valor, obs:g('observacao'), key});
+  });
+  return out;
+}
+
+function plCalcular(meses){ // meses: [{idx, linhas}]
+  const res=[], cancelados=[];
+  const vistos=new Set(); let prevCanc=new Set(), prevBase=null;
+  meses.forEach(({idx,linhas})=>{
+    const ativos=linhas.filter(r=>r.cat==='ativo');
+    const baseKeys=new Set(linhas.filter(r=>r.cat==='ativo'||r.cat==='renova').map(r=>r.key));
+    const novos=idx>0 ? [...new Set(ativos.map(r=>r.key))].filter(k=>!vistos.has(k)).length : null;
+    const canc=linhas.filter(r=>r.cat==='cancelado');
+    const novosCanc=canc.filter(r=>!prevCanc.has(r.key));
+    novosCanc.forEach(r=>cancelados.push({...r, mesIdx:idx}));
+    const receita=ativos.reduce((a,r)=>a+(r.valor||0),0);
+    const porSec=s=>ativos.filter(r=>(r.secao||'').toUpperCase()===s).length;
+    res.push({
+      idx, mes:PL_MESES[idx], nome:PL_NOMES[idx],
+      ativos:ativos.length,
+      renova:linhas.filter(r=>r.cat==='renova').length,
+      pendente:linhas.filter(r=>r.cat==='pendente').length,
+      base:baseKeys.size, novos, cancel:novosCanc.length,
+      cong:linhas.filter(r=>r.cat==='congelado').length,
+      receita, ticket:ativos.length?receita/ativos.length:0,
+      mensal:porSec('MENSAL'), quinz:porSec('QUINZENAL'), pers:porSec('PERSONALIZADO'),
+      churn:prevBase?novosCanc.length/prevBase*100:null
+    });
+    linhas.forEach(r=>vistos.add(r.key));
+    prevCanc=new Set(canc.map(r=>r.key)); prevBase=baseKeys.size;
+  });
+
+  // Congelados: o que aconteceu depois
+  const primeiroCong={};
+  meses.forEach(({idx,linhas})=>linhas.forEach(r=>{ if(r.cat==='congelado' && primeiroCong[r.key]==null) primeiroCong[r.key]=idx; }));
+  let voltaram=0, cancelaram=0, aberto=0;
+  Object.entries(primeiroCong).forEach(([k,mi])=>{
+    const depois=meses.filter(m=>m.idx>mi).flatMap(m=>m.linhas.filter(r=>r.key===k));
+    if(depois.some(r=>r.cat==='ativo')) voltaram++;
+    else if(depois.some(r=>r.cat==='cancelado')) cancelaram++;
+    else aberto++;
+  });
+
+  cancelados.forEach(c=>{ c.motivo=plMotivo(c.obs); });
+  return {mensal:res, cancelados, congelados:{voltaram, cancelaram, aberto, total:Object.keys(primeiroCong).length}};
+}
+
+async function loadPlanos(noCache=false){
+  const stEl=document.getElementById('pl-status');
+  const hoje=new Date();
+  const ultimoMes = hoje.getFullYear()>PLANOS_ANO ? 11 : hoje.getMonth();
+  const idxs=[...Array(ultimoMes+1).keys()];
+  if(stEl) stEl.textContent='Carregando planilha de planos...';
+
+  const textos=await Promise.all(idxs.map(i=>fetchCSV(plSheetURL(PL_ABAS[i]), noCache).catch(()=>null)));
+
+  // Descarta aba inexistente (o Sheets devolve outra aba igual) ou vazia
+  const vistos=new Set(), meses=[];
+  idxs.forEach((i,j)=>{
+    const t=textos[j];
+    if(!t || vistos.has(t)) return;
+    vistos.add(t);
+    const linhas=plParseMes(t);
+    if(linhas.length) meses.push({idx:i, linhas});
+  });
+
+  if(!meses.length){
+    if(stEl){ stEl.textContent='⚠️ Não foi possível ler a planilha PLANOS - 2026. Confira se ela está compartilhada como "qualquer pessoa com o link".'; stEl.style.color='var(--amber)'; }
+    return;
+  }
+  renderPlanos(plCalcular(meses));
+  const falhas=idxs.length-meses.length;
+  if(stEl){
+    stEl.textContent=`✅ PLANOS - 2026 · ${PL_MESES[meses[0].idx]}–${PL_MESES[meses[meses.length-1].idx]} · lido em ${hoje.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}`+(falhas?` · ${falhas} mês(es) sem dados`:'');
+    stEl.style.color='var(--muted2)';
+  }
+}
+
+function plSet(id,txt,cor){ const el=document.getElementById(id); if(!el) return; el.textContent=txt; if(cor!==undefined) el.style.color=cor; }
+function plPct(v,sinal){ if(v==null||isNaN(v)) return '—'; return (sinal&&v>0?'+':'')+v.toFixed(1).replace('.',',')+'%'; }
+// Delta no padrão do dash: valor em branco, só a seta/variação colorida
+function plDelta(id, atual, anterior, txtRef, maiorEhMelhor=true, fmt=v=>v){
+  const el=document.getElementById(id); if(!el) return;
+  if(anterior==null||atual==null){ el.innerHTML=`<span class="delta neu">${txtRef||'—'}</span>`; return; }
+  const diff=atual-anterior;
+  const bom = maiorEhMelhor ? diff>=0 : diff<=0;
+  const cor = diff===0 ? 'var(--muted2)' : (bom?'var(--green)':'var(--red)');
+  const seta = diff>0?'↑':diff<0?'↓':'→';
+  el.innerHTML=`<span style="color:${cor};font-weight:600;font-size:12px">${seta} ${fmt(Math.abs(diff))}</span><span style="color:var(--muted2)">${txtRef}</span>`;
+}
+
+function plBarras(id, itens, cor){
+  const el=document.getElementById(id); if(!el) return;
+  const max=Math.max(1,...itens.map(i=>i.v));
+  el.innerHTML='';
+  itens.forEach(i=>{
+    const row=document.createElement('div'); row.className='pl-bar';
+    const l=document.createElement('div'); l.className='pl-bar-lbl'; l.textContent=i.l;
+    const t=document.createElement('div'); t.className='pl-bar-track';
+    const f=document.createElement('div'); f.className='pl-bar-fill'; f.style.width=(i.v/max*100)+'%'; f.style.background=i.c||cor;
+    const v=document.createElement('div'); v.className='pl-bar-val'; v.textContent=i.txt!=null?i.txt:i.v;
+    t.appendChild(f); row.append(l,t,v); el.appendChild(row);
+  });
+}
+
+function plChart(id, config){
+  const ctx=document.getElementById(id)?.getContext('2d'); if(!ctx) return;
+  if(_charts[id]) _charts[id].destroy();
+  _charts[id]=new Chart(ctx, config);
+}
+
+function renderPlanos(P){
+  chartDefaults();
+  const M=P.mensal;
+  const atual=M[M.length-1], ant=M.length>1?M[M.length-2]:null;
+  const hoje=new Date();
+  const atualParcial = atual.idx===hoje.getMonth() && hoje.getFullYear()===PLANOS_ANO;
+  const nomeAtual = atual.nome + (atualParcial?' (parcial)':'');
+
+  // ── KPIs do mês ──
+  plSet('pl-k-base-lbl', 'Base de planos · '+atual.mes);
+  plSet('pl-k-base', String(atual.base));
+  plDelta('pl-k-base-sub', atual.base, ant?.base, ` vs ${ant?.mes||''}`+(atual.pendente?` · +${atual.pendente} à confirmar`:''), true);
+  plSet('pl-k-novos', atual.novos==null?'—':String(atual.novos));
+  plDelta('pl-k-novos-sub', atual.novos, ant?.novos, ` vs ${ant?.mes||''}`, true);
+  plSet('pl-k-canc', String(atual.cancel));
+  plDelta('pl-k-canc-sub', atual.cancel, ant?.cancel, ` vs ${ant?.mes||''}`, false);
+  const churns=M.filter(m=>m.churn!=null).map(m=>m.churn);
+  const churnMedio=churns.length?churns.reduce((a,b)=>a+b,0)/churns.length:null;
+  plSet('pl-k-churn', plPct(atual.churn));
+  plDelta('pl-k-churn-sub', atual.churn, churnMedio, ' vs média do ano', false, v=>v.toFixed(1).replace('.',',')+' p.p.');
+  plSet('pl-k-cong', String(atual.cong));
+  plDelta('pl-k-cong-sub', atual.cong, ant?.cong, ` vs ${ant?.mes||''}`, false);
+  plSet('pl-k-rec', fmtR(atual.receita));
+  plDelta('pl-k-rec-sub', atual.receita, ant?.receita, ` vs ${ant?.mes||''}`, true, v=>fmtR(v));
+
+  // ── Resumo do ano ──
+  const fechados = atualParcial && M.length>1 ? M.slice(0,-1) : M;
+  const primeiro=M[0], ultimoF=fechados[fechados.length-1];
+  const cresc = primeiro.base ? (ultimoF.base/primeiro.base-1)*100 : null;
+  const pico = M.reduce((a,m)=>m.base>a.base?m:a, M[0]);
+  const novosAno=M.reduce((a,m)=>a+(m.novos||0),0);
+  const cancAno=M.reduce((a,m)=>a+m.cancel,0);
+  const congAno=M.reduce((a,m)=>a+m.cong,0);
+  const recAno=M.reduce((a,m)=>a+m.receita,0);
+  const ativosAno=M.reduce((a,m)=>a+m.ativos,0);
+  plSet('pl-ano-sub', `${primeiro.nome} a ${nomeAtual}`);
+  plSet('pl-a-cresc', plPct(cresc,true), cresc==null?'':(cresc>=0?'var(--green)':'var(--red)'));
+  plSet('pl-a-cresc-sub', `${primeiro.base} em ${primeiro.mes} → ${ultimoF.base} em ${ultimoF.mes}`);
+  plSet('pl-a-pico', String(pico.base));
+  plSet('pl-a-pico-sub', pico.nome);
+  plSet('pl-a-novos', String(novosAno));
+  plSet('pl-a-canc', String(cancAno));
+  const saldo=novosAno-cancAno;
+  plSet('pl-a-saldo', `saldo ${saldo>0?'+':''}${saldo} clientes`, saldo>=0?'var(--green)':'var(--red)');
+  plSet('pl-a-churn', plPct(churnMedio));
+  plSet('pl-a-cong', String(congAno));
+  plSet('pl-a-cong-sub', `${P.congelados.voltaram} voltaram ao plano`);
+  plSet('pl-a-rec', fmtR(recAno));
+  plSet('pl-a-rec-sub', `ticket médio ${fmtR(ativosAno?recAno/ativosAno:0)}`);
+
+  // ── Gráficos ──
+  const labels=M.map(m=>m.mes);
+  const grid={color:'#1e2130'}, tick={color:'#5a6080'};
+  const legenda={labels:{color:'#5a6080',boxWidth:10,padding:12}};
+
+  plChart('plBaseChart',{type:'bar',data:{labels,datasets:[
+      {label:'Mensal',data:M.map(m=>m.mensal),backgroundColor:'#4da6ff',stack:'b'},
+      {label:'Quinzenal',data:M.map(m=>m.quinz),backgroundColor:'#a78bfa',stack:'b'},
+      {label:'Personalizado',data:M.map(m=>m.pers),backgroundColor:'#22d3ee',stack:'b'},
+      {label:'Renova no mês seguinte',data:M.map(m=>m.renova),backgroundColor:'#ffb84d',stack:'b'},
+      {label:'À confirmar',data:M.map(m=>m.pendente),backgroundColor:'#3a3f55',stack:'b',
+        datalabels:{display:(c)=>true,anchor:'end',align:'end',color:'#e6e8f0',font:{family:"'DM Mono', monospace",size:11},
+          formatter:(v,c)=>{const m=M[c.dataIndex]; return m.base+m.pendente;}}}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},
+      plugins:{legend:legenda,tooltip:{mode:'index',callbacks:{footer:(items)=>{const m=M[items[0].dataIndex];return `Base: ${m.base}`+(m.pendente?` (+${m.pendente} à confirmar)`:'');}}}},
+      scales:{x:{stacked:true,grid,ticks:tick},y:{stacked:true,grid,ticks:tick}}}});
+
+  plChart('plFluxoChart',{type:'bar',data:{labels,datasets:[
+      {label:'Novos',data:M.map(m=>m.novos),backgroundColor:'#4da6ff'},
+      {label:'Cancelados',data:M.map(m=>m.cancel),backgroundColor:'#ff6eb4'},
+      {label:'Congelados',data:M.map(m=>m.cong),backgroundColor:'#ffb84d'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:legenda,tooltip:{mode:'index'}},
+      scales:{x:{grid,ticks:tick},y:{grid,ticks:{...tick,precision:0}}}}});
+
+  plChart('plChurnChart',{type:'line',data:{labels,datasets:[
+      {label:'Churn %',data:M.map(m=>m.churn==null?null:+m.churn.toFixed(1)),borderColor:'#a78bfa',backgroundColor:'#a78bfa',tension:0,pointRadius:3,spanGaps:false,
+        datalabels:{display:true,align:'top',color:'#e6e8f0',font:{family:"'DM Mono', monospace",size:10},formatter:v=>v==null?'':v.toFixed(0)+'%'}},
+      {label:'Média do ano',data:M.map(()=>churnMedio==null?null:+churnMedio.toFixed(1)),borderColor:'#5a6080',borderDash:[4,3],pointRadius:0,borderWidth:1}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16}},
+      plugins:{legend:legenda,tooltip:{callbacks:{label:c=>c.parsed.y==null?null:` ${c.dataset.label}: ${c.parsed.y.toFixed(1).replace('.',',')}%`}}},
+      scales:{x:{grid,ticks:tick},y:{grid,beginAtZero:true,ticks:{...tick,callback:v=>v+'%'}}}}});
+
+  plChart('plRecChart',{type:'bar',data:{labels,datasets:[
+      {label:'Receita de planos',data:M.map(m=>+m.receita.toFixed(2)),
+        backgroundColor:M.map(m=>(atualParcial&&m===atual)?'#3a3f55':'#4da6ff'),
+        datalabels:{display:c=>c.chart.width>560,anchor:'end',align:'end',color:'#e6e8f0',font:{family:"'DM Mono', monospace",size:10},formatter:v=>fmtR(v).replace('R$ ','')}}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const m=M[c.dataIndex];return [` ${fmtR(m.receita)}`,` ${m.ativos} planos · ticket ${fmtR(m.ticket)}`];}}}},
+      scales:{x:{grid,ticks:tick},y:{grid,beginAtZero:true,ticks:{...tick,callback:v=>fmtR(v)}}}}});
+
+  // ── Barras de motivos / congelados / modalidade ──
+  const cont=(arr,f)=>arr.reduce((o,x)=>{const k=f(x);o[k]=(o[k]||0)+1;return o;},{});
+  const mot=Object.entries(cont(P.cancelados,c=>c.motivo)).sort((a,b)=>b[1]-a[1]);
+  plBarras('pl-motivos', mot.map(([l,v])=>({l,v,txt:`${v} · ${Math.round(v/P.cancelados.length*100)}%`})), '#ff6eb4');
+  const cg=P.congelados;
+  plBarras('pl-congelados',[
+    {l:'Voltaram ao plano',v:cg.voltaram,c:'#4da6ff'},
+    {l:'Cancelaram depois',v:cg.cancelaram,c:'#ff6eb4'},
+    {l:'Ainda em aberto',v:cg.aberto,c:'#ffb84d'}]);
+  const mod=Object.entries(cont(P.cancelados,c=>{const s=(c.secao||'Outros'); return s.charAt(0)+s.slice(1).toLowerCase();})).sort((a,b)=>b[1]-a[1]);
+  plBarras('pl-canc-mod', mod.map(([l,v])=>({l,v,txt:`${v} · ${Math.round(v/P.cancelados.length*100)}%`})), '#a78bfa');
+
+  // ── Tabela mensal ──
+  const tb=document.getElementById('pl-tbl-body');
+  if(tb){
+    tb.innerHTML='';
+    M.forEach(m=>{
+      const tr=document.createElement('tr');
+      const cels=[
+        [m.nome+((atualParcial&&m===atual)?'*':''),'td-month'],[m.ativos,'td-num'],[m.renova,'td-num'],[m.pendente||'—','td-num'],
+        [m.base,'td-month'],[m.novos==null?'—':m.novos,'td-num'],[m.cancel,'td-num'],[m.cong,'td-num'],
+        [plPct(m.churn),'td-num'],[fmtR(m.receita),'td-num'],[fmtR(m.ticket),'td-num']];
+      cels.forEach(([v,c])=>{const td=document.createElement('td');td.className=c;td.textContent=String(v);tr.appendChild(td);});
+      tb.appendChild(tr);
+    });
+  }
+
+  // ── Lista de cancelados ──
+  plSet('pl-lista-sub', `${P.cancelados.length} no ano`);
+  const cb=document.getElementById('pl-canc-body');
+  if(cb){
+    cb.innerHTML='';
+    P.cancelados.slice().sort((a,b)=>b.mesIdx-a.mesIdx).forEach(c=>{
+      const tr=document.createElement('tr');
+      [[PL_MESES[c.mesIdx],'td-month'],[c.pet,''],[c.cliente,''],[(c.secao||'').charAt(0)+(c.secao||'').slice(1).toLowerCase(),'td-num'],[c.motivo,''],[c.obs,'td-num']]
+        .forEach(([v,cl])=>{const td=document.createElement('td');if(cl)td.className=cl;td.textContent=v||'';tr.appendChild(td);});
+      cb.appendChild(tr);
+    });
+  }
 }
 
 // ── fetch e inicialização ────────────────────────────────
@@ -2680,6 +3183,8 @@ function spinIcon(on){
 }
 
 async function loadData(noCache=false){
+  // Planos vem de outra planilha: carrega em paralelo e não trava o resto do dash se falhar
+  const planosJob = loadPlanos(noCache).catch(e=>console.warn('⚠️ Erro ao carregar planilha de planos:', e.message));
   try {
     setStatus(noCache ? 'Buscando dados frescos...' : 'Carregando...', 'var(--amber)');
     spinIcon(true);
@@ -2704,6 +3209,7 @@ async function loadData(noCache=false){
     console.warn('⚠️ Erro ao carregar Sheets:', e.message);
     renderAll(defaults);
   } finally {
+    await planosJob;
     spinIcon(false);
   }
 }
