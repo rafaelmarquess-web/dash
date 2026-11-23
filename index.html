@@ -1055,7 +1055,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     </div>
   </div>
 
-  <!-- ── Recorrência e retenção (lê ao vivo "RETENÇÃO E ORIGEM - 2026") ── -->
+  <!-- ── Recorrência e retenção (lê ao vivo "DASH - RETENÇÃO 2026 (agregado)") ── -->
   <div class="rt-sec-title">Recorrência e retenção</div>
   <div id="rt-status" class="pl-status">Carregando retenção...</div>
 
@@ -3533,11 +3533,11 @@ function renderClientes(D){
     : 'Tabela da aba GRÁFICOS do mapeamento');
 }
 
-// ── RECORRÊNCIA E RETENÇÃO — lê ao vivo "RETENÇÃO E ORIGEM - 2026" ──
+// ── RECORRÊNCIA E RETENÇÃO — lê ao vivo "DASH - RETENÇÃO 2026 (agregado)" ──
 // Abas: Retencao_Mensal, Safras, Origem_90d (uma tabela por aba, cabeçalho na linha 1).
 // Atualizada todo mês a partir dos relatórios do Pet Shop Control.
 // A planilha precisa estar como "qualquer pessoa com o link pode ver".
-const RET_SHEET_ID = '1WfZi8DFZofY2Ld9cs9lSfXfwZ7jgVqCYImDqLKJO7Wo';
+const RET_SHEET_ID = '1E_EE7M6M4I0jZwXuAGRLWQTtdOL1oFq88qm3pGYNYmA';
 function rtURL(aba){
   return `https://docs.google.com/spreadsheets/d/${RET_SHEET_ID}/gviz/tq?tqx=out:csv&headers=1&sheet=${encodeURIComponent(aba)}`;
 }
@@ -3572,7 +3572,7 @@ async function loadRetencao(noCache=false){
     ret:rtFrac(r.retencao_mes_anterior), base:plNum(r.base_ativa_60d), visitas:plNum(r.visitas_por_cliente)
   })).filter(r=>r.idx>=0&&r.clientes!=null);
   if(!mensal.length){
-    if(st){ st.textContent='⚠️ Não foi possível ler a planilha "RETENÇÃO E ORIGEM - 2026". Confira se ela está compartilhada como "qualquer pessoa com o link".'; st.style.color='var(--amber)'; }
+    if(st){ st.textContent='⚠️ Não foi possível ler a planilha "DASH - RETENÇÃO 2026 (agregado)". Confira se ela está compartilhada como "qualquer pessoa com o link".'; st.style.color='var(--amber)'; }
     return;
   }
   const safras=rtObjs(s).map(r=>({mes:r.safra, novos:plNum(r.novos), r30:rtFrac(r.volta_30d), r60:rtFrac(r.volta_60d), r90:rtFrac(r.volta_90d), nunca:plNum(r.nunca_compraram)}));
