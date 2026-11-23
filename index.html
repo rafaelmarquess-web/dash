@@ -264,6 +264,12 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 }
 /* ── ABA PLANOS ── */
 .pl-status{font-size:11px;color:var(--muted2);font-family:var(--mono);margin-bottom:12px}
+.rt-story{display:flex;flex-direction:column;gap:12px}
+.rt-story-item{display:flex;gap:12px;align-items:flex-start}
+.rt-story-n{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--s2);border:1px solid var(--border);color:var(--muted2);font-family:var(--mono);font-size:11px;display:flex;align-items:center;justify-content:center}
+.rt-story-t{font-size:13px;line-height:1.5;color:var(--muted2)}
+.rt-story-t b{color:#e6e8f0;font-weight:600}
+.rt-headline{font-size:15px;font-weight:600;color:#e6e8f0;line-height:1.45;margin-bottom:14px}
 .rt-sec-title{font-size:13px;font-weight:600;color:var(--text,#e6e8f0);letter-spacing:.02em;margin:26px 0 6px;padding-top:18px;border-top:1px solid var(--border)}
 .pl-resumo{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;text-align:center}
 .pl-r-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
@@ -1059,6 +1065,15 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
   <div class="rt-sec-title">Recorrência e retenção</div>
   <div id="rt-status" class="pl-status">Carregando retenção...</div>
 
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div><div class="card-title">O que os números dizem</div><div class="card-sub" id="rt-story-sub">Leitura automática da retenção</div></div>
+      <span class="badge badge-amber">LEITURA</span>
+    </div>
+    <div class="rt-headline" id="rt-headline">—</div>
+    <div class="rt-story" id="rt-story"></div>
+  </div>
+
   <div class="kpi-grid pl-kpis cl-kpis">
     <div class="kpi" style="--acc:#3dffa0">
       <div class="kpi-label" id="rt-k-base-lbl">Base ativa (60 dias)</div>
@@ -1090,6 +1105,14 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <div class="kpi-footer" id="rt-k-fat-sub"><span class="delta">—</span></div>
       <div class="kpi-accent"></div>
     </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-head">
+      <div><div class="card-title">Entradas × saídas da base</div><div class="card-sub">Clientes novos que entraram no mês × clientes que saíram da base ativa (sem compra há mais de 60 dias). A linha é o saldo.</div></div>
+      <span class="badge badge-amber">VAZAMENTO</span>
+    </div>
+    <div class="pl-rv-wrap"><canvas id="rtFluxoChart"></canvas></div>
   </div>
 
   <div class="card" style="margin-bottom:14px">
@@ -3611,6 +3634,55 @@ function renderRetencao(M, S, O){
   }
   plSet('rt-k-fat', p0(atual.pctRec));
   plSet('rt-k-fat-sub', `${fmtR(atual.fatRec)} de ${fmtR(atual.fat)} em ${atual.mes}`); document.getElementById('rt-k-fat-sub').style.color='var(--muted2)';
+
+  // ── Entradas × saídas da base ──
+  // saídas (líquidas) = base do mês anterior + novos do mês − base do mês
+  // (líquido de clientes antigos que voltaram depois de 60+ dias sem compra)
+  const F=[];
+  for(let i=1;i<M.length;i++){
+    const a=M[i-1], b=M[i];
+    if(a.base==null||b.base==null) continue;
+    F.push({mes:b.mes, entra:b.novos, sai:a.base+b.novos-b.base, saldo:b.base-a.base});
+  }
+  plChart('rtFluxoChart',{type:'bar',data:{labels:F.map(f=>f.mes),datasets:[
+      {type:'line',label:'Saldo da base',data:F.map(f=>f.saldo),borderColor:'#3dffa0',backgroundColor:'#3dffa0',tension:0,pointRadius:3,borderWidth:2,order:0},
+      {label:'Entraram (novos)',data:F.map(f=>f.entra),backgroundColor:'rgba(77,166,255,.8)',borderRadius:4,order:1},
+      {label:'Saíram da base',data:F.map(f=>-f.sai),backgroundColor:'rgba(255,95,95,.75)',borderRadius:4,order:1}]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:legenda,tooltip:{callbacks:{label:c=>{const f=F[c.dataIndex];
+        if(c.dataset.label==='Saíram da base') return ` Saíram da base: ${f.sai}`;
+        if(c.dataset.label==='Saldo da base') return ` Saldo: ${f.saldo>0?'+':''}${f.saldo}`;
+        return ` Entraram: ${f.entra}`;}}}},
+      scales:{x:{grid,ticks:tick},y:{grid,ticks:{...tick,precision:0,callback:v=>Math.abs(v)}}}}});
+
+  // ── Leitura automática ──
+  const pctI=v=>v==null?'—':Math.round(v*100)+'%';
+  const ult3=F.slice(-3);
+  const novos3=ult3.reduce((a,f)=>a+f.entra,0), saldo3=ult3.reduce((a,f)=>a+f.saldo,0), sai3=ult3.reduce((a,f)=>a+f.sai,0);
+  const fechadas30=S.filter(x=>x.r30!=null).slice(-3);
+  const med30=fechadas30.length?fechadas30.reduce((a,x)=>a+x.r30,0)/fechadas30.length:null;
+  const fechadas90=S.filter(x=>x.r90!=null);
+  const med90=fechadas90.length?fechadas90.reduce((a,x)=>a+x.r90,0)/fechadas90.length:null;
+  const prim=M[0];
+  const retMin=retsAno.length?Math.min(...retsAno):null, retMax=retsAno.length?Math.max(...retsAno):null;
+  const og=k=>O.find(x=>x.o===k);
+  const g=og('GOOGLE'), fa=og('FACHADA'), ind=og('INDICAÇÃO');
+  const totNovosO=O.reduce((a,x)=>a+(x.novos||0),0);
+  if(ult3.length){
+    plSet('rt-headline', `Nos últimos 3 meses entraram ${novos3} clientes novos, mas a base ativa cresceu só ${saldo3>0?'+':''}${saldo3}. ${novos3?Math.round(sai3/novos3*100):0}% das entradas só repuseram clientes que saíram.`);
+  }
+  plSet('rt-story-sub', `${ult3.length?ult3[0].mes+'–'+ult3[ult3.length-1].mes:''} · atualizada com a planilha`);
+  const itens=[];
+  itens.push(`<b>A recorrência cresceu em volume, não em qualidade.</b> Os recorrentes foram de ${prim.rec} em ${prim.mes} para ${atual.rec} em ${atual.mes}, mas a taxa de volta mês a mês ficou entre ${pctI(retMin)} e ${pctI(retMax)} o ano todo (média ${pctI(mediaRet)}). Cresceu porque entrou mais gente, não porque o cliente passou a ficar mais.`);
+  if(ult3.length) itens.push(`<b>O balde está vazando.</b> Nos últimos 3 meses saíram ${sai3} clientes da base ativa, contra ${novos3} que entraram. Para a base crescer de verdade, é preciso segurar quem já veio.`);
+  if(med30!=null) itens.push(`<b>O ponto crítico é a 2ª visita.</b> Só ${pctI(med30)} dos clientes novos voltam em até 30 dias (média das últimas 3 safras) e ${med90!=null?pctI(1-med90):'—'} não voltam nem em 90 dias.`);
+  if(g&&fa) itens.push(`<b>O Google traz volume, a fachada e a indicação trazem fidelidade.</b> O Google trouxe ${pctI(g.novos/totNovosO)} dos novos de jan–jul, mas só ${pctI(g.pct)} voltaram em 90 dias, contra ${pctI(fa.pct)} da fachada${ind?` e ${pctI(ind.pct)} da indicação`:''}.`);
+  if(med30!=null){
+    const novosMes=Math.round(M.slice(-3).reduce((a,m)=>a+m.novos,0)/Math.min(3,M.length));
+    itens.push(`<b>A alavanca:</b> com ~${novosMes} novos por mês, cada +10 p.p. na volta em 30 dias são ~${Math.round(novosMes*0.1)} clientes recorrentes a mais por mês, sem gastar mais em anúncio. Agendar o próximo banho no caixa e mandar WhatsApp entre 15 e 20 dias depois atacam exatamente isso.`);
+  }
+  const st=document.getElementById('rt-story');
+  if(st) st.innerHTML=itens.map((t,i)=>`<div class="rt-story-item"><div class="rt-story-n">${i+1}</div><div class="rt-story-t">${t}</div></div>`).join('');
 
   // ── Aquisição × base ativa ──
   const labels=M.map(m=>m.mes);
