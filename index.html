@@ -837,7 +837,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 
   <div class="kpi-grid pl-kpis">
     <div class="kpi" style="--acc:#4da6ff">
-      <div class="kpi-label" id="pl-k-base-lbl">Base de planos</div>
+      <div class="kpi-label" id="pl-k-base-lbl">Planos vigentes</div>
       <div class="kpi-val" id="pl-k-base">—</div>
       <div class="kpi-footer" id="pl-k-base-sub"><span class="delta">—</span></div>
       <div class="kpi-accent"></div>
@@ -881,8 +881,8 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <span class="badge badge-blue">PLANOS 2026</span>
     </div>
     <div class="pl-resumo">
-      <div><div class="pl-r-lbl">Crescimento da base</div><div class="pl-r-val" id="pl-a-cresc">—</div><div class="pl-r-sub" id="pl-a-cresc-sub">—</div></div>
-      <div><div class="pl-r-lbl">Pico da base</div><div class="pl-r-val" id="pl-a-pico">—</div><div class="pl-r-sub" id="pl-a-pico-sub">—</div></div>
+      <div><div class="pl-r-lbl">Crescimento vigentes</div><div class="pl-r-val" id="pl-a-cresc">—</div><div class="pl-r-sub" id="pl-a-cresc-sub">—</div></div>
+      <div><div class="pl-r-lbl">Pico de vigentes</div><div class="pl-r-val" id="pl-a-pico">—</div><div class="pl-r-sub" id="pl-a-pico-sub">—</div></div>
       <div><div class="pl-r-lbl">Novos no ano</div><div class="pl-r-val" id="pl-a-novos">—</div><div class="pl-r-sub">1ª vez em um plano</div></div>
       <div><div class="pl-r-lbl">Cancelados no ano</div><div class="pl-r-val" id="pl-a-canc">—</div><div class="pl-r-sub" id="pl-a-saldo">—</div></div>
       <div><div class="pl-r-lbl">Churn médio</div><div class="pl-r-val" id="pl-a-churn">—</div><div class="pl-r-sub">por mês</div></div>
@@ -893,7 +893,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 
   <div class="card" style="margin-bottom:14px">
     <div class="card-head">
-      <div><div class="card-title">Base de planos por modalidade</div><div class="card-sub">Vigentes por modalidade + quem já pagou e renova no mês seguinte</div></div>
+      <div><div class="card-title">Base de planos por modalidade</div><div class="card-sub">Total de planos vigentes no mês, por modalidade</div></div>
     </div>
     <div class="chart-h220"><canvas id="plBaseChart"></canvas></div>
   </div>
@@ -907,7 +907,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     </div>
     <div class="card">
       <div class="card-head">
-        <div><div class="card-title">Churn mensal</div><div class="card-sub">Cancelados do mês ÷ base do mês anterior</div></div>
+        <div><div class="card-title">Churn mensal</div><div class="card-sub">Cancelados do mês ÷ vigentes do mês anterior</div></div>
       </div>
       <div class="chart-h180"><canvas id="plChurnChart"></canvas></div>
     </div>
@@ -945,11 +945,11 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 
   <div class="card" style="margin-bottom:14px">
     <div class="card-head">
-      <div><div class="card-title">Indicadores mês a mês</div><div class="card-sub">Base = vigentes + renova no mês seguinte</div></div>
+      <div><div class="card-title">Indicadores mês a mês</div><div class="card-sub">Base = total de planos vigentes no mês</div></div>
     </div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>Mês</th><th>Vigentes</th><th>Renova próx.</th><th>À confirmar</th><th>Base</th><th>Novos</th><th>Cancelados</th><th>Congelados</th><th>Churn</th><th>Receita</th><th>Ticket</th></tr></thead>
+        <thead><tr><th>Mês</th><th>Vigentes</th><th>Renova próx.</th><th>À confirmar</th><th>Novos</th><th>Cancelados</th><th>Congelados</th><th>Churn</th><th>Receita</th><th>Ticket</th></tr></thead>
         <tbody id="pl-tbl-body"></tbody>
       </table>
     </div>
@@ -2892,7 +2892,7 @@ function plCalcular(meses){ // meses: [{idx, linhas}]
   const vistos=new Set(); let prevCanc=new Set(), prevBase=null;
   meses.forEach(({idx,linhas})=>{
     const ativos=linhas.filter(r=>r.cat==='ativo');
-    const baseKeys=new Set(linhas.filter(r=>r.cat==='ativo'||r.cat==='renova').map(r=>r.key));
+    const base=ativos.length; // base = total vigente do mês
     const novos=idx>0 ? [...new Set(ativos.map(r=>r.key))].filter(k=>!vistos.has(k)).length : null;
     const canc=linhas.filter(r=>r.cat==='cancelado');
     const novosCanc=canc.filter(r=>!prevCanc.has(r.key));
@@ -2904,14 +2904,14 @@ function plCalcular(meses){ // meses: [{idx, linhas}]
       ativos:ativos.length,
       renova:linhas.filter(r=>r.cat==='renova').length,
       pendente:linhas.filter(r=>r.cat==='pendente').length,
-      base:baseKeys.size, novos, cancel:novosCanc.length,
+      base, novos, cancel:novosCanc.length,
       cong:linhas.filter(r=>r.cat==='congelado').length,
       receita, ticket:ativos.length?receita/ativos.length:0,
       mensal:porSec('MENSAL'), quinz:porSec('QUINZENAL'), pers:porSec('PERSONALIZADO'),
       churn:prevBase?novosCanc.length/prevBase*100:null
     });
     linhas.forEach(r=>vistos.add(r.key));
-    prevCanc=new Set(canc.map(r=>r.key)); prevBase=baseKeys.size;
+    prevCanc=new Set(canc.map(r=>r.key)); prevBase=base;
   });
 
   // Congelados: o que aconteceu depois
@@ -3002,9 +3002,9 @@ function renderPlanos(P){
   const nomeAtual = atual.nome + (atualParcial?' (parcial)':'');
 
   // ── KPIs do mês ──
-  plSet('pl-k-base-lbl', 'Base de planos · '+atual.mes);
+  plSet('pl-k-base-lbl', 'Planos vigentes · '+atual.mes);
   plSet('pl-k-base', String(atual.base));
-  plDelta('pl-k-base-sub', atual.base, ant?.base, ` vs ${ant?.mes||''}`+(atual.pendente?` · +${atual.pendente} à confirmar`:''), true);
+  plDelta('pl-k-base-sub', atual.base, ant?.base, ` vs ${ant?.mes||''}`, true);
   plSet('pl-k-novos', atual.novos==null?'—':String(atual.novos));
   plDelta('pl-k-novos-sub', atual.novos, ant?.novos, ` vs ${ant?.mes||''}`, true);
   plSet('pl-k-canc', String(atual.cancel));
@@ -3052,13 +3052,12 @@ function renderPlanos(P){
       {label:'Mensal',data:M.map(m=>m.mensal),backgroundColor:'#4da6ff',stack:'b'},
       {label:'Quinzenal',data:M.map(m=>m.quinz),backgroundColor:'#a78bfa',stack:'b'},
       {label:'Personalizado',data:M.map(m=>m.pers),backgroundColor:'#22d3ee',stack:'b'},
-      {label:'Renova no mês seguinte',data:M.map(m=>m.renova),backgroundColor:'#ffb84d',stack:'b'},
-      {label:'À confirmar',data:M.map(m=>m.pendente),backgroundColor:'#3a3f55',stack:'b',
-        datalabels:{display:(c)=>true,anchor:'end',align:'end',color:'#e6e8f0',font:{family:"'DM Mono', monospace",size:11},
-          formatter:(v,c)=>{const m=M[c.dataIndex]; return m.base+m.pendente;}}}
+      {label:'Total',data:M.map(()=>0),backgroundColor:'transparent',stack:'b',
+        datalabels:{display:true,anchor:'end',align:'end',color:'#e6e8f0',font:{family:"'DM Mono', monospace",size:11},
+          formatter:(v,c)=>M[c.dataIndex].base}}
     ]},
     options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:18}},
-      plugins:{legend:legenda,tooltip:{mode:'index',callbacks:{footer:(items)=>{const m=M[items[0].dataIndex];return `Base: ${m.base}`+(m.pendente?` (+${m.pendente} à confirmar)`:'');}}}},
+      plugins:{legend:{...legenda,labels:{...legenda.labels,filter:i=>i.text!=='Total'}},tooltip:{mode:'index',filter:i=>i.dataset.label!=='Total',callbacks:{footer:(items)=>`Total vigente: ${M[items[0].dataIndex].base}`}}},
       scales:{x:{stacked:true,grid,ticks:tick},y:{stacked:true,grid,ticks:tick}}}});
 
   plChart('plFluxoChart',{type:'bar',data:{labels,datasets:[
@@ -3106,8 +3105,8 @@ function renderPlanos(P){
     M.forEach(m=>{
       const tr=document.createElement('tr');
       const cels=[
-        [m.nome+((atualParcial&&m===atual)?'*':''),'td-month'],[m.ativos,'td-num'],[m.renova,'td-num'],[m.pendente||'—','td-num'],
-        [m.base,'td-month'],[m.novos==null?'—':m.novos,'td-num'],[m.cancel,'td-num'],[m.cong,'td-num'],
+        [m.nome+((atualParcial&&m===atual)?'*':''),'td-month'],[m.ativos,'td-month'],[m.renova,'td-num'],[m.pendente||'—','td-num'],
+        [m.novos==null?'—':m.novos,'td-num'],[m.cancel,'td-num'],[m.cong,'td-num'],
         [plPct(m.churn),'td-num'],[fmtR(m.receita),'td-num'],[fmtR(m.ticket),'td-num']];
       cels.forEach(([v,c])=>{const td=document.createElement('td');td.className=c;td.textContent=String(v);tr.appendChild(td);});
       tb.appendChild(tr);
