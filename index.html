@@ -283,6 +283,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 @media(min-width:600px){ .pl-resumo{grid-template-columns:repeat(4,1fr)} .pl-rv-wrap{height:300px} }
 @media(min-width:1024px){
   .kpi-grid.pl-kpis{grid-template-columns:repeat(6,1fr)}
+  .kpi-grid.cl-kpis{grid-template-columns:repeat(5,1fr)}
   .pl-resumo{grid-template-columns:repeat(7,1fr)}
   .pl-rv-wrap{height:340px}
 }
@@ -985,7 +986,7 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
 
   <div id="cl-status" class="pl-status">Carregando mapeamento de clientes...</div>
 
-  <div class="kpi-grid pl-kpis">
+  <div class="kpi-grid pl-kpis cl-kpis">
     <div class="kpi" style="--acc:#4da6ff">
       <div class="kpi-label" id="cl-k-mes-lbl">Clientes novos</div>
       <div class="kpi-val" id="cl-k-mes">—</div>
@@ -1016,12 +1017,6 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
       <div class="kpi-footer" id="cl-k-ind-sub"><span class="delta">—</span></div>
       <div class="kpi-accent"></div>
     </div>
-    <div class="kpi" style="--acc:#ff6eb4">
-      <div class="kpi-label">Voltaram mais de 1x</div>
-      <div class="kpi-val" id="cl-k-rec">—</div>
-      <div class="kpi-footer" id="cl-k-rec-sub"><span class="delta">—</span></div>
-      <div class="kpi-accent"></div>
-    </div>
   </div>
 
   <div class="card" style="margin-bottom:14px">
@@ -1047,21 +1042,6 @@ code{background:#0a1a10;color:var(--green);padding:2px 6px;border-radius:3px;fon
     </div>
   </div>
 
-  <div class="row2b">
-    <div class="card">
-      <div class="card-head">
-        <div><div class="card-title">Voltaram mais de 1x</div><div class="card-sub">% dos clientes novos de cada mês que retornaram (coluna "Voltou mais de 1x")</div></div>
-      </div>
-      <div class="chart-h180"><canvas id="clRecChart"></canvas></div>
-      <div class="card-sub" id="cl-rec-nota" style="margin-top:8px"></div>
-    </div>
-    <div class="card">
-      <div class="card-head">
-        <div><div class="card-title">Retorno por origem</div><div class="card-sub">% que voltou mais de 1x, nos meses já preenchidos</div></div>
-      </div>
-      <div class="pl-bars" id="cl-rec-origem"></div>
-    </div>
-  </div>
 
   <div class="card">
     <div class="card-head">
@@ -3422,10 +3402,6 @@ function renderClientes(D){
   const indAno=M.reduce((a,m)=>a+(m.por['INDICAÇÃO']||0),0);
   plSet('cl-k-ind', String(indAno));
   plSet('cl-k-ind-sub', `${pct(indAno,totAno)}% dos novos do ano`); document.getElementById('cl-k-ind-sub').style.color='var(--muted2)';
-  const recM=M.filter(m=>D.okMeses.has(m.idx));
-  const recSim=recM.reduce((a,m)=>a+m.voltaram,0), recTot=recM.reduce((a,m)=>a+m.preenchidos,0);
-  plSet('cl-k-rec', recTot?pct(recSim,recTot)+'%':'—');
-  plSet('cl-k-rec-sub', recTot?`${recSim} de ${recTot} · ${recM[0].mes}–${recM[recM.length-1].mes}`:'coluna ainda não preenchida'); document.getElementById('cl-k-rec-sub').style.color='var(--muted2)';
 
   // ── Gráfico principal: barras empilhadas por origem + total ──
   const labels=M.map(m=>m.mes+(m.fonte==='tabela'?'*':''));
@@ -3457,18 +3433,6 @@ function renderClientes(D){
       plugins:{legend:legenda,tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${String(c.parsed.y).replace('.',',')}%`}}},
       scales:{x:{grid,ticks:tick},y:{grid,beginAtZero:true,max:100,ticks:{...tick,callback:v=>v+'%'}}}}});
 
-  // ── Voltaram mais de 1x por mês ──
-  plChart('clRecChart',{type:'bar',data:{labels,datasets:[{label:'% voltou',
-      data:M.map(m=>D.okMeses.has(m.idx)&&m.recPct!=null?+m.recPct.toFixed(0):null),backgroundColor:'#ff6eb4',borderRadius:4,
-      datalabels:{display:true,anchor:'end',align:'end',color:'#e6e8f0',font:{family:mono,size:10},formatter:v=>v==null?'':v+'%'}}]},
-    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:16}},
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const m=M[c.dataIndex];return ` ${m.voltaram} de ${m.preenchidos} voltaram (${c.parsed.y}%)`;}}}},
-      scales:{x:{grid,ticks:tick},y:{grid,beginAtZero:true,ticks:{...tick,callback:v=>v+'%'}}}}});
-  const semRec=M.filter(m=>!D.okMeses.has(m.idx)).map(m=>m.mes);
-  plSet('cl-rec-nota', semRec.length?`Sem dado de retorno em ${semRec.join(', ')}: coluna "Voltou mais de 1x" ainda não preenchida.`:'');
-
-  const ro=Object.entries(D.recOrigem).filter(([,v])=>v.tot>=5).map(([o,v])=>({o,p:v.sim/v.tot*100,v})).sort((a,b)=>b.p-a.p);
-  plBarras('cl-rec-origem', ro.map(x=>({l:x.o.charAt(0)+x.o.slice(1).toLowerCase(),v:x.p,c:cor(x.o),txt:`${Math.round(x.p)}% · ${x.v.sim}/${x.v.tot}`})));
 
   // ── Tabela mês × origem ──
   const th=document.getElementById('cl-tbl-head');
